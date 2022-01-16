@@ -40,7 +40,16 @@ class _TabsScreenState extends State<TabsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_pages[_selectedPageIndex]['title']),
+        iconTheme: const IconThemeData(
+          color: Colors.black, //change your color here
+        ),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          _pages[_selectedPageIndex]['title'],
+          style: const TextStyle(color: Colors.black),
+        ),
         actions: [
           if (_selectedPageIndex == 0)
             TextButton(
