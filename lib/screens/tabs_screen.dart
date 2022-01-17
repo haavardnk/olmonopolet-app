@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_fadein/flutter_fadein.dart';
 
 import '../screens/product_overview_screen.dart';
 import '../screens/shopping_list_screen.dart';
 import '../widgets/app_drawer.dart';
+import '../widgets/products/bottom_filter_sheet.dart';
+import '../widgets/products/search_bar.dart';
+import '../providers/filter.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({Key? key}) : super(key: key);
@@ -46,27 +51,28 @@ class _TabsScreenState extends State<TabsScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(
-          _pages[_selectedPageIndex]['title'],
-          style: const TextStyle(color: Colors.black),
+        title: Consumer<Filter>(
+          builder: (context, filter, _) => FadeIn(
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                filter.storeName,
+                style: const TextStyle(color: Colors.black),
+              ),
+            ),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeIn,
+          ),
         ),
         actions: [
-          if (_selectedPageIndex == 0)
-            TextButton(
-              onPressed: () {
-                // Open filters
-                showModalBottomSheet(
-                    context: context,
-                    builder: (_) {
-                      return const Text('Filter her');
-                    });
-              },
-              child: const Text(
-                'Filter',
-                style: TextStyle(color: Colors.white),
-              ),
-            )
+          if (_selectedPageIndex == 0) const BottomFilterSheet(),
         ],
+        bottom: _selectedPageIndex == 0
+            ? const PreferredSize(
+                child: SearchBar(),
+                preferredSize: Size.fromHeight(kToolbarHeight),
+              )
+            : null,
       ),
       drawer: const AppDrawer(),
       body: _pages[_selectedPageIndex]['page'],
@@ -75,11 +81,11 @@ class _TabsScreenState extends State<TabsScreen> {
         currentIndex: _selectedPageIndex,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.category),
+            icon: Icon(Icons.liquor),
             label: 'Produkter',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shop),
+            icon: Icon(Icons.receipt_long),
             label: 'Handleliste',
           ),
         ],

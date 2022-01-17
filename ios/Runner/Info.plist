@@ -43,5 +43,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Ølmonopolet trenger tilgang til din lokasjon for å beregne avstand til de ulike Vinmonopolene.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Ølmonopolet trenger tilgang til din lokasjon for å beregne avstand til de ulike Vinmonopolene.</string>
 </dict>
 </plist>

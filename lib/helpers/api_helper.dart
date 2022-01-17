@@ -4,13 +4,19 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../models/product.dart';
+import '../models/store.dart';
+import '../providers/filter.dart';
+
+//const _baseUrl = 'http://127.0.0.1:8000/';
+const _baseUrl = 'https://api.beermonopoly.com/';
 
 class ApiHelper {
-  static Future<List<Product>> getProductList(int page) async {
+  static Future<List<Product>> getProductList(int page, Filter filter) async {
     const fields =
-        "vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,sub_category,style";
+        "vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,sub_category,style,stock,abv";
     try {
-      final response = await http.get(_apiUrlBuilder(fields, page));
+      final response =
+          await http.get(_apiProductUrlBuilder(fields, page, filter));
       if (response.statusCode == 200) {
         final jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))['results'];
@@ -27,13 +33,55 @@ class ApiHelper {
       throw NoConnectionException();
     }
   }
+
+  static Future<List<Store>> getStoreList() async {
+    const fields = "store_id,name,gps_lat,gps_long";
+    try {
+      final response = await http.get(_apiStoreUrlBuilder(fields));
+      if (response.statusCode == 200) {
+        final jsonResponse =
+            json.decode(utf8.decode(response.bodyBytes))['results'];
+        List<Store> stores = List<Store>.from(
+          jsonResponse.map(
+            (store) => Store.fromJson(store),
+          ),
+        );
+        return stores;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
 }
 
-Uri _apiUrlBuilder(String fields, int page) {
-  const _baseUrl = 'http://127.0.0.1:8000/beers/';
-  //const _baseUrl = 'https://api.beermonopoly.com/beers/';
+Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
+  var string = ('$_baseUrl'
+      'beers/'
+      '?fields=$fields'
+      '&active=true'
+      '&price_low=${filter.priceLow}'
+      '&price_high=${filter.priceHigh}'
+      '&ordering=${filter.sortBy}'
+      '&style=${filter.style}'
+      '&search=${filter.search}'
+      '&page=$page'
+      '&page_size=15');
+  if (filter.storeId.isNotEmpty) {
+    string = string + '&store=${filter.storeId}';
+  }
+  final url = Uri.parse(string);
+  return url;
+}
+
+Uri _apiStoreUrlBuilder(String fields) {
   final url = Uri.parse(
-      '$_baseUrl?fields=$fields&active=true&ordering=-rating&page=$page');
+    '$_baseUrl'
+    'stores/'
+    '?fields=$fields'
+    '&page_size=500',
+  );
   return url;
 }
 
