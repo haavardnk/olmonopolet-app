@@ -66,12 +66,10 @@ class Filter with ChangeNotifier {
       return storeList;
     }
     try {
-      loadLastStore();
       var stores = await ApiHelper.getStoreList();
       storeList = stores;
       storeList = await LocationHelper.calculateStoreDistance(storeList);
       storeList.sort((a, b) => a.distance!.compareTo(b.distance!));
-      print(storeList);
     } catch (error) {
       print(error);
       return storeList;
@@ -121,7 +119,11 @@ class Filter with ChangeNotifier {
   }
 
   void setStore(String storeId) {
-    storeName = storeList.firstWhere((element) => element.id == storeId).name;
+    if (storeId.isEmpty) {
+      storeName = 'Alle Butikker';
+    } else {
+      storeName = storeList.firstWhere((element) => element.id == storeId).name;
+    }
     notifyListeners();
     saveLastStore();
   }
@@ -135,18 +137,17 @@ class Filter with ChangeNotifier {
     prefs.setString('storeData', storeData);
   }
 
-  void loadLastStore() async {
+  Future<void> loadLastStore() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('storeData')) {
       final extractedStoreData = json.decode(prefs.getString('storeData')!);
       storeId = extractedStoreData['storeId'];
       storeName = extractedStoreData['storeName'];
-      notifyListeners();
-      print('last store loaded');
     } else {
       storeId = '';
       storeName = 'Alle Butikker';
     }
+    notifyListeners();
   }
 
   void resetFilters() {

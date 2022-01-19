@@ -6,6 +6,7 @@ import '../../helpers/api_helper.dart';
 import './product_item.dart';
 import '../../models/product.dart';
 import '../../providers/filter.dart';
+import '../../providers/auth.dart';
 import './pagination_indicators/first_page_error_indicator.dart';
 import './pagination_indicators/new_page_error_indicator.dart';
 import './pagination_indicators/no_items_found_indicator.dart';
@@ -26,14 +27,16 @@ class _ProductListViewState extends State<ProductListView> {
   void initState() {
     _pagingController.addPageRequestListener((pageKey) {
       final filters = Provider.of<Filter>(context, listen: false).filters;
-      _fetchPage(pageKey, filters);
+      final authToken = Provider.of<Auth>(context, listen: false).token;
+      _fetchPage(pageKey, filters, authToken);
     });
     super.initState();
   }
 
-  Future<void> _fetchPage(int pageKey, Filter filters) async {
+  Future<void> _fetchPage(int pageKey, Filter filters, String apiToken) async {
     try {
-      final newItems = await ApiHelper.getProductList(pageKey, filters);
+      final newItems =
+          await ApiHelper.getProductList(pageKey, filters, apiToken);
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
@@ -67,7 +70,8 @@ class _ProductListViewState extends State<ProductListView> {
               newPageErrorIndicatorBuilder: (_) => NewPageErrorIndicator(
                 onTap: () => _pagingController.retryLastFailedRequest(),
               ),
-              noItemsFoundIndicatorBuilder: (_) => NoItemsFoundIndicator(),
+              noItemsFoundIndicatorBuilder: (_) =>
+                  const NoItemsFoundIndicator(),
             ),
             separatorBuilder: (context, index) => Divider(
               height: 0,

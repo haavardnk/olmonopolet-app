@@ -5,7 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 import './screens/tabs_screen.dart';
+import './screens/auth_screen.dart';
+import './screens/splash_screen.dart';
 import './providers/filter.dart';
+import './providers/auth.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,22 +36,37 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
+          create: (ctx) => Auth(),
+        ),
+        ChangeNotifierProvider(
           create: (ctx) => Filter(),
         ),
       ],
-      child: MaterialApp(
-        scrollBehavior: MyCustomScrollBehavior(),
-        title: 'Ølmonopolet',
-        theme: ThemeData(
-          primarySwatch: Colors.pink,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          pageTransitionsTheme: const PageTransitionsTheme(builders: {
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: ZoomPageTransitionsBuilder(),
-          }),
-        ),
-        home: const TabsScreen(),
-      ),
+      child: Consumer<Auth>(builder: (ctx, auth, _) {
+        Provider.of<Filter>(ctx, listen: false).loadLastStore();
+        return MaterialApp(
+          scrollBehavior: MyCustomScrollBehavior(),
+          title: 'Ølmonopolet',
+          theme: ThemeData(
+            primarySwatch: Colors.pink,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            pageTransitionsTheme: const PageTransitionsTheme(builders: {
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.android: ZoomPageTransitionsBuilder(),
+            }),
+          ),
+          home: auth.isAuthOrSkipLogin
+              ? const TabsScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? const SplashScreen()
+                          : const AuthScreen(),
+                ),
+        );
+      }),
     );
   }
 }

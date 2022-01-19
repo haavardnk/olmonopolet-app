@@ -1,4 +1,4 @@
-package com.example.beermonopoly
+package com.beermonopoly.olmonopolet
 
 import io.flutter.embedding.android.FlutterActivity
 
