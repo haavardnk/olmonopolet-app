@@ -39,7 +39,7 @@ Widget createRatingBar({double rating = 5, double size = 24}) {
         Icon(Icons.star, color: Colors.yellow[700], size: size),
       !_absolute
           ? Icon(Icons.star_half, color: Colors.yellow[700], size: size)
-          : SizedBox.shrink(),
+          : const SizedBox.shrink(),
       for (int i = 1; i <= (5 - rating + _emptyStar); i++)
         Icon(Icons.star_border, color: Colors.yellow[700], size: size),
     ],
