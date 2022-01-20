@@ -15,7 +15,6 @@ class Auth with ChangeNotifier {
   bool _skipLogin = false;
 
   bool get isAuth {
-    print(_apiToken);
     return _apiToken.isNotEmpty;
   }
 
@@ -41,10 +40,8 @@ class Auth with ChangeNotifier {
       // Get Untappd token
       final untappdResponse = await FlutterWebAuth.authenticate(
           url: oauthUrl, callbackUrlScheme: callbackUrl);
-
       final untappdToken =
           Uri.parse(untappdResponse).queryParameters['access_token'];
-
       // Get API token
       final apiResponse =
           await http.post(Uri.parse('$apiUrl?access_token=$untappdToken'),
@@ -52,19 +49,16 @@ class Auth with ChangeNotifier {
                 'Content-type': 'application/json',
               },
               body: jsonEncode({'access_token': untappdToken}));
-
       final apiData = json.decode(apiResponse.body);
       if (apiData['error'] != null) {
         throw HttpException(apiData['error']['message']);
       }
       _apiToken = apiData['key'];
       _untappdToken = untappdToken ?? '';
-
       // Get Untappd profile
       final untappdProfileResponse = await http.get(
           Uri.parse('$profileUrl?access_token=$_untappdToken&compact=true'));
       final untappdProfileData = json.decode(untappdProfileResponse.body);
-
       userName = untappdProfileData['response']['user']['user_name'];
       userAvatarUrl = untappdProfileData['response']['user']['user_avatar'];
 

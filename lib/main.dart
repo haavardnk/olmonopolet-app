@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
-import './screens/tabs_screen.dart';
+import 'screens/home_screen.dart';
 import './screens/auth_screen.dart';
 import './screens/splash_screen.dart';
 import './providers/filter.dart';
 import './providers/auth.dart';
+import './providers/cart.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +42,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (ctx) => Filter(),
         ),
+        ChangeNotifierProvider(
+          create: (ctx) => Cart(),
+        ),
       ],
       child: Consumer<Auth>(builder: (ctx, auth, _) {
         Provider.of<Filter>(ctx, listen: false).loadLastStore();
@@ -56,7 +60,7 @@ class MyApp extends StatelessWidget {
             }),
           ),
           home: auth.isAuthOrSkipLogin
-              ? const TabsScreen()
+              ? const HomeScreen()
               : FutureBuilder(
                   future: auth.tryAutoLogin(),
                   builder: (ctx, authResultSnapshot) =>

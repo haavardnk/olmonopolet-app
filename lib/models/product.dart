@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-
 class Product {
   Product(
       {required this.id,
       required this.name,
       required this.style,
+      required this.price,
       this.stock,
-      this.price,
       this.rating,
       this.checkins,
       this.abv,
@@ -34,8 +32,8 @@ class Product {
   final int id;
   final String name;
   final String style;
+  final double price;
   final int? stock;
-  final double? price;
   final double? rating;
   final int? checkins;
   final double? abv;
