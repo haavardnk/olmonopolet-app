@@ -15,6 +15,7 @@ class Filter with ChangeNotifier {
   String priceHigh = '';
   String priceLow = '';
   String sortBy = '-rating';
+  int checkIn = 0;
 
   Store allStores = Store(id: '', name: 'Alle Butikker');
   List<Store> storeList = [];
@@ -55,6 +56,12 @@ class Filter with ChangeNotifier {
     {'Sider': 'cider'},
     {'Stout': 'stout'},
     {'Surøl': 'sour,wild ale,lambic,fruit beer'},
+  ];
+
+  List<String> checkinList = [
+    'Alle Produkt',
+    'Innsjekket',
+    'Ikke innsjekket',
   ];
 
   Filter get filters {
@@ -110,6 +117,11 @@ class Filter with ChangeNotifier {
       },
     );
     style = temporaryStyle;
+    notifyListeners();
+  }
+
+  void setCheckin(int index) {
+    checkIn = index;
     notifyListeners();
   }
 
