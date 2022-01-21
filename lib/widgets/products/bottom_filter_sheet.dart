@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
+import '../../providers/auth.dart';
 import '../../models/store.dart';
 
 class BottomFilterSheet extends StatefulWidget {
@@ -14,17 +15,13 @@ class BottomFilterSheet extends StatefulWidget {
 class _BottomFilterSheetState extends State<BottomFilterSheet> {
   // filter provider
   late Filter filters = Provider.of<Filter>(context, listen: false);
+  late Auth authData = Provider.of<Auth>(context, listen: false);
 
   // price slider
   late RangeValues _priceRange;
 
   // sort
   late List<String?> _sortList;
-
-  // user checked in
-  // create sort filter data
-  late List<String> _checkinList;
-  late int _checkinIndex = 0;
 
   @override
   void initState() {
@@ -231,9 +228,12 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text('Innsjekket',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                      authData.isAuth
+                          ? 'Innsjekket'
+                          : 'Innsjekket - Innlogging kreves',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
                   Wrap(
                     spacing: 8,
                     children:
@@ -272,9 +272,11 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
             ? (index == 0 ? true : false)
             : filters.checkIn == index,
         onSelected: (bool selected) {
-          mystate(() {
-            filters.setCheckin(index);
-          });
+          authData.isAuth
+              ? mystate(() {
+                  filters.setCheckin(index);
+                })
+              : null;
         });
   }
 

@@ -172,6 +172,8 @@ class Filter with ChangeNotifier {
     priceHigh = '';
     priceLow = '';
     sortBy = '-rating';
+    checkIn = 0;
     notifyListeners();
+    saveLastStore();
   }
 }

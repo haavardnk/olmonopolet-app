@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<Cart>(context, listen: false).fetchAndSetCart();
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(
