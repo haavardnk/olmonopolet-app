@@ -7,8 +7,8 @@ import '../models/product.dart';
 import '../models/store.dart';
 import '../providers/filter.dart';
 
-const _baseUrl = 'http://127.0.0.1:8000/';
-//const _baseUrl = 'https://api.example.com/ApiHelper {
+//const _baseUrl = 'http://127.0.0.1:8000/';
+const _baseUrl = 'https://api.example.com/ApiHelper {
   static Future<List<Product>> getProductList(
       int page, Filter filter, String apiToken) async {
     const fields =
@@ -66,7 +66,7 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
   var string = ('$_baseUrl'
       'beers/'
       '?fields=$fields'
-      '&active=true'
+      '&active=True'
       '&price_low=${filter.priceLow}'
       '&price_high=${filter.priceHigh}'
       '&ordering=${filter.sortBy}'
@@ -78,9 +78,9 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
     string = string + '&store=${filter.storeId}';
   }
   if (filter.checkIn == 1) {
-    string = string + '&user_checkin=false';
+    string = string + '&user_checkin=True';
   } else if (filter.checkIn == 2) {
-    string = string + '&user_checkin=true';
+    string = string + '&user_checkin=False';
   }
 
   final url = Uri.parse(string);
