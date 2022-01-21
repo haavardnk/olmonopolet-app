@@ -6,10 +6,9 @@ import 'package:http/http.dart' as http;
 import '../models/product.dart';
 import '../models/store.dart';
 import '../providers/filter.dart';
-import '../providers/auth.dart';
 
-//const _baseUrl = 'http://127.0.0.1:8000/';
-const _baseUrl = 'https://api.beermonopoly.com/';
+const _baseUrl = 'http://127.0.0.1:8000/';
+//const _baseUrl = 'https://api.beermonopoly.com/';
 
 class ApiHelper {
   static Future<List<Product>> getProductList(
@@ -80,6 +79,12 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
   if (filter.storeId.isNotEmpty) {
     string = string + '&store=${filter.storeId}';
   }
+  if (filter.checkIn == 1) {
+    string = string + '&user_checkin=false';
+  } else if (filter.checkIn == 2) {
+    string = string + '&user_checkin=true';
+  }
+
   final url = Uri.parse(string);
   return url;
 }

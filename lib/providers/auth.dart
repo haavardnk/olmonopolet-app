@@ -37,7 +37,8 @@ class Auth with ChangeNotifier {
     const oauthUrl =
         'https://auth.beermonopoly.com/connect/untappd?callback=com.beermonopoly.olmonopolet://callback';
     const callbackUrl = 'com.beermonopoly.olmonopolet';
-    const apiUrl = 'https://api.beermonopoly.com/auth/untappd/';
+    //const apiUrl = 'https://api.beermonopoly.com/auth/untappd/';
+    const apiUrl = 'http://127.0.0.1:8000/auth/untappd/';
     const profileUrl = 'https://api.untappd.com/v4/user/info/';
 
     try {
