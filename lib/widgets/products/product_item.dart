@@ -7,6 +7,7 @@ import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
 
 import '../../models/product.dart';
 import '../../providers/cart.dart';
+import '../../screens/product_detail_screen.dart';
 import './rating_widget.dart';
 
 class ProductItem extends StatelessWidget {
@@ -36,7 +37,12 @@ class ProductItem extends StatelessWidget {
             Column(
               children: [
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed(
+                      ProductDetailScreen.routeName,
+                      arguments: product,
+                    );
+                  },
                   child: Container(
                     margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
                     child: Container(
@@ -48,16 +54,22 @@ class ProductItem extends StatelessWidget {
                           ClipRRect(
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(4)),
-                            child: product.imageUrl != null
-                                ? ProgressiveImage(
-                                    image: product.imageUrl!,
-                                    height: _boxImageSize,
-                                    width: _boxImageSize)
-                                : Image.asset(
-                                    'assets/images/placeholder.png',
-                                    width: _boxImageSize,
-                                    height: _boxImageSize,
-                                  ),
+                            child: Hero(
+                              tag: product.id,
+                              child: product.imageUrl != null
+                                  ? ProgressiveImage(
+                                      image: product.imageUrl ?? '',
+                                      height: _boxImageSize,
+                                      width: _boxImageSize,
+                                      imageError:
+                                          'assets/images/placeholder.png',
+                                    )
+                                  : Image.asset(
+                                      'assets/images/placeholder.png',
+                                      height: _boxImageSize,
+                                      width: _boxImageSize,
+                                    ),
+                            ),
                           ),
                           const SizedBox(
                             width: 10,
@@ -140,7 +152,7 @@ class ProductItem extends StatelessWidget {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              product.rating != null
+                                              product.userRating != null
                                                   ? 'Din: ${product.userRating!.toStringAsFixed(2)} '
                                                   : '0 ',
                                               style: const TextStyle(

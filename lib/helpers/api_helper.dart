@@ -11,6 +11,36 @@ import '../providers/filter.dart';
 const _baseUrl = 'https://api.beermonopoly.com/';
 
 class ApiHelper {
+  static Future<Map<String, dynamic>> getDetailedProductInfo(
+      int productId, String apiToken) async {
+    const fields =
+        "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url";
+    final Map<String, String> headers = apiToken.isNotEmpty
+        ? {
+            'Authorization': 'Token $apiToken',
+          }
+        : {};
+    final url = Uri.parse('${_baseUrl}beers/?beers=$productId&fields=$fields');
+    print(url);
+    try {
+      print('trying');
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse =
+            json.decode(utf8.decode(response.bodyBytes))['results'][0];
+        print(jsonResponse);
+        return jsonResponse;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
+
   static Future<List<Product>> getProductList(
       int page, Filter filter, String apiToken) async {
     const fields =

@@ -27,8 +27,8 @@ class _ProductListViewState extends State<ProductListView> {
   void initState() {
     _pagingController.addPageRequestListener((pageKey) {
       final filters = Provider.of<Filter>(context, listen: false).filters;
-      final authToken = Provider.of<Auth>(context, listen: false).token;
-      _fetchPage(pageKey, filters, authToken);
+      final apiToken = Provider.of<Auth>(context, listen: false).token;
+      _fetchPage(pageKey, filters, apiToken);
     });
     super.initState();
   }
