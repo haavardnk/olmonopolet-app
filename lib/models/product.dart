@@ -4,6 +4,7 @@ class Product {
       required this.name,
       required this.style,
       required this.price,
+      required this.volume,
       this.stock,
       this.rating,
       this.checkins,
@@ -19,6 +20,7 @@ class Product {
             product['main_category'],
         stock: product['stock'],
         price: product['price'],
+        volume: product['volume'],
         rating: product['rating'],
         checkins: product['checkins'],
         abv: product['abv'],
@@ -33,6 +35,7 @@ class Product {
   final String name;
   final String style;
   final double price;
+  final double volume;
   final int? stock;
   final double? rating;
   final int? checkins;

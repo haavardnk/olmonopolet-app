@@ -7,12 +7,12 @@ import '../models/product.dart';
 import '../models/store.dart';
 import '../providers/filter.dart';
 
-const _baseUrl = 'http://127.0.0.1:8000/';
-//const _baseUrl = 'https://api.example.com/ApiHelper {
+//const _baseUrl = 'http://127.0.0.1:8000/';
+const _baseUrl = 'https://api.example.com/ApiHelper {
   static Future<List<Product>> getProductList(
       int page, Filter filter, String apiToken) async {
     const fields =
-        "vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,sub_category,style,stock,abv,user_checked_in";
+        "vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,sub_category,style,stock,abv,user_checked_in,volume";
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',
