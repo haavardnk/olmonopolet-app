@@ -76,20 +76,23 @@ class ProductItem extends StatelessWidget {
                                 Container(
                                   margin: const EdgeInsets.only(top: 5),
                                   child: Text(
-                                      'Kr ${product.price.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold)),
+                                    'Kr ${product.price.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                                 Container(
-                                    margin: const EdgeInsets.only(top: 5),
-                                    child: Text(
-                                        product.abv != null
-                                            ? '${product.style} - ${product.abv!.toStringAsFixed(1)}%'
-                                            : product.style,
-                                        style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFFaaaaaa)))),
+                                  margin: const EdgeInsets.only(top: 5),
+                                  child: Text(
+                                    product.style,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFFaaaaaa),
+                                    ),
+                                  ),
+                                ),
                                 Container(
                                   margin: const EdgeInsets.only(top: 5),
                                   child: product.userRating == null
@@ -111,8 +114,9 @@ class ProductItem extends StatelessWidget {
                                             Text(
                                               ' ${NumberFormat.compact().format(product.checkins)}',
                                               style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFFaaaaaa)),
+                                                fontSize: 12,
+                                                color: Color(0xFFaaaaaa),
+                                              ),
                                             ),
                                           ],
                                         )
@@ -123,8 +127,9 @@ class ProductItem extends StatelessWidget {
                                                   ? 'Global: ${product.rating!.toStringAsFixed(2)}'
                                                   : '0 ',
                                               style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFFaaaaaa)),
+                                                fontSize: 12,
+                                                color: Color(0xFFaaaaaa),
+                                              ),
                                             ),
                                             Icon(
                                               Icons.star,
@@ -137,8 +142,9 @@ class ProductItem extends StatelessWidget {
                                                   ? 'Din: ${product.userRating!.toStringAsFixed(2)} '
                                                   : '0 ',
                                               style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFFaaaaaa)),
+                                                fontSize: 12,
+                                                color: Color(0xFFaaaaaa),
+                                              ),
                                             ),
                                             Icon(
                                               Icons.star,
@@ -148,14 +154,55 @@ class ProductItem extends StatelessWidget {
                                           ],
                                         ),
                                 ),
-                                if (product.stock != null && product.stock != 0)
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 5),
-                                    child: Text('På lager: ${product.stock}',
-                                        style: const TextStyle(
-                                            fontSize: 11,
-                                            color: Color(0xFFaaaaaa))),
+                                Container(
+                                  height: 11,
+                                  margin: const EdgeInsets.only(top: 5),
+                                  child: Row(
+                                    children: [
+                                      if (product.stock != null &&
+                                          product.stock != 0)
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'På lager: ${product.stock}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                color: Color(0xFFaaaaaa),
+                                              ),
+                                            ),
+                                            VerticalDivider(
+                                              width: 15,
+                                              thickness: 1,
+                                              color: Colors.grey[300],
+                                            ),
+                                          ],
+                                        ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '${product.abv!.toStringAsFixed(1)}%',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color: Color(0xFFaaaaaa),
+                                            ),
+                                          ),
+                                          VerticalDivider(
+                                            width: 15,
+                                            thickness: 1,
+                                            color: Colors.grey[300],
+                                          ),
+                                          Text(
+                                            '${product.volume}cl',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color: Color(0xFFaaaaaa),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
+                                ),
                               ],
                             ),
                           ),
