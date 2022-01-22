@@ -12,6 +12,7 @@ class Filter with ChangeNotifier {
   String storeId = '';
   String storeName = 'Alle Butikker';
   String style = '';
+  String productSelection = '';
   String priceHigh = '';
   String priceLow = '';
   String sortBy = '-rating';
@@ -43,7 +44,7 @@ class Filter with ChangeNotifier {
     {'Barleywine': 'barleywine'},
     {'Belgisk': 'belgian'},
     {'Blonde': 'blonde'},
-    {'Bokk': 'Bock'},
+    {'Bokk': 'bock'},
     {'Brown': 'brown'},
     {'Gluten Fri': 'gluten-free'},
     {'IPA': 'ipa'},
@@ -56,6 +57,16 @@ class Filter with ChangeNotifier {
     {'Sider': 'cider'},
     {'Stout': 'stout'},
     {'Surøl': 'sour,wild ale,lambic,fruit beer'},
+  ];
+
+  List<bool> productSelectionSelectedList = List<bool>.filled(6, false);
+  List<Map<String, String>> productSelectionList = [
+    {'Basisutvalget': 'basisutvalget'},
+    {'Bestillingsutvalget': 'bestillingsutvalget'},
+    {'Partiutvalget': 'partiutvalget'},
+    {'Spesialbestilling': 'spesialbestilling'},
+    {'Spesialutvalget': 'spesialutvalg'},
+    {'Tilleggsutvalget': 'tilleggsutvalget'},
   ];
 
   List<String> checkinList = [
@@ -120,6 +131,23 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
+  void setProductSelection(int index, bool boolean) {
+    productSelectionSelectedList[index] = boolean;
+    var temporaryProductSelection = '';
+    productSelectionSelectedList.asMap().forEach(
+      (index, value) {
+        if (value) {
+          if (temporaryProductSelection.isNotEmpty) {
+            temporaryProductSelection += ',';
+          }
+          temporaryProductSelection += productSelectionList[index].values.first;
+        }
+      },
+    );
+    productSelection = temporaryProductSelection;
+    notifyListeners();
+  }
+
   void setCheckin(int index) {
     checkIn = index;
     notifyListeners();
@@ -169,6 +197,7 @@ class Filter with ChangeNotifier {
     storeId = '';
     storeName = 'Alle Butikker';
     style = '';
+    productSelection = '';
     priceHigh = '';
     priceLow = '';
     sortBy = '-rating';

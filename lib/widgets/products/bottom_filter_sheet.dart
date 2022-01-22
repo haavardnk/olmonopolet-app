@@ -211,7 +211,7 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text('Type',
+                  const Text('Stil',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   Wrap(
@@ -222,6 +222,24 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                           filters.styleList[index].keys.first,
                           index,
                           filters.setStyle,
+                          mystate);
+                    }),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text('Produktutvalg',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Wrap(
+                    spacing: 8,
+                    children: List.generate(filters.productSelectionList.length,
+                        (index) {
+                      return _filter(
+                          filters.productSelectionSelectedList,
+                          filters.productSelectionList[index].keys.first,
+                          index,
+                          filters.setProductSelection,
                           mystate);
                     }),
                   ),
