@@ -25,15 +25,17 @@ class CartTab extends StatelessWidget {
                           padding: const EdgeInsets.all(16),
                           color: Colors.white,
                           child: Column(
-                            children:
-                                List.generate(cartData.itemCount, (index) {
-                              return _buildItem(
-                                  index,
-                                  boxImageSize,
-                                  cartData.items.values.elementAt(index),
-                                  cartData,
-                                  context);
-                            }),
+                            children: List.generate(
+                              cartData.itemCount,
+                              (index) {
+                                return _buildItem(
+                                    index,
+                                    boxImageSize,
+                                    cartData.items.values.elementAt(index),
+                                    cartData,
+                                    context);
+                              },
+                            ),
                           ),
                         ),
                       ],
@@ -129,9 +131,10 @@ class CartTab extends StatelessWidget {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(4)),
                         child: ProgressiveImage(
-                          image: cartItem.imageUrl!,
+                          image: cartItem.imageUrl ?? '',
                           height: boxImageSize,
                           width: boxImageSize,
+                          imageError: 'assets/images/placeholder.png',
                         )),
                   ),
                   const SizedBox(
@@ -199,7 +202,7 @@ class CartTab extends StatelessWidget {
                                           const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                       height: 28,
                                       decoration: BoxDecoration(
-                                          color: Colors.cyan[600],
+                                          color: Colors.pink[300],
                                           borderRadius:
                                               BorderRadius.circular(8)),
                                       child: const Icon(Icons.remove,
@@ -226,7 +229,7 @@ class CartTab extends StatelessWidget {
                                           const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                       height: 28,
                                       decoration: BoxDecoration(
-                                          color: Colors.cyan[600],
+                                          color: Colors.pink[300],
                                           borderRadius:
                                               BorderRadius.circular(8)),
                                       child: const Icon(Icons.add,
@@ -256,10 +259,19 @@ class CartTab extends StatelessWidget {
                       height: 43,
                       width: 87,
                       decoration: BoxDecoration(
-                          color: Colors.cyan[600],
-                          borderRadius: BorderRadius.circular(8)),
-                      child: const Icon(Icons.check,
-                          color: Colors.white, size: 20),
+                        color: cartItem.checked ? Colors.pink[300] : null,
+                        border: Border.all(width: 1, color: Colors.pink[300]!),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(
+                            10,
+                          ),
+                        ),
+                      ),
+                      child: Icon(Icons.check,
+                          color: cartItem.checked
+                              ? Colors.white
+                              : Colors.pink[300],
+                          size: 20),
                     ),
                   ))
             ],
@@ -277,30 +289,34 @@ class CartTab extends StatelessWidget {
 
   void showPopupDelete(int index, double boxImageSize, CartItem cartItem,
       Cart cartData, BuildContext context) {
-    // set up the buttons
     Widget cancelButton = TextButton(
         onPressed: () {
           Navigator.pop(context);
         },
         child: const Text('Nei', style: TextStyle(color: Color(0xff01aed6))));
     Widget continueButton = TextButton(
-        onPressed: () {
-          cartData.removeItem(cartItem.id);
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Produktet har blitt fjernet fra handlelisten din.',
-                textAlign: TextAlign.center,
-              ),
-              duration: Duration(seconds: 2),
+      onPressed: () {
+        cartData.removeItem(cartItem.id);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Produktet har blitt fjernet fra handlelisten din.',
+              textAlign: TextAlign.center,
             ),
-          );
-        },
-        child: const Text('Ja', style: TextStyle(color: Color(0xff01aed6))));
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
+      child: const Text(
+        'Ja',
+        style: TextStyle(
+          color: Color(0xff01aed6),
+        ),
+      ),
+    );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -310,15 +326,18 @@ class CartTab extends StatelessWidget {
         style: TextStyle(fontSize: 18),
       ),
       content: const Text(
-          'Er du sikker på at du vil fjerne dette produktet fra handlelisten?',
-          style: TextStyle(fontSize: 13, color: Color(0xff777777))),
+        'Er du sikker på at du vil fjerne dette produktet fra handlelisten?',
+        style: TextStyle(
+          fontSize: 13,
+          color: Color(0xff777777),
+        ),
+      ),
       actions: [
         cancelButton,
         continueButton,
       ],
     );
 
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
