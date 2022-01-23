@@ -129,7 +129,7 @@ class Cart with ChangeNotifier {
           'quantity': _items[productId]!.quantity,
           'price': _items[productId]!.price,
           'checked': _items[productId]!.checked ? 1 : 0,
-          'imageUrl': _items[productId]!.imageUrl!,
+          'imageUrl': _items[productId]!.imageUrl ?? '',
         },
       );
     } else {

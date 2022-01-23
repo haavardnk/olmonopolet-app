@@ -112,7 +112,9 @@ class ProductItem extends StatelessWidget {
                                                     : 0,
                                                 size: 18),
                                             Text(
-                                              ' ${NumberFormat.compact().format(product.checkins)}',
+                                              product.checkins != null
+                                                  ? ' ${NumberFormat.compact().format(product.checkins)}'
+                                                  : '',
                                               style: const TextStyle(
                                                 fontSize: 12,
                                                 color: Color(0xFFaaaaaa),
@@ -180,17 +182,20 @@ class ProductItem extends StatelessWidget {
                                       Row(
                                         children: [
                                           Text(
-                                            '${product.abv!.toStringAsFixed(1)}%',
+                                            product.abv != null
+                                                ? '${product.abv!.toStringAsFixed(1)}%'
+                                                : '',
                                             style: const TextStyle(
                                               fontSize: 11,
                                               color: Color(0xFFaaaaaa),
                                             ),
                                           ),
-                                          VerticalDivider(
-                                            width: 15,
-                                            thickness: 1,
-                                            color: Colors.grey[300],
-                                          ),
+                                          if (product.abv != null)
+                                            VerticalDivider(
+                                              width: 15,
+                                              thickness: 1,
+                                              color: Colors.grey[300],
+                                            ),
                                           Text(
                                             '${product.volume}cl',
                                             style: const TextStyle(
@@ -239,13 +244,22 @@ class ProductItem extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  height: 30,
-                  width: 45,
+                  height: 35,
+                  width: 50,
                   decoration: BoxDecoration(
-                      color: Colors.cyan[600],
-                      borderRadius: BorderRadius.circular(8)),
-                  child: const Icon(Icons.shopping_cart,
-                      color: Colors.white, size: 20),
+                    border: Border.all(
+                      width: 1,
+                      color: Colors.grey[500]!,
+                    ),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.add_shopping_cart,
+                    color: Color(0xff777777),
+                    size: 20,
+                  ),
                 ),
               ),
             ),
