@@ -90,20 +90,25 @@ class Filter with ChangeNotifier {
     return this;
   }
 
+  bool _storesLoading = false;
   Future<List<Store>> getStores() async {
-    if (storeList.isNotEmpty && storeList.length > 1) {
+    if (storeList.isNotEmpty && storeList.length > 1 && !_storesLoading) {
+      print('first');
       return storeList;
     }
     try {
+      _storesLoading = true;
       var stores = await ApiHelper.getStoreList();
       storeList = stores;
       storeList = await LocationHelper.calculateStoreDistance(storeList);
       storeList.sort((a, b) => a.distance!.compareTo(b.distance!));
+      storeList.insert(0, allStores);
+      _storesLoading = false;
+      return storeList;
     } catch (error) {
+      _storesLoading = false;
       return storeList;
     }
-    storeList.insert(0, allStores);
-    return storeList;
   }
 
   void setPriceRange(RangeValues range) {
@@ -201,7 +206,7 @@ class Filter with ChangeNotifier {
   }
 
   void resetFilters() {
-    styleSelectedList = List<bool>.filled(16, false);
+    styleSelectedList = List<bool>.filled(23, false);
     priceRange = const RangeValues(0, 500);
     sortIndex = 'Rating - Høy til lav';
     storeId = '';
