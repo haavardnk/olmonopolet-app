@@ -13,6 +13,7 @@ import '../widgets/products/rating_widget.dart';
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({Key? key}) : super(key: key);
   static const routeName = '/product-detail';
+  static final GlobalKey<FormState> _formKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -60,32 +61,33 @@ class ProductDetailScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 5),
                     height: _boxImageSize,
                     width: _boxImageSize,
-                    child:
-                        snapshot.hasData && snapshot.data!['label_hd_url'] != ''
-                            ? FadeInImage(
-                                fit: BoxFit.contain,
-                                image: NetworkImage(
-                                  snapshot.data!['label_hd_url'],
-                                ),
-                                placeholder: product.imageUrl != null
-                                    ? NetworkImage(product.imageUrl!)
-                                    : Image.asset(
-                                        'assets/images/placeholder.png',
-                                        fit: BoxFit.contain,
-                                      ).image,
-                              )
-                            : Hero(
-                                tag: product.id,
-                                child: product.imageUrl != null
-                                    ? Image.network(
-                                        product.imageUrl!,
-                                        fit: BoxFit.contain,
-                                      )
-                                    : Image.asset(
-                                        'assets/images/placeholder.png',
-                                        fit: BoxFit.contain,
-                                      ),
-                              ),
+                    child: snapshot.hasData &&
+                            snapshot.data!['label_hd_url'] != null &&
+                            snapshot.data!['label_hd_url'].isNotEmpty
+                        ? FadeInImage(
+                            fit: BoxFit.contain,
+                            image: NetworkImage(
+                              snapshot.data!['label_hd_url'],
+                            ),
+                            placeholder: product.imageUrl != null
+                                ? NetworkImage(product.imageUrl!)
+                                : Image.asset(
+                                    'assets/images/placeholder.png',
+                                    fit: BoxFit.contain,
+                                  ).image,
+                          )
+                        : Hero(
+                            tag: product.id,
+                            child: product.imageUrl != null
+                                ? Image.network(
+                                    product.imageUrl!,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Image.asset(
+                                    'assets/images/placeholder.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                          ),
                   ),
                   Container(
                     color: Colors.white,
@@ -372,7 +374,20 @@ class ProductDetailScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet<void>(
+                          isScrollControlled: true,
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(24),
+                                topRight: Radius.circular(24)),
+                          ),
+                          builder: (BuildContext context) {
+                            return _showPopup(context, product.id);
+                          },
+                        );
+                      },
                       label: Text(product.rating != null
                           ? 'Rapporter feil Untappd match'
                           : 'Foreslå untappd match'),
@@ -470,15 +485,145 @@ class ProductDetailScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-Future<void> _launchInBrowser(String url) async {
-  if (!await launch(
-    url,
-    forceSafariVC: false,
-    forceWebView: false,
-    headers: <String, String>{'my_header_key': 'my_header_value'},
-  )) {
-    throw 'Could not launch $url';
+  Future<void> _launchInBrowser(String url) async {
+    if (!await launch(
+      url,
+      forceSafariVC: false,
+      forceWebView: false,
+      headers: <String, String>{'my_header_key': 'my_header_value'},
+    )) {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Widget _showPopup(BuildContext context, int productId) {
+    final _urlController = TextEditingController();
+
+    Future<void> showDialogMessage(String title, String message) async {
+      Widget continueButton = TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: const Text(
+          'Ok',
+          style: TextStyle(
+            color: Colors.pink,
+          ),
+        ),
+      );
+
+      AlertDialog alert = AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18),
+        ),
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Color(0xff777777),
+          ),
+        ),
+        actions: [
+          continueButton,
+        ],
+      );
+
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+
+    void _submit() async {
+      if (!_formKey.currentState!.validate()) {
+        return;
+      }
+      if (_urlController.text.isEmpty) {
+        return;
+      }
+      final untappdUrl = _urlController.text;
+      try {
+        await ApiHelper.submitUntappdMatch(productId, untappdUrl);
+        await showDialogMessage('Takk for hjelpen!',
+            'Ditt forslag er nå sendt inn og vil bli behandlet innen kort tid.');
+      } catch (error) {
+        await showDialogMessage(
+            'Det oppsto en feil',
+            'Det oppsto en feil når vi forsøkte å sende forslaget ditt. '
+                'Sjekk at linken er en korrekt untappd link eller prøv igjen senere.');
+      }
+      Navigator.of(context).pop();
+    }
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.30 +
+          MediaQuery.of(context).viewInsets.bottom,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: Colors.grey[500],
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+          Flexible(
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: <Widget>[
+                  const Text('Untappd link',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    autocorrect: false,
+                    autofocus: true,
+                    controller: _urlController,
+                    keyboardType: TextInputType.url,
+                    validator: (value) {
+                      if (!value!.contains('https://untappd.com/b/')) {
+                        return 'Ugyldig untappd link';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText:
+                            'https://untappd.com/b/nogne-o-imperial-stout/42871',
+                        floatingLabelBehavior: FloatingLabelBehavior.never),
+                    onEditingComplete: () => FocusScope.of(context).unfocus(),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      _submit();
+                    },
+                    label: const Text('Send inn'),
+                    icon: const Icon(Icons.send),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

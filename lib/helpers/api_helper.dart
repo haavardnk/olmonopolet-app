@@ -19,9 +19,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
           }
         : {};
     final url = Uri.parse('${_baseUrl}beers/?beers=$productId&fields=$fields');
-    print(url);
     try {
-      print('trying');
       final response = await http.get(
         url,
         headers: headers,
@@ -29,7 +27,6 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))['results'][0];
-        print(jsonResponse);
         return jsonResponse;
       } else {
         throw GenericHttpException();
@@ -62,6 +59,30 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
           ),
         );
         return products;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
+
+  static Future<void> submitUntappdMatch(
+      int productId, String untappdUrl) async {
+    final jsonBody = json.encode({
+      'beer': productId,
+      'suggested_url': untappdUrl,
+    });
+    try {
+      final response = await http.post(
+        Uri.parse('${_baseUrl}wrongmatch/'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonBody,
+      );
+      if (response.statusCode == 201) {
+        return;
       } else {
         throw GenericHttpException();
       }
