@@ -62,7 +62,7 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
 
   Widget _showPopup() {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6,
+      height: MediaQuery.of(context).size.height * 0.7,
       child:
           StatefulBuilder(builder: (BuildContext context, StateSetter mystate) {
         return Column(
