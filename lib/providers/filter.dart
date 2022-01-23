@@ -39,32 +39,43 @@ class Filter with ChangeNotifier {
     'Rating - Lav til høy': 'rating',
   };
 
-  List<bool> styleSelectedList = List<bool>.filled(16, false);
+  List<bool> styleSelectedList = List<bool>.filled(23, false);
   List<Map<String, String>> styleList = [
+    {
+      'Annet': 'adambier,altbier,brett,burton,tan,chilli,cream ale,festbier,grape ale,'
+          'happoshu,historical,honey beer,kellerbier,koji,kvass,lichtenhainer,'
+          'malt beer,mild,pumpkin,rauchbier,roggenbier,root beer,rye beer,schwarzbier,'
+          'smoked beer,shandy,scotch ale,scottish,steinbier,spiced / herbed,strong ale,table beer,zoigl'
+    },
     {'Barleywine': 'barleywine'},
     {'Belgisk': 'belgian'},
     {'Blonde': 'blonde'},
     {'Bokk': 'bock'},
-    {'Brown': 'brown'},
-    {'Gluten Fri': 'gluten-free'},
+    {'Brown Ale': 'brown'},
+    {'Dark Ale': 'dark ale'},
+    {'Farmhouse Ale': 'farmhouse ale'},
+    {'Glutenfri': 'gluten-free'},
+    {'Hvete': 'wheat beer'},
     {'IPA': 'ipa'},
     {'Juleøl': 'winter'},
+    {'Kölsch': 'kölsch'},
     {'Lager': 'lager'},
     {'Mjød': 'mead'},
+    {'Old Ale': 'old ale, traditional ale'},
     {'Pale Ale': 'pale ale'},
     {'Pilsner': 'pilsner'},
     {'Porter': 'porter'},
+    {'Red Ale': 'red ale -'},
     {'Sider': 'cider'},
     {'Stout': 'stout'},
     {'Surøl': 'sour,wild ale,lambic,fruit beer'},
   ];
 
-  List<bool> productSelectionSelectedList = List<bool>.filled(6, false);
+  List<bool> productSelectionSelectedList = List<bool>.filled(5, false);
   List<Map<String, String>> productSelectionList = [
     {'Basisutvalget': 'basisutvalget'},
     {'Bestillingsutvalget': 'bestillingsutvalget'},
     {'Partiutvalget': 'partiutvalget'},
-    {'Spesialbestilling': 'spesialbestilling'},
     {'Spesialutvalget': 'spesialutvalg'},
     {'Tilleggsutvalget': 'tilleggsutvalget'},
   ];
@@ -89,7 +100,6 @@ class Filter with ChangeNotifier {
       storeList = await LocationHelper.calculateStoreDistance(storeList);
       storeList.sort((a, b) => a.distance!.compareTo(b.distance!));
     } catch (error) {
-      print(error);
       return storeList;
     }
     storeList.insert(0, allStores);
