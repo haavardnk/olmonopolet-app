@@ -25,9 +25,6 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
 
   @override
   void initState() {
-    if (filters.storeList.isEmpty) {
-      filters.getStores();
-    }
     _priceRange = filters.priceRange;
     _sortList = filters.sortList.keys.toList();
     super.initState();
@@ -102,53 +99,58 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   FutureBuilder<List<Store>>(
                     future: filters.getStores(),
                     builder: (context, snapshot) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Card(
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                isExpanded: true,
-                                hint: const Text("Velg Butikk"),
-                                value: filters.storeId,
-                                items: filters.storeList.map((value) {
-                                  return DropdownMenuItem<String>(
-                                    child: Row(
-                                      mainAxisAlignment: value.distance != null
-                                          ? MainAxisAlignment.spaceBetween
-                                          : MainAxisAlignment.center,
-                                      children: [
-                                        Flexible(
-                                          child: Text(value.name),
-                                          flex: 1,
-                                        ),
-                                        Flexible(
-                                          child: Text(
-                                            value.distance != null
-                                                ? (value.distance! / 1000)
-                                                        .toStringAsFixed(1) +
-                                                    'Km'
-                                                : '',
+                      return snapshot.hasData && snapshot.data!.isNotEmpty
+                          ? Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              child: Card(
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      isExpanded: true,
+                                      hint: const Text("Velg Butikk"),
+                                      value: filters.storeId,
+                                      items: snapshot.data!.map((value) {
+                                        return DropdownMenuItem<String>(
+                                          child: Row(
+                                            mainAxisAlignment: value.distance !=
+                                                    null
+                                                ? MainAxisAlignment.spaceBetween
+                                                : MainAxisAlignment.center,
+                                            children: [
+                                              Flexible(
+                                                child: Text(value.name),
+                                                flex: 1,
+                                              ),
+                                              Flexible(
+                                                child: Text(
+                                                  value.distance != null
+                                                      ? (value.distance! / 1000)
+                                                              .toStringAsFixed(
+                                                                  1) +
+                                                          'Km'
+                                                      : '',
+                                                ),
+                                                flex: 1,
+                                              ),
+                                            ],
                                           ),
-                                          flex: 1,
-                                        ),
-                                      ],
+                                          value: value.id,
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? value) {
+                                        mystate(() {
+                                          filters.storeId = value!;
+                                          filters.setStore(value);
+                                        });
+                                      },
                                     ),
-                                    value: value.id,
-                                  );
-                                }).toList(),
-                                onChanged: (String? value) {
-                                  mystate(() {
-                                    filters.storeId = value!;
-                                    filters.setStore(value);
-                                  });
-                                },
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      );
+                            )
+                          : Center(child: CircularProgressIndicator());
                     },
                   ),
                   const SizedBox(
