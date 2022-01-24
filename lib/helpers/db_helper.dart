@@ -9,13 +9,15 @@ class DBHelper {
       path.join(dbPath, 'cart.db'),
       onCreate: (db, version) {
         return db.execute(
-            'CREATE TABLE cart(id INT PRIMARY KEY, name TEXT, quantity INT, price REAL, checked INT, imageUrl TEXT)');
+            'CREATE TABLE cart(id INT PRIMARY KEY,name TEXT,style TEXT,'
+            'price REAL,volume REAL,stock INT,rating REAL,checkins INT,'
+            'abv REAL,imageUrl TEXT,userRating REAL,quantity INT)');
       },
       version: 1,
     );
   }
 
-  static Future<void> insert(String table, Map<String, Object> data) async {
+  static Future<void> insert(String table, Map<String, Object?> data) async {
     final db = await DBHelper.database();
     db.insert(
       table,
@@ -36,6 +38,6 @@ class DBHelper {
 
   static Future<void> clear(String table) async {
     final db = await DBHelper.database();
-    db.delete(table);
+    sql.deleteDatabase(db.path);
   }
 }

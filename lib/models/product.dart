@@ -10,7 +10,6 @@ class Product {
       this.checkins,
       this.abv,
       this.imageUrl,
-      this.imageUrlHd,
       this.userRating});
 
   factory Product.fromJson(Map<String, dynamic> product) => Product(
@@ -26,7 +25,6 @@ class Product {
         checkins: product['checkins'],
         abv: product['abv'],
         imageUrl: product['label_sm_url'],
-        imageUrlHd: product['label_hd_url'],
         userRating: product['user_checked_in'] != null &&
                 product['user_checked_in'].isNotEmpty
             ? product['user_checked_in'][0]['rating']
@@ -43,6 +41,5 @@ class Product {
   final int? checkins;
   final double? abv;
   final String? imageUrl;
-  final String? imageUrlHd;
   final double? userRating;
 }

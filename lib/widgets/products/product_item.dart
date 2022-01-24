@@ -23,10 +23,10 @@ class ProductItem extends StatelessWidget {
       child: Container(
         foregroundDecoration: product.userRating != null
             ? const RotatedCornerDecoration(
-                color: Color(0xff00acc1),
+                color: Color(0xFFFBC02D),
                 geometry: BadgeGeometry(
-                  width: 20,
-                  height: 20,
+                  width: 25,
+                  height: 25,
                   cornerRadius: 0,
                   alignment: BadgeAlignment.topLeft,
                 ),
@@ -53,7 +53,7 @@ class ProductItem extends StatelessWidget {
                         children: <Widget>[
                           ClipRRect(
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(4)),
+                                const BorderRadius.all(Radius.circular(5)),
                             child: Hero(
                               tag: product.id,
                               child: product.imageUrl != null
@@ -236,8 +236,7 @@ class ProductItem extends StatelessWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
-                  cart.addItem(product.id, product.name, product.price,
-                      product.imageUrl);
+                  cart.addItem(product.id, product);
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -261,10 +260,10 @@ class ProductItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: 1,
-                      color: Colors.grey[500]!,
+                      color: Colors.grey[400]!,
                     ),
                     borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
+                      Radius.circular(5),
                     ),
                   ),
                   child: const Icon(
