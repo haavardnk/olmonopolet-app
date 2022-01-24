@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Provider.of<Cart>(context, listen: false).fetchAndSetCart();
+    Provider.of<Filter>(context, listen: false).getStores();
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(
@@ -62,7 +63,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FittedBox(
               fit: BoxFit.contain,
               child: Text(
-                filter.storeName,
+                filter.selectedStores.isEmpty
+                    ? 'Alle Butikker'
+                    : filter.selectedStores.length == 1
+                        ? filter.selectedStores[0]
+                        : 'Valgte butikker: ${filter.selectedStores.length}',
                 style: const TextStyle(color: Colors.black),
               ),
             ),

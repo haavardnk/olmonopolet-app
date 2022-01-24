@@ -10,7 +10,6 @@ import '../helpers/location_helper.dart';
 class Filter with ChangeNotifier {
   String search = '';
   String storeId = '';
-  String storeName = 'Alle Butikker';
   String style = '';
   String productSelection = '';
   String priceHigh = '';
@@ -18,7 +17,7 @@ class Filter with ChangeNotifier {
   String sortBy = '-rating';
   int checkIn = 0;
 
-  Store allStores = Store(id: '', name: 'Alle Butikker');
+  List<String> selectedStores = [];
   List<Store> storeList = [];
 
   RangeValues priceRange = const RangeValues(0, 500);
@@ -90,23 +89,25 @@ class Filter with ChangeNotifier {
     return this;
   }
 
-  bool _storesLoading = false;
+  bool storesLoading = false;
   Future<List<Store>> getStores() async {
-    if (storeList.isNotEmpty && storeList.length > 1 && !_storesLoading) {
-      print('first');
+    if (storeList.isNotEmpty && storeList.length > 1 && !storesLoading) {
       return storeList;
     }
     try {
-      _storesLoading = true;
+      storesLoading = true;
+      List<Store> temporaryStoreList = [];
       var stores = await ApiHelper.getStoreList();
-      storeList = stores;
-      storeList = await LocationHelper.calculateStoreDistance(storeList);
-      storeList.sort((a, b) => a.distance!.compareTo(b.distance!));
-      storeList.insert(0, allStores);
-      _storesLoading = false;
+      temporaryStoreList = stores;
+      temporaryStoreList =
+          await LocationHelper.calculateStoreDistance(temporaryStoreList);
+      temporaryStoreList.sort((a, b) => a.distance!.compareTo(b.distance!));
+      storeList = temporaryStoreList;
+      storesLoading = false;
+      notifyListeners();
       return storeList;
     } catch (error) {
-      _storesLoading = false;
+      storesLoading = false;
       return storeList;
     }
   }
@@ -173,11 +174,19 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
-  void setStore(String storeId) {
-    if (storeId.isEmpty) {
-      storeName = 'Alle Butikker';
+  void setStore() {
+    if (selectedStores.isEmpty) {
+      storeId = '';
     } else {
-      storeName = storeList.firstWhere((element) => element.id == storeId).name;
+      String temporaryStores = '';
+      selectedStores.forEach((storeName) {
+        if (temporaryStores.isNotEmpty) {
+          temporaryStores += ',';
+        }
+        temporaryStores +=
+            storeList.firstWhere((element) => element.name == storeName).id;
+      });
+      storeId = temporaryStores;
     }
     notifyListeners();
     saveLastStore();
@@ -185,23 +194,14 @@ class Filter with ChangeNotifier {
 
   void saveLastStore() async {
     final prefs = await SharedPreferences.getInstance();
-    final storeData = json.encode({
-      'storeName': storeName,
-      'storeId': storeId,
-    });
-    prefs.setString('storeData', storeData);
+    prefs.setString('storeId', storeId);
+    prefs.setStringList('selectedStores', selectedStores);
   }
 
   Future<void> loadLastStore() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('storeData')) {
-      final extractedStoreData = json.decode(prefs.getString('storeData')!);
-      storeId = extractedStoreData['storeId'];
-      storeName = extractedStoreData['storeName'];
-    } else {
-      storeId = '';
-      storeName = 'Alle Butikker';
-    }
+    storeId = prefs.getString('storeId') ?? '';
+    selectedStores = prefs.getStringList('selectedStores') ?? [];
     notifyListeners();
   }
 
@@ -210,7 +210,7 @@ class Filter with ChangeNotifier {
     priceRange = const RangeValues(0, 500);
     sortIndex = 'Rating - Høy til lav';
     storeId = '';
-    storeName = 'Alle Butikker';
+    selectedStores = [];
     style = '';
     productSelection = '';
     priceHigh = '';

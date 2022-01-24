@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 import '../../providers/auth.dart';
-import '../../models/store.dart';
+import 'multiselect_stores.dart';
 
 class BottomFilterSheet extends StatefulWidget {
   const BottomFilterSheet({Key? key}) : super(key: key);
@@ -96,59 +96,24 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                       )
                     ],
                   ),
-                  FutureBuilder<List<Store>>(
-                    future: filters.getStores(),
-                    builder: (context, snapshot) {
-                      return snapshot.hasData && snapshot.data!.isNotEmpty
-                          ? Container(
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              child: Card(
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      isExpanded: true,
-                                      hint: const Text("Velg Butikk"),
-                                      value: filters.storeId,
-                                      items: snapshot.data!.map((value) {
-                                        return DropdownMenuItem<String>(
-                                          child: Row(
-                                            mainAxisAlignment: value.distance !=
-                                                    null
-                                                ? MainAxisAlignment.spaceBetween
-                                                : MainAxisAlignment.center,
-                                            children: [
-                                              Flexible(
-                                                child: Text(value.name),
-                                                flex: 1,
-                                              ),
-                                              Flexible(
-                                                child: Text(
-                                                  value.distance != null
-                                                      ? (value.distance! / 1000)
-                                                              .toStringAsFixed(
-                                                                  1) +
-                                                          'Km'
-                                                      : '',
-                                                ),
-                                                flex: 1,
-                                              ),
-                                            ],
-                                          ),
-                                          value: value.id,
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? value) {
-                                        mystate(() {
-                                          filters.storeId = value!;
-                                          filters.setStore(value);
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
+                  Consumer<Filter>(
+                    builder: (context, flt, _) {
+                      if (!flt.storesLoading && flt.storeList.isEmpty) {
+                        flt.getStores();
+                      }
+                      return flt.storeList.isNotEmpty
+                          ? DropDownMultiSelect(
+                              onChanged: (List<String> x) {
+                                mystate(() {
+                                  filters.selectedStores = x;
+                                  filters.setStore();
+                                });
+                              },
+                              options:
+                                  filters.storeList.map((e) => e.name).toList(),
+                              stores: filters.storeList,
+                              selectedValues: filters.selectedStores,
+                              whenEmpty: 'Velg butikker',
                             )
                           : Center(child: CircularProgressIndicator());
                     },
@@ -184,30 +149,25 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: Card(
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            hint: const Text("Velg Sortering"),
-                            value: filters.sortIndex,
-                            items: _sortList.map((value) {
-                              return DropdownMenuItem<String>(
-                                child: Center(child: Text(value!)),
-                                value: value,
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              mystate(() {
-                                filters.sortIndex = value!;
-                                filters.setSortBy(value);
-                              });
-                            },
-                          ),
-                        ),
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                       ),
+                      hint: Text("Select Year"),
+                      value: filters.sortIndex,
+                      items: _sortList.map((value) {
+                        return DropdownMenuItem<String>(
+                          child: Center(child: Text(value!)),
+                          value: value,
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        mystate(() {
+                          filters.sortIndex = value!;
+                          filters.setSortBy(value);
+                        });
+                      },
                     ),
                   ),
                   const SizedBox(
