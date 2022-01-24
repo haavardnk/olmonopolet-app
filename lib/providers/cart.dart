@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
+
 import '../helpers/db_helper.dart';
+import '../models/product.dart';
 
 class CartItem {
-  final int id;
-  final String name;
+  final Product product;
   final int quantity;
-  final double price;
-  final bool checked;
-  final String? imageUrl;
 
   CartItem({
-    required this.id,
-    required this.name,
+    required this.product,
     required this.quantity,
-    required this.price,
-    required this.checked,
-    this.imageUrl,
   });
 }
 
@@ -29,7 +23,7 @@ class Cart with ChangeNotifier {
   double get totalAmount {
     var total = 0.0;
     _items.forEach((key, cartItem) {
-      total += cartItem.price * cartItem.quantity;
+      total += cartItem.product.price * cartItem.quantity;
     });
     return total;
   }
@@ -38,28 +32,20 @@ class Cart with ChangeNotifier {
     return _items.length;
   }
 
-  void addItem(int productId, String name, double price, String? imageUrl) {
+  void addItem(int productId, Product product) {
     if (_items.containsKey(productId)) {
       _items.update(
         productId,
         (existingCartItem) => CartItem(
-          id: existingCartItem.id,
-          name: existingCartItem.name,
+          product: existingCartItem.product,
           quantity: existingCartItem.quantity + 1,
-          price: existingCartItem.price,
-          checked: existingCartItem.checked,
-          imageUrl: existingCartItem.imageUrl,
         ),
       );
     } else {
       _items.putIfAbsent(
         productId,
         () => CartItem(
-          id: productId,
-          name: name,
-          price: price,
-          checked: false,
-          imageUrl: imageUrl,
+          product: product,
           quantity: 1,
         ),
       );
@@ -82,33 +68,13 @@ class Cart with ChangeNotifier {
       _items.update(
         productId,
         (existingCartItem) => CartItem(
-          id: existingCartItem.id,
-          name: existingCartItem.name,
+          product: existingCartItem.product,
           quantity: existingCartItem.quantity - 1,
-          price: existingCartItem.price,
-          checked: existingCartItem.checked,
-          imageUrl: existingCartItem.imageUrl,
         ),
       );
     } else {
       _items.remove(productId);
     }
-    notifyListeners();
-    updateDb(productId);
-  }
-
-  void checkItem(int productId) {
-    _items.update(
-      productId,
-      (existingCartItem) => CartItem(
-        id: existingCartItem.id,
-        name: existingCartItem.name,
-        quantity: existingCartItem.quantity,
-        price: existingCartItem.price,
-        checked: !existingCartItem.checked,
-        imageUrl: existingCartItem.imageUrl,
-      ),
-    );
     notifyListeners();
     updateDb(productId);
   }
@@ -124,12 +90,18 @@ class Cart with ChangeNotifier {
       DBHelper.insert(
         'cart',
         {
-          'id': _items[productId]!.id,
-          'name': _items[productId]!.name,
+          'id': _items[productId]!.product.id,
+          'name': _items[productId]!.product.name,
+          'style': _items[productId]!.product.style,
+          'price': _items[productId]!.product.price,
+          'volume': _items[productId]!.product.volume,
+          'stock': _items[productId]!.product.stock,
+          'rating': _items[productId]!.product.rating,
+          'checkins': _items[productId]!.product.checkins,
+          'abv': _items[productId]!.product.abv,
+          'imageUrl': _items[productId]!.product.imageUrl,
+          'userRating': _items[productId]!.product.userRating,
           'quantity': _items[productId]!.quantity,
-          'price': _items[productId]!.price,
-          'checked': _items[productId]!.checked ? 1 : 0,
-          'imageUrl': _items[productId]!.imageUrl ?? '',
         },
       );
     } else {
@@ -144,11 +116,19 @@ class Cart with ChangeNotifier {
         _items.putIfAbsent(
           item['id'],
           () => CartItem(
-            id: item['id'],
-            name: item['name'],
-            price: item['price'],
-            checked: item['checked'] == 0 ? false : true,
-            imageUrl: item['imageUrl'],
+            product: Product(
+              id: item['id'],
+              name: item['name'],
+              style: item['style'],
+              price: item['price'],
+              volume: item['volume'],
+              stock: item['stock'],
+              rating: item['rating'],
+              checkins: item['checkins'],
+              abv: item['abv'],
+              imageUrl: item['imageUrl'],
+              userRating: item['userRating'],
+            ),
             quantity: item['quantity'],
           ),
         );

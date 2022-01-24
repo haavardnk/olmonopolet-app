@@ -47,7 +47,7 @@ class ProductDetailScreen extends StatelessWidget {
                   Container(
                     foregroundDecoration: product.userRating != null
                         ? const RotatedCornerDecoration(
-                            color: Color(0xff00acc1),
+                            color: Color(0xFFFBC02D),
                             textSpan: TextSpan(text: 'Smakt'),
                             geometry: BadgeGeometry(
                               width: 60,
@@ -437,8 +437,7 @@ class ProductDetailScreen extends StatelessWidget {
               ),
               child: GestureDetector(
                 onTap: () {
-                  cart.addItem(product.id, product.name, product.price,
-                      product.imageUrl);
+                  cart.addItem(product.id, product);
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
