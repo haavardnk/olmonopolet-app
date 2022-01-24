@@ -28,8 +28,13 @@ class LocationHelper {
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
+    var location = await Geolocator.getLastKnownPosition();
+    if (location == null) {
+      location =
+          await Geolocator.getCurrentPosition(timeLimit: Duration(seconds: 15));
+    }
 
-    return await Geolocator.getCurrentPosition();
+    return location;
   }
 
   static Future<List<Store>> calculateStoreDistance(List<Store> list) async {

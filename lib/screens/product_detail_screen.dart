@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/auth.dart';
 import '../providers/cart.dart';
+import '../providers/filter.dart';
 import '../helpers/api_helper.dart';
 import '../models/product.dart';
 import '../widgets/products/rating_widget.dart';
@@ -20,17 +21,20 @@ class ProductDetailScreen extends StatelessWidget {
     final product = ModalRoute.of(context)!.settings.arguments as Product;
     final apiToken = Provider.of<Auth>(context, listen: false).token;
     final cart = Provider.of<Cart>(context, listen: false);
+    final stores = Provider.of<Filter>(context, listen: false).selectedStores;
     final _boxImageSize = MediaQuery.of(context).size.width * 0.8;
 
     return Scaffold(
       appBar: AppBar(
-        title: FittedBox(
-          fit: BoxFit.contain,
-          child: Text(
-            product.name,
-            style: const TextStyle(color: Colors.black),
-          ),
-        ),
+        title: stores.length == 1
+            ? FittedBox(
+                fit: BoxFit.contain,
+                child: Text(
+                  stores[0],
+                  style: const TextStyle(color: Colors.black),
+                ),
+              )
+            : null,
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(
           color: Colors.black, //change your color here
@@ -95,6 +99,21 @@ class ProductDetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                product.name,
+                                style: const TextStyle(fontSize: 18),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -218,7 +237,7 @@ class ProductDetailScreen extends StatelessWidget {
                                 Row(
                                   children: [
                                     Text(
-                                      'På lager: ${product.stock}%',
+                                      'På lager: ${product.stock}',
                                       style: const TextStyle(
                                         fontSize: 13,
                                         color: Color(0xff777777),
