@@ -96,18 +96,16 @@ class Filter with ChangeNotifier {
     }
     try {
       storesLoading = true;
-      List<Store> temporaryStoreList = [];
       var stores = await ApiHelper.getStoreList();
-      temporaryStoreList = stores;
-      temporaryStoreList =
-          await LocationHelper.calculateStoreDistance(temporaryStoreList);
-      temporaryStoreList.sort((a, b) => a.distance!.compareTo(b.distance!));
-      storeList = temporaryStoreList;
+      storeList = stores;
+      storeList = await LocationHelper.calculateStoreDistance(storeList);
+      storeList.sort((a, b) => a.distance!.compareTo(b.distance!));
       storesLoading = false;
       notifyListeners();
       return storeList;
     } catch (error) {
       storesLoading = false;
+      notifyListeners();
       return storeList;
     }
   }
