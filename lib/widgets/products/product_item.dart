@@ -81,7 +81,8 @@ class ProductItem extends StatelessWidget {
                                 Text(
                                   product.name,
                                   style: const TextStyle(
-                                      fontSize: 14, color: Color(0xFF515151)),
+                                    fontSize: 14,
+                                  ),
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -101,7 +102,6 @@ class ProductItem extends StatelessWidget {
                                     product.style,
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Color(0xff777777),
                                     ),
                                   ),
                                 ),
@@ -116,7 +116,6 @@ class ProductItem extends StatelessWidget {
                                                   : '0 ',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xff777777),
                                               ),
                                             ),
                                             createRatingBar(
@@ -130,7 +129,6 @@ class ProductItem extends StatelessWidget {
                                                   : '',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xff777777),
                                               ),
                                             ),
                                           ],
@@ -143,7 +141,6 @@ class ProductItem extends StatelessWidget {
                                                   : '0 ',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xff777777),
                                               ),
                                             ),
                                             Icon(
@@ -158,7 +155,6 @@ class ProductItem extends StatelessWidget {
                                                   : '0 ',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xff777777),
                                               ),
                                             ),
                                             Icon(
@@ -182,7 +178,6 @@ class ProductItem extends StatelessWidget {
                                               'På lager: ${product.stock}',
                                               style: const TextStyle(
                                                 fontSize: 11,
-                                                color: Color(0xff777777),
                                               ),
                                             ),
                                             VerticalDivider(
@@ -200,7 +195,6 @@ class ProductItem extends StatelessWidget {
                                                 : '',
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              color: Color(0xff777777),
                                             ),
                                           ),
                                           if (product.abv != null)
@@ -213,7 +207,6 @@ class ProductItem extends StatelessWidget {
                                             '${product.volume}cl',
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              color: Color(0xff777777),
                                             ),
                                           ),
                                         ],
@@ -261,7 +254,7 @@ class ProductItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: 1,
-                      color: Colors.grey[400]!,
+                      color: Theme.of(context).iconTheme.color!,
                     ),
                     borderRadius: const BorderRadius.all(
                       Radius.circular(5),
@@ -269,7 +262,6 @@ class ProductItem extends StatelessWidget {
                   ),
                   child: const Icon(
                     Icons.add_shopping_cart,
-                    color: Color(0xff777777),
                     size: 20,
                   ),
                 ),

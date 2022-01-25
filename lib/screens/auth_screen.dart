@@ -55,7 +55,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           onPressed: () {
                             Navigator.of(context, rootNavigator: true).pop();
                           },
-                          child: const Text('OK'),
+                          child: const Text(
+                            'OK',
+                            style: TextStyle(
+                              color: Colors.pink,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -86,7 +91,10 @@ class _AuthScreenState extends State<AuthScreen> {
           const Center(
             child: Text(
               'eller',
-              style: TextStyle(fontSize: 13, color: Color(0xFFaaaaaa)),
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFFaaaaaa),
+              ),
             ),
           ),
           const SizedBox(
@@ -94,7 +102,10 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
           Center(
             child: TextButton(
-              child: const Text('Logg inn senere...'),
+              child: const Text(
+                'Logg inn senere...',
+                style: TextStyle(fontSize: 16),
+              ),
               onPressed: () => authData.skipLogin(true),
             ),
           ),

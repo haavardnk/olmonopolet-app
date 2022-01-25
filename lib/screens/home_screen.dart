@@ -52,11 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Provider.of<Filter>(context, listen: false).getStores();
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.black, //change your color here
-        ),
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         centerTitle: true,
         title: Consumer<Filter>(
           builder: (context, filter, _) => FadeIn(
@@ -70,7 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? filter.selectedStores[0]
                             : 'Valgte butikker: ${filter.selectedStores.length}'
                     : 'Handleliste',
-                style: const TextStyle(color: Colors.black),
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.headline6!.color),
               ),
             ),
             duration: const Duration(milliseconds: 300),

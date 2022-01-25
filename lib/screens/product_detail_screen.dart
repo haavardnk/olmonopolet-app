@@ -46,12 +46,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       appBar: AppBar(
         title: Text(
           'Detaljer',
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: Theme.of(context).textTheme.headline6!.color),
         ),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(
-          color: Colors.black, //change your color here
-        ),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        iconTheme:
+            Theme.of(context).appBarTheme.iconTheme, //change your color here
       ),
       body: FutureBuilder(
         future: ApiHelper.getDetailedProductInfo(product.id, apiToken),
@@ -80,7 +79,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             )
                           : null,
-                      color: Colors.white,
                       padding: const EdgeInsets.only(top: 5, left: 5, right: 5),
                       height: _boxImageSize,
                       width: _boxImageSize,
@@ -113,7 +111,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                     ),
                     Container(
-                      color: Colors.white,
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +171,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                             : '',
                                         style: const TextStyle(
                                           fontSize: 12,
-                                          color: Color(0xff777777),
                                         ),
                                       ),
                                     ],
@@ -205,7 +201,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                               ' ${NumberFormat.compact().format(product.checkins)}',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xff777777),
                                               ),
                                             ),
                                           ],
@@ -251,10 +246,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                     ),
+                    Divider(),
                     Container(
-                      margin: const EdgeInsets.only(top: 12),
                       padding: const EdgeInsets.all(16),
-                      color: Colors.white,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -360,11 +354,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                     ),
+                    Divider(),
                     Container(
                       height: 165,
-                      margin: const EdgeInsets.only(top: 12),
                       padding: const EdgeInsets.all(16),
-                      color: Colors.white,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -404,19 +397,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               child: Center(
                                 child: Text(
                                   'Ingen butikker har denne på lager',
-                                  style: const TextStyle(
-                                    color: Color(0xff777777),
-                                  ),
                                 ),
                               ),
                             )
                         ],
                       ),
                     ),
+                    Divider(),
                     Container(
-                      margin: const EdgeInsets.only(top: 12),
                       padding: const EdgeInsets.all(16),
-                      color: Colors.white,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -434,9 +423,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Center(
                               child: Text(
                                 'Mangler beskrivelse',
-                                style: const TextStyle(
-                                  color: Color(0xff777777),
-                                ),
                               ),
                             ),
                           const SizedBox(
@@ -499,8 +485,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               Container(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 25),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).bottomAppBarColor,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey,
@@ -534,7 +520,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                     margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.pink,
                       border: Border.all(
                         width: 1,
                         color: Colors.pink,
@@ -546,7 +532,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: const Text(
                       'Legg til i handleliste',
                       style: TextStyle(
-                        color: Colors.pink,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -599,7 +585,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           message,
           style: const TextStyle(
             fontSize: 13,
-            color: Color(0xff777777),
           ),
         ),
         actions: [

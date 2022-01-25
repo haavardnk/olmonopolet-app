@@ -29,27 +29,20 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-            bottom: BorderSide(
-          color: Colors.grey[100]!,
-          width: 1.0,
-        )),
-      ),
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       height: kToolbarHeight,
       child: TextFormField(
         controller: _search,
         textAlignVertical: TextAlignVertical.bottom,
         maxLines: 1,
-        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+        style: TextStyle(fontSize: 16),
         onChanged: (textValue) {
           setState(() {
             filters.setSearch(textValue);
           });
         },
         decoration: InputDecoration(
-          fillColor: Colors.grey[100],
+          fillColor: Theme.of(context).backgroundColor,
           filled: true,
           hintText: 'Søk',
           prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
@@ -65,10 +58,10 @@ class _SearchBarState extends State<SearchBar> {
                   child: Icon(Icons.close, color: Colors.grey[500])),
           focusedBorder: UnderlineInputBorder(
               borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-              borderSide: BorderSide(color: Colors.grey[200]!)),
+              borderSide: BorderSide(color: Theme.of(context).backgroundColor)),
           enabledBorder: UnderlineInputBorder(
             borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-            borderSide: BorderSide(color: Colors.grey[200]!),
+            borderSide: BorderSide(color: Theme.of(context).backgroundColor),
           ),
         ),
       ),
