@@ -281,9 +281,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
+                          Divider(height: 5),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -297,9 +295,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
+                          Divider(height: 5),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -318,9 +314,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
+                          Divider(height: 5),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -339,9 +333,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
+                          Divider(height: 5),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -353,9 +345,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
+                          Divider(height: 5),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -403,9 +393,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
+                                      Divider(height: 5),
                                     ],
                                   );
                                 },
@@ -528,7 +516,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text(
-                          'Lagt til i handlevogn!',
+                          'Lagt til i handlelisten!',
                           textAlign: TextAlign.center,
                         ),
                         duration: const Duration(seconds: 2),

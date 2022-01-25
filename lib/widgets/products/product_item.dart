@@ -242,7 +242,7 @@ class ProductItem extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text(
-                        'Lagt til i handlevogn!',
+                        'Lagt til i handlelisten!',
                         textAlign: TextAlign.center,
                       ),
                       duration: const Duration(seconds: 2),
