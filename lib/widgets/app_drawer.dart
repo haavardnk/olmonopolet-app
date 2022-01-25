@@ -54,6 +54,18 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
           const Divider(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Image.asset(
+                  'assets/images/powered_by_untappd.png',
+                  width: 100,
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
