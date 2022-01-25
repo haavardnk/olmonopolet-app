@@ -201,8 +201,9 @@ class CartTab extends StatelessWidget {
                                           ? '${cartItem.product.rating!.toStringAsFixed(2)} '
                                           : '0 ',
                                       style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFFaaaaaa)),
+                                        fontSize: 12,
+                                        color: Color(0xff777777),
+                                      ),
                                     ),
                                     createRatingBar(
                                         rating: cartItem.product.rating != null
@@ -215,7 +216,7 @@ class CartTab extends StatelessWidget {
                                           : '',
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xFFaaaaaa),
+                                        color: Color(0xff777777),
                                       ),
                                     ),
                                   ],
@@ -228,7 +229,7 @@ class CartTab extends StatelessWidget {
                                           : '0 ',
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xFFaaaaaa),
+                                        color: Color(0xff777777),
                                       ),
                                     ),
                                     Icon(
@@ -243,7 +244,7 @@ class CartTab extends StatelessWidget {
                                           : '0 ',
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xFFaaaaaa),
+                                        color: Color(0xff777777),
                                       ),
                                     ),
                                     Icon(

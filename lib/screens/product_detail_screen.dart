@@ -154,8 +154,9 @@ class ProductDetailScreen extends StatelessWidget {
                                           ? ' ${NumberFormat.compact().format(product.checkins)}'
                                           : '',
                                       style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFFaaaaaa)),
+                                        fontSize: 12,
+                                        color: Color(0xff777777),
+                                      ),
                                     ),
                                   ],
                                 )
@@ -184,8 +185,9 @@ class ProductDetailScreen extends StatelessWidget {
                                           Text(
                                             ' ${NumberFormat.compact().format(product.checkins)}',
                                             style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Color(0xFFaaaaaa)),
+                                              fontSize: 12,
+                                              color: Color(0xff777777),
+                                            ),
                                           ),
                                         ],
                                       ),

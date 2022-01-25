@@ -101,7 +101,7 @@ class ProductItem extends StatelessWidget {
                                     product.style,
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Color(0xFFaaaaaa),
+                                      color: Color(0xff777777),
                                     ),
                                   ),
                                 ),
@@ -115,8 +115,9 @@ class ProductItem extends StatelessWidget {
                                                   ? '${product.rating!.toStringAsFixed(2)} '
                                                   : '0 ',
                                               style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFFaaaaaa)),
+                                                fontSize: 12,
+                                                color: Color(0xff777777),
+                                              ),
                                             ),
                                             createRatingBar(
                                                 rating: product.rating != null
@@ -129,7 +130,7 @@ class ProductItem extends StatelessWidget {
                                                   : '',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xFFaaaaaa),
+                                                color: Color(0xff777777),
                                               ),
                                             ),
                                           ],
@@ -142,7 +143,7 @@ class ProductItem extends StatelessWidget {
                                                   : '0 ',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xFFaaaaaa),
+                                                color: Color(0xff777777),
                                               ),
                                             ),
                                             Icon(
@@ -157,7 +158,7 @@ class ProductItem extends StatelessWidget {
                                                   : '0 ',
                                               style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xFFaaaaaa),
+                                                color: Color(0xff777777),
                                               ),
                                             ),
                                             Icon(
@@ -181,7 +182,7 @@ class ProductItem extends StatelessWidget {
                                               'På lager: ${product.stock}',
                                               style: const TextStyle(
                                                 fontSize: 11,
-                                                color: Color(0xFFaaaaaa),
+                                                color: Color(0xff777777),
                                               ),
                                             ),
                                             VerticalDivider(
@@ -199,7 +200,7 @@ class ProductItem extends StatelessWidget {
                                                 : '',
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              color: Color(0xFFaaaaaa),
+                                              color: Color(0xff777777),
                                             ),
                                           ),
                                           if (product.abv != null)
@@ -212,7 +213,7 @@ class ProductItem extends StatelessWidget {
                                             '${product.volume}cl',
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              color: Color(0xFFaaaaaa),
+                                              color: Color(0xff777777),
                                             ),
                                           ),
                                         ],
