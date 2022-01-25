@@ -12,13 +12,14 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   static Future<Map<String, dynamic>> getDetailedProductInfo(
       int productId, String apiToken) async {
     const fields =
-        "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url";
+        "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url,all_stock";
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',
           }
         : {};
-    final url = Uri.parse('${_baseUrl}beers/?beers=$productId&fields=$fields');
+    final url = Uri.parse(
+        '${_baseUrl}beers/?beers=$productId&fields=$fields&all_stock=true');
     try {
       final response = await http.get(
         url,
