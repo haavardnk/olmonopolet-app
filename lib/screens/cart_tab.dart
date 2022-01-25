@@ -26,7 +26,6 @@ class CartTab extends StatelessWidget {
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
                         Container(
-                          color: Colors.white,
                           child: Column(
                             children: List.generate(
                               cartData.itemCount,
@@ -50,7 +49,7 @@ class CartTab extends StatelessWidget {
             Container(
               margin: const EdgeInsets.only(top: 12),
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: Theme.of(context).backgroundColor,
               child: Column(
                 children: [
                   _createTotalPrice(cartData),
@@ -76,9 +75,9 @@ class CartTab extends StatelessWidget {
             Text(
               'Kr ${cartData.totalAmount.toStringAsFixed(2)}',
               style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFe75f3f)),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -178,7 +177,8 @@ class CartTab extends StatelessWidget {
                           child: Text(
                             cartItem.product.name,
                             style: const TextStyle(
-                                fontSize: 14, color: Color(0xFF515151)),
+                              fontSize: 14,
+                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -202,7 +202,6 @@ class CartTab extends StatelessWidget {
                                           : '0 ',
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xff777777),
                                       ),
                                     ),
                                     createRatingBar(
@@ -216,7 +215,6 @@ class CartTab extends StatelessWidget {
                                           : '',
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xff777777),
                                       ),
                                     ),
                                   ],
@@ -229,7 +227,6 @@ class CartTab extends StatelessWidget {
                                           : '0 ',
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xff777777),
                                       ),
                                     ),
                                     Icon(
@@ -244,7 +241,6 @@ class CartTab extends StatelessWidget {
                                           : '0 ',
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xff777777),
                                       ),
                                     ),
                                     Icon(
@@ -288,16 +284,12 @@ class CartTab extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                             height: 28,
-                            child: const Icon(Icons.add,
-                                color: Color(0xff777777), size: 20),
+                            child: const Icon(Icons.add, size: 20),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Text(
                           quantity.toString(),
-                          style: TextStyle(
-                            color: Color(0xff777777),
-                          ),
                         ),
                         const SizedBox(width: 10),
                         GestureDetector(
@@ -312,8 +304,7 @@ class CartTab extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                             height: 28,
-                            child: const Icon(Icons.remove,
-                                color: Color(0xff777777), size: 20),
+                            child: const Icon(Icons.remove, size: 20),
                           ),
                         ),
                       ],
@@ -325,7 +316,6 @@ class CartTab extends StatelessWidget {
               ? Wrap()
               : Divider(
                   height: 1,
-                  color: Colors.grey[400],
                 )
         ],
       ),
@@ -335,10 +325,14 @@ class CartTab extends StatelessWidget {
   void showPopupDelete(int index, double boxImageSize, CartItem cartItem,
       Cart cartData, BuildContext context) {
     Widget cancelButton = TextButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: const Text('Nei', style: TextStyle(color: Color(0xff01aed6))));
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      child: const Text(
+        'Nei',
+        style: TextStyle(color: Colors.pink),
+      ),
+    );
     Widget continueButton = TextButton(
       onPressed: () {
         cartData.removeItem(cartItem.product.id);
@@ -357,7 +351,7 @@ class CartTab extends StatelessWidget {
       child: const Text(
         'Ja',
         style: TextStyle(
-          color: Color(0xff01aed6),
+          color: Colors.pink,
         ),
       ),
     );
@@ -374,7 +368,6 @@ class CartTab extends StatelessWidget {
         'Er du sikker på at du vil fjerne dette produktet fra handlelisten?',
         style: TextStyle(
           fontSize: 13,
-          color: Color(0xff777777),
         ),
       ),
       actions: [

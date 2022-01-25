@@ -235,19 +235,18 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
     return ChoiceChip(
         label: Text(value,
             style: TextStyle(
-                color: filters.checkIn == index
-                    ? Colors.white
-                    : const Color(0xFF515151))),
+                color: filters.checkIn == index ? Colors.white : null)),
         shape: RoundedRectangleBorder(
             side: BorderSide(
                 width: 1,
-                color:
-                    filters.checkIn == index ? Colors.pink : Colors.grey[300]!),
+                color: filters.checkIn == index
+                    ? Colors.pink
+                    : Theme.of(context).focusColor),
             borderRadius: BorderRadius.circular(10)),
         elevation: 0,
         pressElevation: 0,
         selectedColor: Colors.pink,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).backgroundColor,
         selected: (filters.checkIn == 0)
             ? (index == 0 ? true : false)
             : filters.checkIn == index,
@@ -264,16 +263,14 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
       var selectedData, String value, int index, Function setFilter, mystate) {
     return FilterChip(
       label: Text(value),
-      labelStyle: TextStyle(
-          color: selectedData[index] == true
-              ? Colors.white
-              : const Color(0xFF515151)),
+      labelStyle:
+          TextStyle(color: selectedData[index] == true ? Colors.white : null),
       shape: RoundedRectangleBorder(
           side: BorderSide(
               width: 1,
               color: selectedData[index] == true
                   ? Colors.pink
-                  : Colors.grey[300]!),
+                  : Theme.of(context).focusColor),
           borderRadius: BorderRadius.circular(10)),
       selected: selectedData[index],
       onSelected: (bool selected) {
@@ -283,7 +280,7 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
       },
       elevation: 0,
       pressElevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).backgroundColor,
       selectedColor: Colors.pink,
       checkmarkColor: Colors.white,
     );

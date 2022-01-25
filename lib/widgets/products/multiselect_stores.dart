@@ -26,11 +26,13 @@ class _SelectRow extends StatelessWidget {
     return Row(
       children: [
         Checkbox(
-            value: selected,
-            onChanged: (x) {
-              onChange(x!);
-              _theState.notify();
-            }),
+          activeColor: Colors.pink,
+          value: selected,
+          onChanged: (x) {
+            onChange(x!);
+            _theState.notify();
+          },
+        ),
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
