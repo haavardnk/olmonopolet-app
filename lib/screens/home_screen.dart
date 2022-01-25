@@ -63,11 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FittedBox(
               fit: BoxFit.contain,
               child: Text(
-                filter.selectedStores.isEmpty
-                    ? 'Alle Butikker'
-                    : filter.selectedStores.length == 1
-                        ? filter.selectedStores[0]
-                        : 'Valgte butikker: ${filter.selectedStores.length}',
+                _currentIndex == 0
+                    ? filter.selectedStores.isEmpty
+                        ? 'Alle Butikker'
+                        : filter.selectedStores.length == 1
+                            ? filter.selectedStores[0]
+                            : 'Valgte butikker: ${filter.selectedStores.length}'
+                    : 'Handleliste',
                 style: const TextStyle(color: Colors.black),
               ),
             ),
@@ -99,7 +101,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (value) {
           _currentIndex = value;
           _pageController.jumpToPage(value);
-          // this unfocus is to prevent show keyboard in the wishlist page when focus on search text field
           FocusScope.of(context).unfocus();
         },
         items: [
