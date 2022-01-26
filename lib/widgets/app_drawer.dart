@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 
 import '../providers/auth.dart';
+import '../providers/filter.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -81,6 +82,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     Navigator.of(context).pop();
                     Navigator.of(context).pushReplacementNamed('/');
                     authData.logout();
+                    Provider.of<Filter>(context, listen: false).resetFilters();
                   },
                 )
               : ListTile(
