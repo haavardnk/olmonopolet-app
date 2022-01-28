@@ -9,6 +9,7 @@ import 'screens/home_screen.dart';
 import './screens/auth_screen.dart';
 import './screens/splash_screen.dart';
 import './screens/product_detail_screen.dart';
+import './screens/about_screen.dart';
 import './providers/filter.dart';
 import './providers/auth.dart';
 import './providers/cart.dart';
@@ -95,6 +96,7 @@ class MyApp extends StatelessWidget {
             routes: {
               ProductDetailScreen.routeName: (ctx) =>
                   const ProductDetailScreen(),
+              AboutScreen.routeName: (ctx) => const AboutScreen(),
             },
           );
         }),
