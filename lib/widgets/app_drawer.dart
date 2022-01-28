@@ -74,6 +74,15 @@ class _AppDrawerState extends State<AppDrawer> {
             },
           ),
           const Divider(),
+          ListTile(
+            trailing: const Icon(Icons.info),
+            title: const Text('Om'),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushNamed('/about');
+            },
+          ),
+          const Divider(),
           authData.isAuth
               ? ListTile(
                   trailing: const Icon(Icons.exit_to_app),
