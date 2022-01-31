@@ -1,0 +1,444 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_fadein/flutter_fadein.dart';
+import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
+import 'package:shimmer_image/shimmer_image.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/cart.dart';
+import '../../providers/auth.dart';
+import '../../providers/filter.dart';
+import '../../screens/product_detail_screen.dart';
+import '../../helpers/api_helper.dart';
+import './rating_widget.dart';
+
+class CartElement extends StatefulWidget {
+  final int index;
+  final double boxImageSize;
+  final CartItem cartItem;
+  final Cart cartData;
+
+  const CartElement(this.index, this.boxImageSize, this.cartItem, this.cartData,
+      {Key? key})
+      : super(key: key);
+
+  @override
+  _CartElementState createState() => _CartElementState();
+}
+
+class _CartElementState extends State<CartElement> {
+  bool _expanded = false;
+
+  List<dynamic> _stockList = [];
+  List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
+    stockList = snapshot.data!['all_stock'];
+    Map<String, int> order = new Map.fromIterable(
+      storeList.map((e) => e.name).toList(),
+      key: (key) => key,
+      value: (key) => storeList.map((e) => e.name).toList().indexOf(key),
+    );
+    stockList.sort(
+        (a, b) => order[a['store_name']]!.compareTo(order[b['store_name']]!));
+    return stockList;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const fields = "all_stock";
+    final apiToken = Provider.of<Auth>(context, listen: false).token;
+    final filters = Provider.of<Filter>(context, listen: false);
+    int quantity = widget.cartItem.quantity;
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.fastOutSlowIn,
+      height: _expanded == true
+          ? widget.boxImageSize + 110
+          : widget.boxImageSize + 25,
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              Container(
+                foregroundDecoration: widget.cartItem.product.userRating != null
+                    ? const RotatedCornerDecoration(
+                        color: Color(0xFFFBC02D),
+                        geometry: BadgeGeometry(
+                          width: 25,
+                          height: 25,
+                          cornerRadius: 0,
+                          alignment: BadgeAlignment.topLeft,
+                        ),
+                      )
+                    : null,
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          ProductDetailScreen.routeName,
+                          arguments: widget.cartItem.product,
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(5)),
+                        child: Hero(
+                          tag: widget.cartItem.product.id,
+                          child: widget.cartItem.product.imageUrl != null
+                              ? ProgressiveImage(
+                                  image: widget.cartItem.product.imageUrl ?? '',
+                                  height: widget.boxImageSize,
+                                  width: widget.boxImageSize,
+                                  imageError: 'assets/images/placeholder.png',
+                                )
+                              : Image.asset(
+                                  'assets/images/placeholder.png',
+                                  height: widget.boxImageSize,
+                                  width: widget.boxImageSize,
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: Container(
+                        height: widget.boxImageSize,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushNamed(
+                                  ProductDetailScreen.routeName,
+                                  arguments: widget.cartItem.product,
+                                );
+                              },
+                              child: Text(
+                                widget.cartItem.product.name,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 5),
+                              child: Text(
+                                'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 5),
+                              child: widget.cartItem.product.userRating == null
+                                  ? Row(
+                                      children: [
+                                        Text(
+                                          widget.cartItem.product.rating != null
+                                              ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
+                                              : '0 ',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        createRatingBar(
+                                            rating: widget.cartItem.product
+                                                        .rating !=
+                                                    null
+                                                ? widget
+                                                    .cartItem.product.rating!
+                                                : 0,
+                                            size: 18),
+                                        Text(
+                                          widget.cartItem.product.checkins !=
+                                                  null
+                                              ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
+                                              : '',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      children: [
+                                        Text(
+                                          widget.cartItem.product.rating != null
+                                              ? 'Global: ${widget.cartItem.product.rating!.toStringAsFixed(2)}'
+                                              : '0 ',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.star,
+                                          color: Colors.yellow[700],
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          widget.cartItem.product.userRating !=
+                                                  null
+                                              ? 'Din: ${widget.cartItem.product.userRating!.toStringAsFixed(2)} '
+                                              : '0 ',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.star,
+                                          color: Colors.yellow[700],
+                                          size: 18,
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      height: widget.boxImageSize,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 1,
+                          color: Colors.grey[400]!,
+                        ),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(5),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              widget.cartData.addItem(
+                                widget.cartItem.product.id,
+                                widget.cartItem.product,
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                              height: 28,
+                              child: const Icon(Icons.add, size: 20),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            quantity.toString(),
+                          ),
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              quantity == 1
+                                  ? showPopupDelete(
+                                      widget.index,
+                                      widget.boxImageSize,
+                                      widget.cartItem,
+                                      widget.cartData,
+                                      context)
+                                  : widget.cartData.removeSingleItem(
+                                      widget.cartItem.product.id);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                              height: 28,
+                              child: const Icon(Icons.remove, size: 20),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              if (_expanded == true)
+                FutureBuilder(
+                    future: ApiHelper.getDetailedProductInfo(
+                        widget.cartItem.product.id, apiToken, fields),
+                    builder: (context,
+                        AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                      if (snapshot.hasData &&
+                          snapshot.data!['all_stock'] != null &&
+                          filters.storeList.isNotEmpty) {
+                        _stockList = _sortStockList(
+                            _stockList, snapshot, filters.storeList);
+                      }
+                      return Expanded(
+                        child: snapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? FadeIn(
+                                duration: Duration(milliseconds: 500),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                            : Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (_stockList.isNotEmpty)
+                                      Expanded(
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: _stockList.length,
+                                          itemBuilder: (context, index) {
+                                            return Column(
+                                              children: [
+                                                FadeIn(
+                                                  duration: Duration(
+                                                      milliseconds: 300),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        _stockList[index]
+                                                            ['store_name'],
+                                                      ),
+                                                      Text(
+                                                        'På lager: ${_stockList[index]['quantity']}',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Divider(height: 5),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    if (_stockList.isEmpty)
+                                      Expanded(
+                                        child: Center(
+                                          child: FadeIn(
+                                            duration:
+                                                Duration(milliseconds: 300),
+                                            child: Text(
+                                              'Ingen butikker har denne på lager',
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                  ],
+                                ),
+                              ),
+                      );
+                    }),
+            ],
+          ),
+          Positioned(
+            top: widget.boxImageSize + (12 - 30),
+            right: 12 + 40 + 5,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                setState(() {
+                  _expanded = !_expanded;
+                });
+              },
+              child: Container(
+                height: 30,
+                width: 40,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 1,
+                    color: Colors.grey[400]!,
+                  ),
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(5),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.store,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+void showPopupDelete(int index, double boxImageSize, CartItem cartItem,
+    Cart cartData, BuildContext context) {
+  Widget cancelButton = TextButton(
+    onPressed: () {
+      Navigator.pop(context);
+    },
+    child: const Text(
+      'Nei',
+      style: TextStyle(color: Colors.pink),
+    ),
+  );
+  Widget continueButton = TextButton(
+    onPressed: () {
+      cartData.removeItem(cartItem.product.id);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Produktet har blitt fjernet fra handlelisten din.',
+            textAlign: TextAlign.center,
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    },
+    child: const Text(
+      'Ja',
+      style: TextStyle(
+        color: Colors.pink,
+      ),
+    ),
+  );
+
+  AlertDialog alert = AlertDialog(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    title: const Text(
+      'Fjern fra handleliste',
+      style: TextStyle(fontSize: 18),
+    ),
+    content: const Text(
+      'Er du sikker på at du vil fjerne dette produktet fra handlelisten?',
+      style: TextStyle(
+        fontSize: 13,
+      ),
+    ),
+    actions: [
+      cancelButton,
+      continueButton,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
