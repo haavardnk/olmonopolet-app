@@ -46,7 +46,7 @@ class ProductItem extends StatelessWidget {
                   child: Container(
                     margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
                     child: Container(
-                      margin: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,8 +225,8 @@ class ProductItem extends StatelessWidget {
               ],
             ),
             Positioned(
-              bottom: 15,
-              right: 15,
+              top: _boxImageSize + (14 - 35),
+              right: 12,
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {

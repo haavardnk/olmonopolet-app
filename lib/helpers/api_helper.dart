@@ -12,9 +12,7 @@ const _baseUrl = 'https://api.beermonopoly.com/';
 
 class ApiHelper {
   static Future<Map<String, dynamic>> getDetailedProductInfo(
-      int productId, String apiToken) async {
-    const fields =
-        "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url,all_stock";
+      int productId, String apiToken, String fields) async {
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',

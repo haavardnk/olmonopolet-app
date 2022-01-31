@@ -41,6 +41,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final cart = Provider.of<Cart>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
     final _boxImageSize = MediaQuery.of(context).size.width * 0.75;
+    const fields =
+        "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url,all_stock";
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +55,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Theme.of(context).appBarTheme.iconTheme, //change your color here
       ),
       body: FutureBuilder(
-        future: ApiHelper.getDetailedProductInfo(product.id, apiToken),
+        future: ApiHelper.getDetailedProductInfo(product.id, apiToken, fields),
         builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
           if (snapshot.hasData &&
               snapshot.data!['all_stock'] != null &&
