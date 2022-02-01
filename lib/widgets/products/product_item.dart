@@ -204,7 +204,7 @@ class ProductItem extends StatelessWidget {
                                               color: Colors.grey[300],
                                             ),
                                           Text(
-                                            '${product.volume}cl',
+                                            '${product.volume}l',
                                             style: const TextStyle(
                                               fontSize: 11,
                                             ),
