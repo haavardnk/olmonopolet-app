@@ -225,7 +225,7 @@ class ProductItem extends StatelessWidget {
               ],
             ),
             Positioned(
-              top: _boxImageSize + (14 - 35),
+              bottom: 14,
               right: 12,
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
