@@ -286,7 +286,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 width: 250,
                                 child: Align(
                                   alignment: Alignment.centerRight,
-                                  child: Text('${product.volume}cl'),
+                                  child: Text('${product.volume}l'),
                                 ),
                               )
                             ],
