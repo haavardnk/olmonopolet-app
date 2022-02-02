@@ -20,7 +20,7 @@ class Filter with ChangeNotifier {
 
   RangeValues priceRange = const RangeValues(0, 500);
 
-  String sortIndex = 'Rating - Høy til lav';
+  String sortIndex = 'Global rating - Høy til lav';
   Map<String, String> sortList = {
     'Alkohol - Høy til lav': '-abv',
     'Alkohol - Lav til høy': 'abv',
@@ -28,12 +28,32 @@ class Filter with ChangeNotifier {
     'Bryggeri - Synkende': '-brewery',
     'Dato lagt til - Nyeste først': '-created_at',
     'Dato lagt til - Eldste først': 'created_at',
+    'Global rating - Høy til lav': '-rating',
+    'Global rating - Lav til høy': 'rating',
     'Navn - A til Å': 'vmp_name',
     'Navn - Å til A': '-vmp_name',
     'Pris - Høy til lav': '-price',
     'Pris - Lav til høy': 'price',
-    'Rating - Høy til lav': '-rating',
-    'Rating - Lav til høy': 'rating',
+    'Pris per liter - Høy til lav': '-price_per_volume',
+    'Pris per liter - Lav til høy': 'price_per_volume',
+  };
+  Map<String, String> sortListAuth = {
+    'Alkohol - Høy til lav': '-abv',
+    'Alkohol - Lav til høy': 'abv',
+    'Bryggeri - Stigende': 'brewery',
+    'Bryggeri - Synkende': '-brewery',
+    'Dato lagt til - Nyeste først': '-created_at',
+    'Dato lagt til - Eldste først': 'created_at',
+    'Din rating - Høy til lav': '-checkin__rating',
+    'Din rating - Lav til høy': 'checkin__rating',
+    'Global rating - Høy til lav': '-rating',
+    'Global rating - Lav til høy': 'rating',
+    'Navn - A til Å': 'vmp_name',
+    'Navn - Å til A': '-vmp_name',
+    'Pris - Høy til lav': '-price',
+    'Pris - Lav til høy': 'price',
+    'Pris per liter - Høy til lav': '-price_per_volume',
+    'Pris per liter - Lav til høy': 'price_per_volume',
   };
 
   List<bool> styleSelectedList = List<bool>.filled(23, false);
@@ -122,7 +142,7 @@ class Filter with ChangeNotifier {
 
   void setSortBy(String index) {
     sortIndex = index;
-    sortBy = sortList[index]!;
+    sortBy = sortListAuth[index]!;
     notifyListeners();
   }
 
@@ -204,7 +224,7 @@ class Filter with ChangeNotifier {
   void resetFilters() {
     styleSelectedList = List<bool>.filled(23, false);
     priceRange = const RangeValues(0, 500);
-    sortIndex = 'Rating - Høy til lav';
+    sortIndex = 'Global rating - Høy til lav';
     storeId = '';
     selectedStores = [];
     style = '';
