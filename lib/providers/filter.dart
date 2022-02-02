@@ -223,6 +223,7 @@ class Filter with ChangeNotifier {
 
   void resetFilters() {
     styleSelectedList = List<bool>.filled(23, false);
+    productSelectionSelectedList = List<bool>.filled(5, false);
     priceRange = const RangeValues(0, 500);
     sortIndex = 'Global rating - Høy til lav';
     storeId = '';
