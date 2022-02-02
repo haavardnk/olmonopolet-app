@@ -129,10 +129,23 @@ class _CartElementState extends State<CartElement> {
                             ),
                             Container(
                               margin: const EdgeInsets.only(top: 5),
-                              child: Text(
-                                'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.bold),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  if (widget.cartItem.product.pricePerVolume !=
+                                      null)
+                                    Text(
+                                      ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                      ),
+                                    )
+                                ],
                               ),
                             ),
                             Container(
@@ -368,7 +381,7 @@ class _CartElementState extends State<CartElement> {
                     Radius.circular(5),
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.store,
                   size: 20,
                 ),

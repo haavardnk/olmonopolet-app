@@ -10,7 +10,7 @@ class DBHelper {
       onCreate: (db, version) {
         return db.execute(
             'CREATE TABLE cart(id INT PRIMARY KEY,name TEXT,style TEXT,'
-            'price REAL,volume REAL,stock INT,rating REAL,checkins INT,'
+            'price REAL,volume REAL,pricePerVolume REAL,stock INT,rating REAL,checkins INT,'
             'abv REAL,imageUrl TEXT,userRating REAL,quantity INT)');
       },
       version: 1,

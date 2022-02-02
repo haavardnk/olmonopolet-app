@@ -88,12 +88,22 @@ class ProductItem extends StatelessWidget {
                                 ),
                                 Container(
                                   margin: const EdgeInsets.only(top: 5),
-                                  child: Text(
-                                    'Kr ${product.price.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Kr ${product.price.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        ' - Kr ${product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
                                 Container(
