@@ -128,7 +128,7 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
   if (filter.storeId.isNotEmpty) {
     string = string + '&store=${filter.storeId}';
   }
-  if (filter.checkIn == 1) {
+  if (filter.checkIn == 1 || filter.sortBy.contains('checkin__rating')) {
     string = string + '&user_checkin=True';
   } else if (filter.checkIn == 2) {
     string = string + '&user_checkin=False';

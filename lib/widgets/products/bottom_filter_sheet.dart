@@ -26,7 +26,12 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
   @override
   void initState() {
     _priceRange = filters.priceRange;
-    _sortList = filters.sortList.keys.toList();
+    if(authData.isAuth) {
+       _sortList = filters.sortListAuth.keys.toList();
+    } else {
+      _sortList = filters.sortList.keys.toList();
+    }
+   
     super.initState();
   }
 
