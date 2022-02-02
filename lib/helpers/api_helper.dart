@@ -40,7 +40,8 @@ class ApiHelper {
   static Future<List<Product>> getProductList(
       int page, Filter filter, String apiToken) async {
     const fields =
-        "vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,sub_category,style,stock,abv,user_checked_in,volume";
+        'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
+        'sub_category,style,stock,abv,user_checked_in,volume,price_per_volume';
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',

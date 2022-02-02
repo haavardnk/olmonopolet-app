@@ -133,14 +133,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                           const SizedBox(height: 12),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
                                 'Kr ${product.price.toStringAsFixed(2)}',
                                 style: const TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ),
+                              if (product.pricePerVolume != null)
+                                Text(
+                                  ' - Kr ${product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                )
                             ],
                           ),
                           const SizedBox(height: 12),
