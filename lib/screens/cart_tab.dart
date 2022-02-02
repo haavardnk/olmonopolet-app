@@ -86,29 +86,30 @@ class CartTab extends StatelessWidget {
           ],
         ),
         TextButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                (Set<MaterialState> states) => Colors.pink,
-              ),
-              overlayColor: MaterialStateProperty.all(Colors.transparent),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4.0),
-              )),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) => Colors.pink,
             ),
-            onPressed: () {
-              cartData.clear();
-            },
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                'TØM',
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-            ))
+            overlayColor: MaterialStateProperty.all(Colors.transparent),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4.0),
+            )),
+          ),
+          onPressed: () {
+            cartData.clear();
+          },
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text(
+              'TØM',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        )
       ],
     );
   }
