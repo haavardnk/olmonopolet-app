@@ -26,12 +26,12 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
   @override
   void initState() {
     _priceRange = filters.priceRange;
-    if(authData.isAuth) {
-       _sortList = filters.sortListAuth.keys.toList();
+    if (authData.isAuth) {
+      _sortList = filters.sortListAuth.keys.toList();
     } else {
       _sortList = filters.sortList.keys.toList();
     }
-   
+
     super.initState();
   }
 
@@ -90,14 +90,18 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                       const Text('Butikk',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
-                      GestureDetector(
-                        onTap: () {
-                          filters.resetFilters();
-                          _priceRange = filters.priceRange;
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Reset Alle',
-                            style: TextStyle(color: Colors.pink)),
+                      Semantics(
+                        label: 'Reset alle filter',
+                        button: true,
+                        child: InkWell(
+                          onTap: () {
+                            filters.resetFilters();
+                            _priceRange = filters.priceRange;
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Reset Alle',
+                              style: TextStyle(color: Colors.pink)),
+                        ),
                       )
                     ],
                   ),
@@ -178,37 +182,107 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text('Stil',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Stil',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Semantics(
+                        label: 'Velg alle stiler',
+                        button: true,
+                        child: InkWell(
+                          onTap: () {
+                            mystate(() {
+                              if (!filters.styleSelectedList.contains(true)) {
+                                filters.styleSelectedList = List<bool>.filled(
+                                  filters.styleList.length,
+                                  true,
+                                );
+                              } else {
+                                filters.styleSelectedList = List<bool>.filled(
+                                  filters.styleList.length,
+                                  false,
+                                );
+                              }
+                            });
+                          },
+                          child: const Text('Velg alle',
+                              style: TextStyle(color: Colors.pink)),
+                        ),
+                      ),
+                    ],
+                  ),
                   Wrap(
                     spacing: 8,
-                    children: List.generate(filters.styleList.length, (index) {
-                      return _filter(
+                    children: List.generate(
+                      filters.styleList.length,
+                      (index) {
+                        return _filter(
                           filters.styleSelectedList,
                           filters.styleList[index].keys.first,
                           index,
                           filters.setStyle,
-                          mystate);
-                    }),
+                          mystate,
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text('Produktutvalg',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Produktutvalg',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Semantics(
+                        label: 'Velg alle produktutvalg',
+                        button: true,
+                        child: InkWell(
+                          onTap: () {
+                            mystate(() {
+                              if (!filters.productSelectionSelectedList
+                                  .contains(true)) {
+                                filters.productSelectionSelectedList =
+                                    List<bool>.filled(
+                                  filters.productSelectionList.length,
+                                  true,
+                                );
+                              } else {
+                                filters.productSelectionSelectedList =
+                                    List<bool>.filled(
+                                  filters.productSelectionList.length,
+                                  false,
+                                );
+                              }
+                            });
+                          },
+                          child: const Text('Velg alle',
+                              style: TextStyle(color: Colors.pink)),
+                        ),
+                      ),
+                    ],
+                  ),
                   Wrap(
                     spacing: 8,
-                    children: List.generate(filters.productSelectionList.length,
-                        (index) {
-                      return _filter(
+                    children: List.generate(
+                      filters.productSelectionList.length,
+                      (index) {
+                        return _filter(
                           filters.productSelectionSelectedList,
                           filters.productSelectionList[index].keys.first,
                           index,
                           filters.setProductSelection,
-                          mystate);
-                    }),
+                          mystate,
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(
                     height: 10,
@@ -224,7 +298,10 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                     children:
                         List.generate(filters.checkinList.length, (index) {
                       return _radioCheckin(
-                          filters.checkinList[index], index, mystate);
+                        filters.checkinList[index],
+                        index,
+                        mystate,
+                      );
                     }),
                   ),
                 ],
