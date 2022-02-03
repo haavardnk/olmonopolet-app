@@ -37,7 +37,7 @@ class AboutScreen extends StatelessWidget {
               "Ølmonopolet er en app som samler data fra Vinmonopolet og Untappd. "
               "På grunn av grenser på de respektive API'ene kan vi ikke levere sanntidsdata. "
               "I praksis betyr dette at vi har en egen server som kontinuerlig henter "
-              "informasjon om øl, ratinger, checkins og så videre.",
+              "informasjon om øl, ratinger, checkins med mer.",
             ),
             const SizedBox(
               height: 16,
@@ -82,7 +82,7 @@ class AboutScreen extends StatelessWidget {
               "Derfor blir øl oppdatert rullerende etter hvilken som ble oppdatert sist, "
               "med ekstra prioritet til nye øl og øl med få innsjekkinger. "
               "Når du først logger inn med Untappd vil alle dine checkins bli hentet av serveren. "
-              "Dersom du har under 5000 innsjekkinger vil alle dine innsjekkinger dukke opp innen 10 minutt, "
+              "Dersom du har under 5000 innsjekkinger vil alle dine innsjekkinger bli hentet innen 10 minutt, "
               "ellers vil det ta noen timer. Etter dette blir alle nye innsjekkinger hentet en gang i døgnet.",
             ),
             const SizedBox(
