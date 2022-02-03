@@ -1,17 +1,19 @@
 class Product {
-  Product(
-      {required this.id,
-      required this.name,
-      required this.style,
-      required this.price,
-      required this.volume,
-      this.pricePerVolume,
-      this.stock,
-      this.rating,
-      this.checkins,
-      this.abv,
-      this.imageUrl,
-      this.userRating});
+  Product({
+    required this.id,
+    required this.name,
+    required this.style,
+    required this.price,
+    required this.volume,
+    this.pricePerVolume,
+    this.stock,
+    this.rating,
+    this.checkins,
+    this.abv,
+    this.imageUrl,
+    this.userRating,
+    this.userWishlisted,
+  });
 
   factory Product.fromJson(Map<String, dynamic> product) => Product(
         id: product['vmp_id'],
@@ -31,6 +33,9 @@ class Product {
                 product['user_checked_in'].isNotEmpty
             ? product['user_checked_in'][0]['rating']
             : null,
+        userWishlisted: product['user_wishlisted'] != null
+            ? product['user_wishlisted']
+            : false,
       );
 
   final int id;
@@ -45,4 +50,5 @@ class Product {
   final double? abv;
   final String? imageUrl;
   final double? userRating;
+  final bool? userWishlisted;
 }

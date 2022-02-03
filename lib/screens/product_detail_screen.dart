@@ -69,48 +69,63 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 child: ListView(
                   children: [
                     Container(
-                      foregroundDecoration: product.userRating != null
+                      foregroundDecoration: product.userWishlisted == true
                           ? const RotatedCornerDecoration(
-                              color: Color(0xFFFBC02D),
-                              textSpan: TextSpan(text: 'Smakt'),
+                              color: Color(0xff01aed6),
+                              textSpan: TextSpan(text: 'Ønsket'),
                               geometry: BadgeGeometry(
                                 width: 60,
                                 height: 60,
                                 cornerRadius: 0,
-                                alignment: BadgeAlignment.topLeft,
+                                alignment: BadgeAlignment.topRight,
                               ),
                             )
                           : null,
-                      padding: const EdgeInsets.only(top: 5, left: 5, right: 5),
-                      height: _boxImageSize,
-                      width: _boxImageSize,
-                      child: snapshot.hasData &&
-                              snapshot.data!['label_hd_url'] != null &&
-                              snapshot.data!['label_hd_url'].isNotEmpty
-                          ? FadeInImage(
-                              fit: BoxFit.contain,
-                              image: NetworkImage(
-                                snapshot.data!['label_hd_url'],
+                      child: Container(
+                        foregroundDecoration: product.userRating != null
+                            ? const RotatedCornerDecoration(
+                                color: Color(0xFFFBC02D),
+                                textSpan: TextSpan(text: 'Smakt'),
+                                geometry: BadgeGeometry(
+                                  width: 60,
+                                  height: 60,
+                                  cornerRadius: 0,
+                                  alignment: BadgeAlignment.topLeft,
+                                ),
+                              )
+                            : null,
+                        padding:
+                            const EdgeInsets.only(top: 5, left: 5, right: 5),
+                        height: _boxImageSize,
+                        width: _boxImageSize,
+                        child: snapshot.hasData &&
+                                snapshot.data!['label_hd_url'] != null &&
+                                snapshot.data!['label_hd_url'].isNotEmpty
+                            ? FadeInImage(
+                                fit: BoxFit.contain,
+                                image: NetworkImage(
+                                  snapshot.data!['label_hd_url'],
+                                ),
+                                placeholder: product.imageUrl != null
+                                    ? NetworkImage(product.imageUrl!)
+                                    : Image.asset(
+                                        'assets/images/placeholder.png',
+                                        fit: BoxFit.contain,
+                                      ).image,
+                              )
+                            : Hero(
+                                tag: product.id,
+                                child: product.imageUrl != null
+                                    ? Image.network(
+                                        product.imageUrl!,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : Image.asset(
+                                        'assets/images/placeholder.png',
+                                        fit: BoxFit.contain,
+                                      ),
                               ),
-                              placeholder: product.imageUrl != null
-                                  ? NetworkImage(product.imageUrl!)
-                                  : Image.asset(
-                                      'assets/images/placeholder.png',
-                                      fit: BoxFit.contain,
-                                    ).image,
-                            )
-                          : Hero(
-                              tag: product.id,
-                              child: product.imageUrl != null
-                                  ? Image.network(
-                                      product.imageUrl!,
-                                      fit: BoxFit.contain,
-                                    )
-                                  : Image.asset(
-                                      'assets/images/placeholder.png',
-                                      fit: BoxFit.contain,
-                                    ),
-                            ),
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.all(16),

@@ -102,6 +102,8 @@ class Cart with ChangeNotifier {
           'abv': _items[productId]!.product.abv,
           'imageUrl': _items[productId]!.product.imageUrl,
           'userRating': _items[productId]!.product.userRating,
+          'userWishlisted':
+              (_items[productId]!.product.userWishlisted!) ? 1 : 0,
           'quantity': _items[productId]!.quantity,
         },
       );
@@ -130,6 +132,7 @@ class Cart with ChangeNotifier {
               abv: item['abv'],
               imageUrl: item['imageUrl'],
               userRating: item['userRating'],
+              userWishlisted: (item['userWishlisted'] == 1) ? true : false,
             ),
             quantity: item['quantity'],
           ),

@@ -289,8 +289,8 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   ),
                   Text(
                       authData.isAuth
-                          ? 'Innsjekket'
-                          : 'Innsjekket - Innlogging kreves',
+                          ? 'Untappd Innsjekket'
+                          : 'Untappd Innsjekket - Innlogging kreves',
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold)),
                   Wrap(
@@ -299,6 +299,26 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                         List.generate(filters.checkinList.length, (index) {
                       return _radioCheckin(
                         filters.checkinList[index],
+                        index,
+                        mystate,
+                      );
+                    }),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                      authData.isAuth
+                          ? 'Untappd Ønskeliste'
+                          : 'Untappd Ønskeliste - Innlogging kreves',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  Wrap(
+                    spacing: 8,
+                    children:
+                        List.generate(filters.wishlistList.length, (index) {
+                      return _radioWishlist(
+                        filters.wishlistList[index],
                         index,
                         mystate,
                       );
@@ -315,30 +335,60 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
 
   Widget _radioCheckin(String value, int index, mystate) {
     return ChoiceChip(
-        label: Text(value,
-            style: TextStyle(
-                color: filters.checkIn == index ? Colors.white : null)),
-        shape: RoundedRectangleBorder(
-            side: BorderSide(
-                width: 1,
-                color: filters.checkIn == index
-                    ? Colors.pink
-                    : Theme.of(context).focusColor),
-            borderRadius: BorderRadius.circular(10)),
-        elevation: 0,
-        pressElevation: 0,
-        selectedColor: Colors.pink,
-        backgroundColor: Theme.of(context).backgroundColor,
-        selected: (filters.checkIn == 0)
-            ? (index == 0 ? true : false)
-            : filters.checkIn == index,
-        onSelected: (bool selected) {
-          authData.isAuth
-              ? mystate(() {
-                  filters.setCheckin(index);
-                })
-              : null;
-        });
+      label: Text(value,
+          style:
+              TextStyle(color: filters.checkIn == index ? Colors.white : null)),
+      shape: RoundedRectangleBorder(
+          side: BorderSide(
+              width: 1,
+              color: filters.checkIn == index
+                  ? Colors.pink
+                  : Theme.of(context).focusColor),
+          borderRadius: BorderRadius.circular(10)),
+      elevation: 0,
+      pressElevation: 0,
+      selectedColor: Colors.pink,
+      backgroundColor: Theme.of(context).backgroundColor,
+      selected: (filters.checkIn == 0)
+          ? (index == 0 ? true : false)
+          : filters.checkIn == index,
+      onSelected: (bool selected) {
+        authData.isAuth
+            ? mystate(() {
+                filters.setCheckin(index);
+              })
+            : null;
+      },
+    );
+  }
+
+  Widget _radioWishlist(String value, int index, mystate) {
+    return ChoiceChip(
+      label: Text(value,
+          style: TextStyle(
+              color: filters.wishlisted == index ? Colors.white : null)),
+      shape: RoundedRectangleBorder(
+          side: BorderSide(
+              width: 1,
+              color: filters.wishlisted == index
+                  ? Colors.pink
+                  : Theme.of(context).focusColor),
+          borderRadius: BorderRadius.circular(10)),
+      elevation: 0,
+      pressElevation: 0,
+      selectedColor: Colors.pink,
+      backgroundColor: Theme.of(context).backgroundColor,
+      selected: (filters.wishlisted == 0)
+          ? (index == 0 ? true : false)
+          : filters.wishlisted == index,
+      onSelected: (bool selected) {
+        authData.isAuth
+            ? mystate(() {
+                filters.setWishlisted(index);
+              })
+            : null;
+      },
+    );
   }
 
   Widget _filter(

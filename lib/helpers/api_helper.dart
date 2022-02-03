@@ -39,7 +39,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
       int page, Filter filter, String apiToken) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,user_checked_in,volume,price_per_volume';
+        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,volume,price_per_volume';
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',
@@ -133,6 +133,11 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
     string = string + '&user_checkin=True';
   } else if (filter.checkIn == 2) {
     string = string + '&user_checkin=False';
+  }
+  if (filter.wishlisted == 1) {
+    string = string + '&user_wishlisted=True';
+  } else if (filter.wishlisted == 2) {
+    string = string + '&user_wishlisted=False';
   }
 
   final url = Uri.parse(string);

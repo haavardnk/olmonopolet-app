@@ -49,7 +49,7 @@ class _CartElementState extends State<CartElement> {
     final filters = Provider.of<Filter>(context, listen: false);
     int quantity = widget.cartItem.quantity;
     return Semantics(
-      label: 'Gå til detaljside',
+      label: widget.cartItem.product.name,
       button: true,
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
@@ -63,240 +63,256 @@ class _CartElementState extends State<CartElement> {
               children: [
                 Container(
                   foregroundDecoration:
-                      widget.cartItem.product.userRating != null
+                      widget.cartItem.product.userWishlisted == true
                           ? const RotatedCornerDecoration(
-                              color: Color(0xFFFBC02D),
+                              color: Color(0xff01aed6),
                               geometry: BadgeGeometry(
                                 width: 25,
                                 height: 25,
                                 cornerRadius: 0,
-                                alignment: BadgeAlignment.topLeft,
+                                alignment: BadgeAlignment.topRight,
                               ),
                             )
                           : null,
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pushNamed(
-                            ProductDetailScreen.routeName,
-                            arguments: widget.cartItem.product,
-                          );
-                        },
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(5)),
-                          child: Hero(
-                            tag: widget.cartItem.product.id,
-                            child: widget.cartItem.product.imageUrl != null
-                                ? ProgressiveImage(
-                                    image:
-                                        widget.cartItem.product.imageUrl ?? '',
-                                    height: widget.boxImageSize,
-                                    width: widget.boxImageSize,
-                                    imageError: 'assets/images/placeholder.png',
-                                  )
-                                : Image.asset(
-                                    'assets/images/placeholder.png',
-                                    height: widget.boxImageSize,
-                                    width: widget.boxImageSize,
-                                  ),
+                  child: Container(
+                    foregroundDecoration:
+                        widget.cartItem.product.userRating != null
+                            ? const RotatedCornerDecoration(
+                                color: Color(0xFFFBC02D),
+                                geometry: BadgeGeometry(
+                                  width: 25,
+                                  height: 25,
+                                  cornerRadius: 0,
+                                  alignment: BadgeAlignment.topLeft,
+                                ),
+                              )
+                            : null,
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                              ProductDetailScreen.routeName,
+                              arguments: widget.cartItem.product,
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5)),
+                            child: Hero(
+                              tag: widget.cartItem.product.id,
+                              child: widget.cartItem.product.imageUrl != null
+                                  ? ProgressiveImage(
+                                      image: widget.cartItem.product.imageUrl ??
+                                          '',
+                                      height: widget.boxImageSize,
+                                      width: widget.boxImageSize,
+                                      imageError:
+                                          'assets/images/placeholder.png',
+                                    )
+                                  : Image.asset(
+                                      'assets/images/placeholder.png',
+                                      height: widget.boxImageSize,
+                                      width: widget.boxImageSize,
+                                    ),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: widget.boxImageSize,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushNamed(
-                                    ProductDetailScreen.routeName,
-                                    arguments: widget.cartItem.product,
-                                  );
-                                },
-                                child: Text(
-                                  widget.cartItem.product.name,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: widget.boxImageSize,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pushNamed(
+                                      ProductDetailScreen.routeName,
+                                      arguments: widget.cartItem.product,
+                                    );
+                                  },
+                                  child: Text(
+                                    widget.cartItem.product.name,
+                                    style: const TextStyle(
+                                      fontSize: 14,
                                     ),
-                                    if (widget
-                                            .cartItem.product.pricePerVolume !=
-                                        null)
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 5),
+                                  child: Row(
+                                    children: [
                                       Text(
-                                        ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                        'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
                                         style: const TextStyle(
-                                          fontSize: 11,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      if (widget.cartItem.product
+                                              .pricePerVolume !=
+                                          null)
+                                        Text(
+                                          ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                          ),
+                                        )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 5),
+                                  child: widget.cartItem.product.userRating ==
+                                          null
+                                      ? Row(
+                                          children: [
+                                            Text(
+                                              widget.cartItem.product.rating !=
+                                                      null
+                                                  ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
+                                                  : '0 ',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            createRatingBar(
+                                                rating: widget.cartItem.product
+                                                            .rating !=
+                                                        null
+                                                    ? widget.cartItem.product
+                                                        .rating!
+                                                    : 0,
+                                                size: 18),
+                                            Text(
+                                              widget.cartItem.product
+                                                          .checkins !=
+                                                      null
+                                                  ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
+                                                  : '',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Row(
+                                          children: [
+                                            Text(
+                                              widget.cartItem.product.rating !=
+                                                      null
+                                                  ? 'Global: ${widget.cartItem.product.rating!.toStringAsFixed(2)}'
+                                                  : '0 ',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.star,
+                                              color: Colors.yellow[700],
+                                              size: 18,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              widget.cartItem.product
+                                                          .userRating !=
+                                                      null
+                                                  ? 'Din: ${widget.cartItem.product.userRating!.toStringAsFixed(2)} '
+                                                  : '0 ',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.star,
+                                              color: Colors.yellow[700],
+                                              size: 18,
+                                            ),
+                                          ],
                                         ),
-                                      )
-                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          height: widget.boxImageSize,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.grey[400]!,
+                            ),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(5),
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Semantics(
+                                label: 'Legg til en',
+                                button: true,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  onTap: () {
+                                    widget.cartData.addItem(
+                                      widget.cartItem.product.id,
+                                      widget.cartItem.product,
+                                    );
+                                  },
+                                  child: Container(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                    height: 28,
+                                    child: const Icon(Icons.add, size: 20),
+                                  ),
                                 ),
                               ),
-                              Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                child: widget.cartItem.product.userRating ==
-                                        null
-                                    ? Row(
-                                        children: [
-                                          Text(
-                                            widget.cartItem.product.rating !=
-                                                    null
-                                                ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
-                                                : '0 ',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          createRatingBar(
-                                              rating: widget.cartItem.product
-                                                          .rating !=
-                                                      null
-                                                  ? widget
-                                                      .cartItem.product.rating!
-                                                  : 0,
-                                              size: 18),
-                                          Text(
-                                            widget.cartItem.product.checkins !=
-                                                    null
-                                                ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
-                                                : '',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Row(
-                                        children: [
-                                          Text(
-                                            widget.cartItem.product.rating !=
-                                                    null
-                                                ? 'Global: ${widget.cartItem.product.rating!.toStringAsFixed(2)}'
-                                                : '0 ',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.star,
-                                            color: Colors.yellow[700],
-                                            size: 18,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            widget.cartItem.product
-                                                        .userRating !=
-                                                    null
-                                                ? 'Din: ${widget.cartItem.product.userRating!.toStringAsFixed(2)} '
-                                                : '0 ',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.star,
-                                            color: Colors.yellow[700],
-                                            size: 18,
-                                          ),
-                                        ],
-                                      ),
+                              const SizedBox(width: 10),
+                              Text(
+                                quantity.toString(),
+                              ),
+                              const SizedBox(width: 10),
+                              Semantics(
+                                label: 'Fjern en',
+                                button: true,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  onTap: () {
+                                    quantity == 1
+                                        ? showPopupDelete(
+                                            widget.index,
+                                            widget.boxImageSize,
+                                            widget.cartItem,
+                                            widget.cartData,
+                                            context)
+                                        : widget.cartData.removeSingleItem(
+                                            widget.cartItem.product.id);
+                                  },
+                                  child: Container(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                    height: 28,
+                                    child: const Icon(Icons.remove, size: 20),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        height: widget.boxImageSize,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                            color: Colors.grey[400]!,
-                          ),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Semantics(
-                              label: 'Legg til en',
-                              button: true,
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: () {
-                                  widget.cartData.addItem(
-                                    widget.cartItem.product.id,
-                                    widget.cartItem.product,
-                                  );
-                                },
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                  height: 28,
-                                  child: const Icon(Icons.add, size: 20),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              quantity.toString(),
-                            ),
-                            const SizedBox(width: 10),
-                            Semantics(
-                              label: 'Fjern en',
-                              button: true,
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: () {
-                                  quantity == 1
-                                      ? showPopupDelete(
-                                          widget.index,
-                                          widget.boxImageSize,
-                                          widget.cartItem,
-                                          widget.cartData,
-                                          context)
-                                      : widget.cartData.removeSingleItem(
-                                          widget.cartItem.product.id);
-                                },
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                  height: 28,
-                                  child: const Icon(Icons.remove, size: 20),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 if (_expanded == true)
