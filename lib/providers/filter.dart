@@ -14,6 +14,7 @@ class Filter with ChangeNotifier {
   String priceLow = '';
   String sortBy = '-rating';
   int checkIn = 0;
+  int wishlisted = 0;
 
   List<String> selectedStores = [];
   List<Store> storeList = [];
@@ -103,6 +104,12 @@ class Filter with ChangeNotifier {
     'Ikke innsjekket',
   ];
 
+  List<String> wishlistList = [
+    'Alle Produkt',
+    'I ønskeliste',
+    'Ikke i ønskeliste',
+  ];
+
   Filter get filters {
     return this;
   }
@@ -182,6 +189,11 @@ class Filter with ChangeNotifier {
 
   void setCheckin(int index) {
     checkIn = index;
+    notifyListeners();
+  }
+
+  void setWishlisted(int index) {
+    wishlisted = index;
     notifyListeners();
   }
 

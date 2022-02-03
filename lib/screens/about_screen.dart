@@ -83,7 +83,8 @@ class AboutScreen extends StatelessWidget {
               "med ekstra prioritet til nye øl og øl med få innsjekkinger. "
               "Når du først logger inn med Untappd vil alle dine checkins bli hentet av serveren. "
               "Dersom du har under 5000 innsjekkinger vil alle dine innsjekkinger bli hentet innen 10 minutt, "
-              "ellers vil det ta noen timer. Etter dette blir alle nye innsjekkinger hentet en gang i døgnet.",
+              "ellers vil det ta noen timer. Etter dette blir alle nye innsjekkinger hentet en gang i døgnet. "
+              "Ønskelisten din vil også bli hentet en gang i døgnet, mer nøyaktig i løpet av natten.",
             ),
             const SizedBox(
               height: 16,
