@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:rate_my_app/rate_my_app.dart';
 
 import 'screens/home_screen.dart';
 import './screens/auth_screen.dart';
@@ -32,8 +33,33 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  RateMyApp rateMyApp = RateMyApp(
+    preferencesPrefix: 'rateMyApp_',
+    minDays: 7,
+    minLaunches: 10,
+    remindDays: 7,
+    remindLaunches: 10,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await rateMyApp.init();
+      if (mounted && rateMyApp.shouldOpenDialog) {
+        rateMyApp.showRateDialog(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,18 +98,11 @@ class MyApp extends StatelessWidget {
         child: Consumer<Auth>(builder: (ctx, auth, _) {
           Provider.of<Filter>(ctx, listen: false).loadLastStore();
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             scrollBehavior: MyCustomScrollBehavior(),
             title: 'Ølmonopolet',
             theme: theme,
             darkTheme: darkTheme,
-            // theme: ThemeData(
-            //   primarySwatch: Colors.pink,
-            //   visualDensity: VisualDensity.adaptivePlatformDensity,
-            //   pageTransitionsTheme: const PageTransitionsTheme(builders: {
-            //     TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            //     TargetPlatform.android: ZoomPageTransitionsBuilder(),
-            //   }),
-            // ),
             home: auth.isAuthOrSkipLogin
                 ? const HomeScreen()
                 : FutureBuilder(
