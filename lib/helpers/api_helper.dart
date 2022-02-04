@@ -113,6 +113,24 @@ class ApiHelper {
       throw NoConnectionException();
     }
   }
+
+  static Future<List<String>> getReleaseList() async {
+    const fields = "name";
+    try {
+      final response = await http.get(_apiReleaseUrlBuilder(fields));
+      if (response.statusCode == 200) {
+        List<String> releases = [];
+        final jsonResponse =
+            json.decode(utf8.decode(response.bodyBytes))['results'];
+        jsonResponse.forEach((release) => releases.add(release['name']));
+        return releases;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
 }
 
 Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
@@ -126,6 +144,7 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
       '&style=${filter.style}'
       '&product_selection=${filter.productSelection}'
       '&search=${filter.search}'
+      '&release=${filter.release}'
       '&page=$page'
       '&page_size=15');
   if (filter.storeId.isNotEmpty) {
@@ -152,6 +171,15 @@ Uri _apiStoreUrlBuilder(String fields) {
     'stores/'
     '?fields=$fields'
     '&page_size=500',
+  );
+  return url;
+}
+
+Uri _apiReleaseUrlBuilder(String fields) {
+  final url = Uri.parse(
+    '$_baseUrl'
+    'release/'
+    '?fields=$fields',
   );
   return url;
 }

@@ -287,6 +287,38 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   const SizedBox(
                     height: 10,
                   ),
+                  const Text('Ølslipp',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Consumer<Filter>(
+                    builder: (context, flt, _) {
+                      return flt.releaseList.isNotEmpty
+                          ? Wrap(
+                              spacing: 8,
+                              children: List.generate(
+                                filters.releaseList.length,
+                                (index) {
+                                  return _filter(
+                                    filters.releaseSelectedList,
+                                    filters.releaseList[index],
+                                    index,
+                                    filters.setRelease,
+                                    mystate,
+                                  );
+                                },
+                              ),
+                            )
+                          : Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Ingen aktive ølslipp.'),
+                              ),
+                            );
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Text(
                       authData.isAuth
                           ? 'Untappd Innsjekket'
@@ -297,9 +329,11 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                     spacing: 8,
                     children:
                         List.generate(filters.checkinList.length, (index) {
-                      return _radioCheckin(
+                      return _radio(
                         filters.checkinList[index],
                         index,
+                        filters.checkIn,
+                        filters.setCheckin,
                         mystate,
                       );
                     }),
@@ -317,9 +351,11 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                     spacing: 8,
                     children:
                         List.generate(filters.wishlistList.length, (index) {
-                      return _radioWishlist(
+                      return _radio(
                         filters.wishlistList[index],
                         index,
+                        filters.wishlisted,
+                        filters.setWishlisted,
                         mystate,
                       );
                     }),
@@ -333,15 +369,15 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
     );
   }
 
-  Widget _radioCheckin(String value, int index, mystate) {
+  Widget _radio(
+      String value, int index, int selected, Function setSelected, mystate) {
     return ChoiceChip(
       label: Text(value,
-          style:
-              TextStyle(color: filters.checkIn == index ? Colors.white : null)),
+          style: TextStyle(color: selected == index ? Colors.white : null)),
       shape: RoundedRectangleBorder(
           side: BorderSide(
               width: 1,
-              color: filters.checkIn == index
+              color: selected == index
                   ? Colors.pink
                   : Theme.of(context).focusColor),
           borderRadius: BorderRadius.circular(10)),
@@ -349,42 +385,12 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
       pressElevation: 0,
       selectedColor: Colors.pink,
       backgroundColor: Theme.of(context).backgroundColor,
-      selected: (filters.checkIn == 0)
-          ? (index == 0 ? true : false)
-          : filters.checkIn == index,
+      selected:
+          (selected == 0) ? (index == 0 ? true : false) : selected == index,
       onSelected: (bool selected) {
         authData.isAuth
             ? mystate(() {
-                filters.setCheckin(index);
-              })
-            : null;
-      },
-    );
-  }
-
-  Widget _radioWishlist(String value, int index, mystate) {
-    return ChoiceChip(
-      label: Text(value,
-          style: TextStyle(
-              color: filters.wishlisted == index ? Colors.white : null)),
-      shape: RoundedRectangleBorder(
-          side: BorderSide(
-              width: 1,
-              color: filters.wishlisted == index
-                  ? Colors.pink
-                  : Theme.of(context).focusColor),
-          borderRadius: BorderRadius.circular(10)),
-      elevation: 0,
-      pressElevation: 0,
-      selectedColor: Colors.pink,
-      backgroundColor: Theme.of(context).backgroundColor,
-      selected: (filters.wishlisted == 0)
-          ? (index == 0 ? true : false)
-          : filters.wishlisted == index,
-      onSelected: (bool selected) {
-        authData.isAuth
-            ? mystate(() {
-                filters.setWishlisted(index);
+                setSelected(index);
               })
             : null;
       },
