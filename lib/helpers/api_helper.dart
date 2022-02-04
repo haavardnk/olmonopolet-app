@@ -37,6 +37,26 @@ class ApiHelper {
     }
   }
 
+  static Future<List<dynamic>> checkStock(
+      String productIds, String stores) async {
+    final url = Uri.parse(
+        '${_baseUrl}beers/?beers=$productIds&store=$stores&fields=vmp_id,stock');
+    try {
+      final response = await http.get(
+        url,
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonResponse =
+            json.decode(utf8.decode(response.bodyBytes))['results'];
+        return jsonResponse;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
+
   static Future<List<Product>> getProductList(
       int page, Filter filter, String apiToken) async {
     const fields =

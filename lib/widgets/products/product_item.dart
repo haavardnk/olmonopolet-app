@@ -8,7 +8,7 @@ import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
 import '../../models/product.dart';
 import '../../providers/cart.dart';
 import '../../screens/product_detail_screen.dart';
-import './rating_widget.dart';
+import '../rating_widget.dart';
 
 class ProductItem extends StatelessWidget {
   const ProductItem({required this.product, Key? key}) : super(key: key);

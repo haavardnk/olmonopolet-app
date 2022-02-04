@@ -31,7 +31,6 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
     } else {
       _sortList = filters.sortList.keys.toList();
     }
-
     super.initState();
   }
 
