@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/cart.dart';
-import '../widgets/products/cart_element.dart';
+import '../widgets/cart/cart_element.dart';
 
 class CartTab extends StatelessWidget {
   const CartTab({Key? key}) : super(key: key);
@@ -38,6 +38,18 @@ class CartTab extends StatelessWidget {
                                       cartData.items.values.elementAt(index),
                                       cartData,
                                     ),
+                                    if (index == cartData.itemCount - 1 &&
+                                        cartData.hideNoStock &&
+                                        cartData.cartStoreId.isNotEmpty &&
+                                        (cartData.itemsInStock.length !=
+                                            cartData.itemCount))
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Center(
+                                          child: Text(
+                                              '${cartData.itemCount - cartData.itemsInStock.length} skjulte produkter'),
+                                        ),
+                                      )
                                   ],
                                 );
                               },
