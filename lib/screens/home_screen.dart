@@ -49,7 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Provider.of<Cart>(context, listen: false).fetchAndSetCart();
-    Provider.of<Filter>(context, listen: false).getStores();
+    final filters = Provider.of<Filter>(context, listen: false);
+    if (!filters.storesLoading && filters.storeList.isEmpty) {
+      filters.getStores();
+    }
+    if (!filters.releasesLoading && filters.releaseList.length < 2) {
+      filters.getReleases();
+    }
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

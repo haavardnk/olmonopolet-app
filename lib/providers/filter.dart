@@ -13,6 +13,7 @@ class Filter with ChangeNotifier {
   String priceHigh = '';
   String priceLow = '';
   String sortBy = '-rating';
+  String release = '';
   int checkIn = 0;
   int wishlisted = 0;
 
@@ -98,14 +99,17 @@ class Filter with ChangeNotifier {
     {'Tilleggsutvalget': 'tilleggsutvalget'},
   ];
 
+  List<bool> releaseSelectedList = [];
+  List<String> releaseList = [];
+
   List<String> checkinList = [
-    'Alle Produkt',
+    'Alle',
     'Innsjekket',
     'Ikke innsjekket',
   ];
 
   List<String> wishlistList = [
-    'Alle Produkt',
+    'Alle',
     'I ønskeliste',
     'Ikke i ønskeliste',
   ];
@@ -132,6 +136,26 @@ class Filter with ChangeNotifier {
       storesLoading = false;
       notifyListeners();
       return storeList;
+    }
+  }
+
+  bool releasesLoading = false;
+  Future<List<String>> getReleases() async {
+    if (releaseList.isNotEmpty && releaseList.length > 1 && !releasesLoading) {
+      return releaseList;
+    }
+    try {
+      releasesLoading = true;
+      var releases = await ApiHelper.getReleaseList();
+      releaseList = releases;
+      releaseSelectedList = List<bool>.filled(releaseList.length, false);
+      releasesLoading = false;
+      notifyListeners();
+      return releaseList;
+    } catch (error) {
+      releasesLoading = false;
+      notifyListeners();
+      return releaseList;
     }
   }
 
@@ -187,6 +211,23 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
+  void setRelease(int index, bool boolean) {
+    releaseSelectedList[index] = boolean;
+    var temporaryRelease = '';
+    releaseSelectedList.asMap().forEach(
+      (index, value) {
+        if (value) {
+          if (temporaryRelease.isNotEmpty) {
+            temporaryRelease += ',';
+          }
+          temporaryRelease += releaseList[index];
+        }
+      },
+    );
+    release = temporaryRelease;
+    notifyListeners();
+  }
+
   void setCheckin(int index) {
     checkIn = index;
     notifyListeners();
@@ -236,6 +277,7 @@ class Filter with ChangeNotifier {
   void resetFilters() {
     styleSelectedList = List<bool>.filled(23, false);
     productSelectionSelectedList = List<bool>.filled(5, false);
+    releaseSelectedList = List<bool>.filled(releaseList.length, false);
     priceRange = const RangeValues(0, 500);
     sortIndex = 'Global rating - Høy til lav';
     storeId = '';
@@ -245,6 +287,7 @@ class Filter with ChangeNotifier {
     priceHigh = '';
     priceLow = '';
     sortBy = '-rating';
+    release = '';
     checkIn = 0;
     notifyListeners();
     saveLastStore();
