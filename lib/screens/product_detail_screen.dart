@@ -9,7 +9,7 @@ import '../providers/cart.dart';
 import '../providers/filter.dart';
 import '../helpers/api_helper.dart';
 import '../models/product.dart';
-import '../widgets/products/rating_widget.dart';
+import '../widgets/rating_widget.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({Key? key}) : super(key: key);

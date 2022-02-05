@@ -7,6 +7,7 @@ import 'cart_tab.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/products/bottom_filter_sheet.dart';
 import '../widgets/products/search_bar.dart';
+import '../widgets/cart/bottom_store_sheet.dart';
 import '../providers/filter.dart';
 import '../providers/cart.dart';
 
@@ -28,11 +29,24 @@ class _HomeScreenState extends State<HomeScreen> {
     const CartTab(),
   ];
 
+  Future<void> initCartSettings() async {
+    final cart = Provider.of<Cart>(context, listen: false);
+    final filters = Provider.of<Filter>(context, listen: false);
+    if (cart.useOverviewStoreSelection == true) {
+      cart.cartStoreId = filters.storeId;
+      cart.cartSelectedStores = filters.selectedStores.toList();
+    }
+    if (cart.cartStoreId.isNotEmpty && (cart.greyNoStock || cart.hideNoStock)) {
+      cart.checkCartStockStatus();
+    }
+  }
+
   @override
   void initState() {
     // set initial pages for navigation to home page
     _pageController = PageController(initialPage: 0);
     _pageController.addListener(_handleTabSelection);
+    initCartSettings();
     super.initState();
   }
 
@@ -83,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           if (_currentIndex == 0) const BottomFilterSheet(),
+          if (_currentIndex == 1) BottomStoreSheet(initCartSettings),
         ],
         bottom: _currentIndex == 0
             ? const PreferredSize(

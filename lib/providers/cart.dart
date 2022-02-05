@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/db_helper.dart';
+import '../helpers/api_helper.dart';
 import '../models/product.dart';
+import '../models/store.dart';
 
 class CartItem {
   final Product product;
   final int quantity;
+  bool inStock;
 
   CartItem({
     required this.product,
     required this.quantity,
+    this.inStock = true,
   });
 }
 
 class Cart with ChangeNotifier {
   Map<int, CartItem> _items = {};
+  List<int> itemsInStock = [];
+  List<String> cartSelectedStores = [];
+  String cartStoreId = '';
+  bool useOverviewStoreSelection = true;
+  bool greyNoStock = false;
+  bool hideNoStock = false;
 
   Map<int, CartItem> get items {
     return {..._items};
@@ -51,12 +62,14 @@ class Cart with ChangeNotifier {
       );
     }
     notifyListeners();
+    checkCartStockStatus();
     updateDb(productId);
   }
 
   void removeItem(int productId) {
     _items.remove(productId);
     notifyListeners();
+    checkCartStockStatus();
     updateDb(productId);
   }
 
@@ -74,6 +87,7 @@ class Cart with ChangeNotifier {
       );
     } else {
       _items.remove(productId);
+      checkCartStockStatus();
     }
     notifyListeners();
     updateDb(productId);
@@ -81,6 +95,7 @@ class Cart with ChangeNotifier {
 
   void clear() {
     _items = {};
+    itemsInStock = [];
     notifyListeners();
     DBHelper.clear('cart');
   }
@@ -138,7 +153,71 @@ class Cart with ChangeNotifier {
           ),
         );
       }
+      final prefs = await SharedPreferences.getInstance();
+      cartStoreId = prefs.getString('cartStoreId') ?? '';
+      cartSelectedStores = prefs.getStringList('cartSelectedStores') ?? [];
+      useOverviewStoreSelection =
+          prefs.getBool('useOverviewStoreSelection') ?? true;
+      greyNoStock = prefs.getBool('greyNoStock') ?? false;
+      hideNoStock = prefs.getBool('hideNoStock') ?? false;
+      notifyListeners();
+
+      if (greyNoStock || hideNoStock) {
+        checkCartStockStatus();
+      }
+    }
+  }
+
+  void saveCartSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('cartStoreId', cartStoreId);
+    prefs.setStringList('cartSelectedStores', cartSelectedStores);
+    prefs.setBool('useOverviewStoreSelection', useOverviewStoreSelection);
+    prefs.setBool('greyNoStock', greyNoStock);
+    prefs.setBool('hideNoStock', hideNoStock);
+    notifyListeners();
+  }
+
+  Future<void> checkCartStockStatus() async {
+    if (cartStoreId.isNotEmpty) {
+      String cartItemIds = '';
+      _items.forEach((key, value) {
+        if (cartItemIds.isNotEmpty) {
+          cartItemIds += ',';
+        }
+        cartItemIds += value.product.id.toString();
+      });
+      var response = await ApiHelper.checkStock(cartItemIds, cartStoreId);
+      itemsInStock = [];
+      response.forEach((element) {
+        itemsInStock.add(element['vmp_id']);
+      });
+      _items.forEach((key, value) {
+        if (itemsInStock.contains(value.product.id)) {
+          value.inStock = true;
+        } else {
+          value.inStock = false;
+        }
+      });
       notifyListeners();
     }
+  }
+
+  void setCartStore(List<Store> storeList) {
+    if (cartSelectedStores.isEmpty) {
+      cartStoreId = '';
+    } else {
+      String temporaryStores = '';
+      cartSelectedStores.forEach((storeName) {
+        if (temporaryStores.isNotEmpty) {
+          temporaryStores += ',';
+        }
+        temporaryStores +=
+            storeList.firstWhere((element) => element.name == storeName).id;
+      });
+      cartStoreId = temporaryStores;
+    }
+    notifyListeners();
+    saveCartSettings();
   }
 }
