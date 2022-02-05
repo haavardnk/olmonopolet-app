@@ -17,6 +17,7 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void initState() {
     filters = Provider.of<Filter>(context, listen: false);
+    _search.text = filters.search;
     super.initState();
   }
 
