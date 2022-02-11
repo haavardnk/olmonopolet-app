@@ -19,6 +19,8 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
 
   // price slider
   late RangeValues _priceRange;
+  late RangeValues _pricePerVolumeRange;
+  late RangeValues _alcoholRange;
 
   // sort
   late List<String?> _sortList;
@@ -26,6 +28,8 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
   @override
   void initState() {
     _priceRange = filters.priceRange;
+    _pricePerVolumeRange = filters.pricePerVolumeRange;
+    _alcoholRange = filters.alcoholRange;
     if (authData.isAuth) {
       _sortList = filters.sortListAuth.keys.toList();
     } else {
@@ -54,7 +58,7 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
           builder: (BuildContext context) {
             return _showPopup();
           },
-        );
+        ).whenComplete(() => filters.setFilters());
       },
       icon: const Icon(Icons.filter_list),
       label: const Text('Filter'),
@@ -96,6 +100,8 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                           onTap: () {
                             filters.resetFilters();
                             _priceRange = filters.priceRange;
+                            _pricePerVolumeRange = filters.pricePerVolumeRange;
+                            _alcoholRange = filters.alcoholRange;
                             Navigator.pop(context);
                           },
                           child: const Text('Reset Alle',
@@ -129,26 +135,63 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text('Pris',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  RangeSlider(
-                    values: _priceRange,
-                    min: 0,
-                    max: 500,
-                    divisions: 20,
-                    labels: RangeLabels(
-                      _priceRange.start.round().toString(),
-                      _priceRange.end == 500
-                          ? _priceRange.end.round().toString() + ' +'
-                          : _priceRange.end.round().toString(),
-                    ),
-                    onChanged: (RangeValues values) {
-                      mystate(() {
-                        _priceRange = values;
-                        filters.setPriceRange(_priceRange);
-                      });
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Pris',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Text('Pris per liter',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: RangeSlider(
+                          values: _priceRange,
+                          min: 0,
+                          max: 500,
+                          divisions: 20,
+                          labels: RangeLabels(
+                            _priceRange.start.round().toString(),
+                            _priceRange.end == 500
+                                ? _priceRange.end.round().toString() + ' +'
+                                : _priceRange.end.round().toString(),
+                          ),
+                          onChanged: (RangeValues values) {
+                            mystate(() {
+                              _priceRange = values;
+                              filters.setPriceRange(_priceRange);
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RangeSlider(
+                          values: _pricePerVolumeRange,
+                          min: 0,
+                          max: 500,
+                          divisions: 20,
+                          labels: RangeLabels(
+                            _pricePerVolumeRange.start.round().toString(),
+                            _pricePerVolumeRange.end == 500
+                                ? _pricePerVolumeRange.end.round().toString() +
+                                    ' +'
+                                : _pricePerVolumeRange.end.round().toString(),
+                          ),
+                          onChanged: (RangeValues values) {
+                            mystate(() {
+                              _pricePerVolumeRange = values;
+                              filters
+                                  .setPricePerVolumeRange(_pricePerVolumeRange);
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 10,
@@ -228,6 +271,30 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                         );
                       },
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text('Alkohol %',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  RangeSlider(
+                    values: _alcoholRange,
+                    min: 0,
+                    max: 15,
+                    divisions: 15,
+                    labels: RangeLabels(
+                      _alcoholRange.start.round().toString(),
+                      _alcoholRange.end == 15
+                          ? _alcoholRange.end.round().toString() + ' +'
+                          : _alcoholRange.end.round().toString(),
+                    ),
+                    onChanged: (RangeValues values) {
+                      mystate(() {
+                        _alcoholRange = values;
+                        filters.setAlcoholRange(_alcoholRange);
+                      });
+                    },
                   ),
                   const SizedBox(
                     height: 10,

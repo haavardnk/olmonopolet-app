@@ -12,6 +12,10 @@ class Filter with ChangeNotifier {
   String productSelection = '';
   String priceHigh = '';
   String priceLow = '';
+  String ppvHigh = '';
+  String ppvLow = '';
+  String abvHigh = '';
+  String abvLow = '';
   String sortBy = '-rating';
   String release = '';
   int checkIn = 0;
@@ -21,6 +25,8 @@ class Filter with ChangeNotifier {
   List<Store> storeList = [];
 
   RangeValues priceRange = const RangeValues(0, 500);
+  RangeValues pricePerVolumeRange = const RangeValues(0, 500);
+  RangeValues alcoholRange = const RangeValues(0, 15);
 
   String sortIndex = 'Global rating - Høy til lav';
   Map<String, String> sortList = {
@@ -171,6 +177,30 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
+  void setPricePerVolumeRange(RangeValues range) {
+    pricePerVolumeRange = range;
+    if (pricePerVolumeRange.end == 500) {
+      ppvHigh = '';
+      ppvLow = pricePerVolumeRange.start.toString();
+    } else {
+      ppvHigh = pricePerVolumeRange.end.toString();
+      ppvLow = pricePerVolumeRange.start.toString();
+    }
+    notifyListeners();
+  }
+
+  void setAlcoholRange(RangeValues range) {
+    alcoholRange = range;
+    if (alcoholRange.end == 500) {
+      abvHigh = '';
+      abvLow = alcoholRange.start.toString();
+    } else {
+      abvHigh = alcoholRange.end.toString();
+      abvLow = alcoholRange.start.toString();
+    }
+    notifyListeners();
+  }
+
   void setSortBy(String index) {
     sortIndex = index;
     sortBy = sortListAuth[index]!;
@@ -279,6 +309,8 @@ class Filter with ChangeNotifier {
     productSelectionSelectedList = List<bool>.filled(5, false);
     releaseSelectedList = List<bool>.filled(releaseList.length, false);
     priceRange = const RangeValues(0, 500);
+    pricePerVolumeRange = const RangeValues(0, 500);
+    alcoholRange = const RangeValues(0, 15);
     sortIndex = 'Global rating - Høy til lav';
     storeId = '';
     selectedStores = [];
@@ -286,10 +318,18 @@ class Filter with ChangeNotifier {
     productSelection = '';
     priceHigh = '';
     priceLow = '';
+    ppvHigh = '';
+    ppvLow = '';
+    abvHigh = '';
+    abvLow = '';
     sortBy = '-rating';
     release = '';
     checkIn = 0;
     notifyListeners();
     saveLastStore();
+  }
+
+  void setFilters() {
+    notifyListeners();
   }
 }
