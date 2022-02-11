@@ -540,7 +540,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                    margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
                       color: Colors.pink,
                       border: Border.all(
