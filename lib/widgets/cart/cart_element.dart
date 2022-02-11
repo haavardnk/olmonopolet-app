@@ -61,10 +61,8 @@ class _CartElementState extends State<CartElement> {
               height: _expanded == true
                   ? widget.boxImageSize +
                       110 +
-                      MediaQuery.of(context).textScaleFactor * 15
-                  : widget.boxImageSize +
-                      25 +
-                      MediaQuery.of(context).textScaleFactor * 15,
+                      MediaQuery.of(context).textScaleFactor * 10
+                  : widget.boxImageSize + 24,
               child: Stack(
                 children: [
                   Column(
@@ -145,9 +143,6 @@ class _CartElementState extends State<CartElement> {
                                 ),
                                 Expanded(
                                   child: Container(
-                                    height: widget.boxImageSize +
-                                        MediaQuery.of(context).textScaleFactor *
-                                            15,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -277,78 +272,141 @@ class _CartElementState extends State<CartElement> {
                                 SizedBox(
                                   width: 10,
                                 ),
-                                Container(
-                                  height: widget.boxImageSize +
-                                      MediaQuery.of(context).textScaleFactor *
-                                          15,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Colors.grey[400]!,
+                                Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Container(
+                                      height: widget.boxImageSize - 31,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          width: 1,
+                                          color: Colors.grey[400]!,
+                                        ),
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(5),
+                                        ),
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Semantics(
+                                                  label: 'Legg til en',
+                                                  button: true,
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      widget.cartData.addItem(
+                                                        widget.cartItem.product
+                                                            .id,
+                                                        widget.cartItem.product,
+                                                      );
+                                                    },
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10, 0, 10, 2),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                          Radius.circular(5),
+                                                        ),
+                                                      ),
+                                                      child: const Icon(
+                                                          Icons.add,
+                                                          size: 18),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Semantics(
+                                                  label: 'Fjern en',
+                                                  button: true,
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      quantity == 1
+                                                          ? showPopupDelete(
+                                                              widget.index,
+                                                              widget
+                                                                  .boxImageSize,
+                                                              widget.cartItem,
+                                                              widget.cartData,
+                                                              context)
+                                                          : widget.cartData
+                                                              .removeSingleItem(
+                                                                  widget
+                                                                      .cartItem
+                                                                      .product
+                                                                      .id);
+                                                    },
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10, 2, 10, 0),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                          Radius.circular(5),
+                                                        ),
+                                                      ),
+                                                      child: const Icon(
+                                                          Icons.remove,
+                                                          size: 18),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              quantity.toString(),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(5),
+                                    SizedBox(
+                                      height: 3,
                                     ),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Semantics(
-                                        label: 'Legg til en',
-                                        button: true,
-                                        child: GestureDetector(
-                                          behavior: HitTestBehavior.translucent,
-                                          onTap: () {
-                                            widget.cartData.addItem(
-                                              widget.cartItem.product.id,
-                                              widget.cartItem.product,
-                                            );
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                5, 0, 5, 0),
-                                            height: 28,
-                                            child:
-                                                const Icon(Icons.add, size: 20),
+                                    Semantics(
+                                      label: 'Vis butikker med varen på lager',
+                                      button: true,
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _expanded = !_expanded;
+                                          });
+                                        },
+                                        child: Container(
+                                          height: 28,
+                                          width: 40,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: 1,
+                                              color: Colors.grey[400]!,
+                                            ),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(5),
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            Icons.store_outlined,
+                                            size: 17,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        quantity.toString(),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Semantics(
-                                        label: 'Fjern en',
-                                        button: true,
-                                        child: GestureDetector(
-                                          behavior: HitTestBehavior.translucent,
-                                          onTap: () {
-                                            quantity == 1
-                                                ? showPopupDelete(
-                                                    widget.index,
-                                                    widget.boxImageSize,
-                                                    widget.cartItem,
-                                                    widget.cartData,
-                                                    context)
-                                                : widget.cartData
-                                                    .removeSingleItem(widget
-                                                        .cartItem.product.id);
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                5, 0, 5, 0),
-                                            height: 28,
-                                            child: const Icon(Icons.remove,
-                                                size: 20),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -438,40 +496,6 @@ class _CartElementState extends State<CartElement> {
                               );
                             }),
                     ],
-                  ),
-                  Positioned(
-                    top: widget.boxImageSize +
-                        MediaQuery.of(context).textScaleFactor * 15 +
-                        (12 - 30),
-                    right: 12 + 40 + 5,
-                    child: Semantics(
-                      label: 'Vis butikker med varen på lager',
-                      button: true,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _expanded = !_expanded;
-                          });
-                        },
-                        child: Container(
-                          height: 30,
-                          width: 40,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: Colors.grey[400]!,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(5),
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.store_outlined,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               ),
