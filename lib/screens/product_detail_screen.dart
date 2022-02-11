@@ -537,25 +537,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     );
                   },
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                    decoration: BoxDecoration(
-                      color: Colors.pink,
-                      border: Border.all(
-                        width: 1,
-                        color: Colors.pink,
-                      ),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      'Legg til i handleliste',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  child: Consumer<Cart>(
+                    builder: (_, cart, __) => Stack(
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                          decoration: BoxDecoration(
+                            color: Colors.pink,
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.pink,
+                            ),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          child: const Text(
+                            'Legg til i handleliste',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (cart.items.keys.contains(product.id))
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              // color: Theme.of(context).accentColor,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 18,
+                                minHeight: 18,
+                              ),
+                              child: Text(
+                                cart.items[product.id]!.quantity.toString(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.pink,
+                                ),
+                              ),
+                            ),
+                          )
+                      ],
                     ),
                   ),
                 ),

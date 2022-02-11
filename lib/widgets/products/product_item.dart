@@ -292,9 +292,41 @@ class ProductItem extends StatelessWidget {
                           Radius.circular(5),
                         ),
                       ),
-                      child: const Icon(
-                        Icons.add_shopping_cart,
-                        size: 20,
+                      child: Consumer<Cart>(
+                        builder: (_, cart, __) => Stack(
+                          children: [
+                            Center(
+                              child: const Icon(
+                                Icons.add_shopping_cart,
+                                size: 20,
+                              ),
+                            ),
+                            if (cart.items.keys.contains(product.id))
+                              Positioned(
+                                right: 7,
+                                top: 4,
+                                child: Container(
+                                  // color: Theme.of(context).accentColor,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    color: Colors.pink,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 11,
+                                    minHeight: 11,
+                                  ),
+                                  child: Text(
+                                    cart.items[product.id]!.quantity.toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                          ],
+                        ),
                       ),
                     ),
                   ),
