@@ -59,8 +59,12 @@ class _CartElementState extends State<CartElement> {
               duration: Duration(milliseconds: 300),
               curve: Curves.fastOutSlowIn,
               height: _expanded == true
-                  ? widget.boxImageSize + 110
-                  : widget.boxImageSize + 25,
+                  ? widget.boxImageSize +
+                      110 +
+                      MediaQuery.of(context).textScaleFactor * 15
+                  : widget.boxImageSize +
+                      25 +
+                      MediaQuery.of(context).textScaleFactor * 15,
               child: Stack(
                 children: [
                   Column(
@@ -141,7 +145,9 @@ class _CartElementState extends State<CartElement> {
                                 ),
                                 Expanded(
                                   child: Container(
-                                    height: widget.boxImageSize,
+                                    height: widget.boxImageSize +
+                                        MediaQuery.of(context).textScaleFactor *
+                                            15,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -177,10 +183,13 @@ class _CartElementState extends State<CartElement> {
                                               if (widget.cartItem.product
                                                       .pricePerVolume !=
                                                   null)
-                                                Text(
-                                                  ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                                  style: const TextStyle(
-                                                    fontSize: 11,
+                                                Expanded(
+                                                  child: Text(
+                                                    ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                                    style: const TextStyle(
+                                                        fontSize: 11,
+                                                        overflow: TextOverflow
+                                                            .ellipsis),
                                                   ),
                                                 )
                                             ],
@@ -269,7 +278,9 @@ class _CartElementState extends State<CartElement> {
                                   width: 10,
                                 ),
                                 Container(
-                                  height: widget.boxImageSize,
+                                  height: widget.boxImageSize +
+                                      MediaQuery.of(context).textScaleFactor *
+                                          15,
                                   width: 40,
                                   decoration: BoxDecoration(
                                     border: Border.all(
@@ -429,7 +440,9 @@ class _CartElementState extends State<CartElement> {
                     ],
                   ),
                   Positioned(
-                    top: widget.boxImageSize + (12 - 30),
+                    top: widget.boxImageSize +
+                        MediaQuery.of(context).textScaleFactor * 15 +
+                        (12 - 30),
                     right: 12 + 40 + 5,
                     child: Semantics(
                       label: 'Vis butikker med varen på lager',

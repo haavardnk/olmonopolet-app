@@ -204,6 +204,7 @@ class ProductItem extends StatelessWidget {
                                                   'På lager: ${product.stock}',
                                                   style: const TextStyle(
                                                     fontSize: 11,
+                                                    height: 0.9,
                                                   ),
                                                 ),
                                                 VerticalDivider(
@@ -221,6 +222,7 @@ class ProductItem extends StatelessWidget {
                                                     : '',
                                                 style: const TextStyle(
                                                   fontSize: 11,
+                                                  height: 0.9,
                                                 ),
                                               ),
                                               if (product.abv != null)
@@ -233,6 +235,7 @@ class ProductItem extends StatelessWidget {
                                                 '${product.volume}l',
                                                 style: const TextStyle(
                                                   fontSize: 11,
+                                                  height: 0.9,
                                                 ),
                                               ),
                                             ],
