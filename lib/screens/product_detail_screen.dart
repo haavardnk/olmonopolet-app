@@ -283,6 +283,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              const Text('Varenummer'),
+                              SizedBox(
+                                width: 250,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    product.id.toString(),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          Divider(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
                               const Text('Styrke'),
                               SizedBox(
                                 width: 250,
