@@ -52,6 +52,7 @@ class ProductItem extends StatelessWidget {
                     label: product.name,
                     button: true,
                     child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () {
                         Navigator.of(context).pushNamed(
                           ProductDetailScreen.routeName,
