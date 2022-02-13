@@ -173,11 +173,11 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                         child: RangeSlider(
                           values: _pricePerVolumeRange,
                           min: 0,
-                          max: 500,
+                          max: 1000,
                           divisions: 20,
                           labels: RangeLabels(
                             _pricePerVolumeRange.start.round().toString(),
-                            _pricePerVolumeRange.end == 500
+                            _pricePerVolumeRange.end == 1000
                                 ? _pricePerVolumeRange.end.round().toString() +
                                     ' +'
                                 : _pricePerVolumeRange.end.round().toString(),
