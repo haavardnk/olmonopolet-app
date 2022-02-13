@@ -25,7 +25,7 @@ class Filter with ChangeNotifier {
   List<Store> storeList = [];
 
   RangeValues priceRange = const RangeValues(0, 500);
-  RangeValues pricePerVolumeRange = const RangeValues(0, 500);
+  RangeValues pricePerVolumeRange = const RangeValues(0, 1000);
   RangeValues alcoholRange = const RangeValues(0, 15);
 
   String sortIndex = 'Global rating - Høy til lav';
@@ -309,7 +309,7 @@ class Filter with ChangeNotifier {
     productSelectionSelectedList = List<bool>.filled(5, false);
     releaseSelectedList = List<bool>.filled(releaseList.length, false);
     priceRange = const RangeValues(0, 500);
-    pricePerVolumeRange = const RangeValues(0, 500);
+    pricePerVolumeRange = const RangeValues(0, 1000);
     alcoholRange = const RangeValues(0, 15);
     sortIndex = 'Global rating - Høy til lav';
     storeId = '';
