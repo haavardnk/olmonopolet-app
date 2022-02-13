@@ -82,10 +82,17 @@ class AboutScreen extends StatelessWidget {
               "Derfor blir øl oppdatert rullerende etter hvilken som ble oppdatert sist, "
               "med ekstra prioritet til nye øl og øl med få innsjekkinger. "
               "Når du først logger inn med Untappd vil alle dine checkins bli hentet av serveren. "
-              "Dersom du har under 5000 innsjekkinger vil alle dine innsjekkinger bli hentet innen 10 minutt, "
-              "ellers vil det ta noen timer. Etter dette blir alle nye innsjekkinger hentet en gang i døgnet. "
-              "Ønskelisten din vil også bli hentet en gang i døgnet, mer nøyaktig i løpet av natten.",
+              "Dette kan ta noe tid og avhenger av hvor mange innsjekkinger du har. "
+              "Etter dette blir alle nye innsjekkinger hentet en gang i døgnet. "
+              "Ønskelisten din vil også bli hentet en gang i døgnet.",
             ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+                "Ølmonopolet's algoritme for å matche øl mellom Vinmonopolet og Untappd er bra, men ikke perfekt."
+                " Det vil si at du kan komme over øl hvor metadata er feil. Dette kan du rapportere inn med knappen"
+                " 'Rapporter feil Untappd match' innpå detaljsiden til hvert enkelt øl."),
             const SizedBox(
               height: 16,
             ),
