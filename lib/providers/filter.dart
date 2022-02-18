@@ -105,6 +105,9 @@ class Filter with ChangeNotifier {
     {'Tilleggsutvalget': 'tilleggsutvalget'},
   ];
 
+  List<bool> deliverySelectedList = List<bool>.filled(2, false);
+  List<String> deliveryList = ['Levering til butikk', 'Levering på posten'];
+
   List<bool> releaseSelectedList = [];
   List<String> releaseList = [];
 
@@ -241,6 +244,11 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
+  void setDeliverySelection(int index, bool boolean) {
+    deliverySelectedList[index] = boolean;
+    notifyListeners();
+  }
+
   void setRelease(int index, bool boolean) {
     releaseSelectedList[index] = boolean;
     var temporaryRelease = '';
@@ -307,6 +315,7 @@ class Filter with ChangeNotifier {
   void resetFilters() {
     styleSelectedList = List<bool>.filled(23, false);
     productSelectionSelectedList = List<bool>.filled(5, false);
+    deliverySelectedList = List<bool>.filled(2, false);
     releaseSelectedList = List<bool>.filled(releaseList.length, false);
     priceRange = const RangeValues(0, 500);
     pricePerVolumeRange = const RangeValues(0, 1000);

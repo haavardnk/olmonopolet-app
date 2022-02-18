@@ -184,6 +184,12 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
   } else if (filter.wishlisted == 2) {
     string = string + '&user_wishlisted=False';
   }
+  if (filter.deliverySelectedList[0] == true) {
+    string = string + '&store_delivery=True';
+  }
+  if (filter.deliverySelectedList[1] == true) {
+    string = string + '&post_delivery=True';
+  }
 
   final url = Uri.parse(string);
   return url;
