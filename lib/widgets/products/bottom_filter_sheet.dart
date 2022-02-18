@@ -90,7 +90,7 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Butikk',
+                      const Text('Butikklager',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       Semantics(
@@ -345,6 +345,42 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                           filters.productSelectionList[index].keys.first,
                           index,
                           filters.setProductSelection,
+                          mystate,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.ideographic,
+                    children: [
+                      const Text(
+                        'Bestilling',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Text(
+                        '(NB: Ikke filtrer på butikklager)',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: List.generate(
+                      filters.deliveryList.length,
+                      (index) {
+                        return _filter(
+                          filters.deliverySelectedList,
+                          filters.deliveryList[index],
+                          index,
+                          filters.setDeliverySelection,
                           mystate,
                         );
                       },
