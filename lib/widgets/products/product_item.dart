@@ -17,8 +17,12 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData _mediaQueryData = MediaQuery.of(context);
+    final _tabletMode = _mediaQueryData.size.shortestSide >= 600 ? true : false;
     final cart = Provider.of<Cart>(context, listen: false);
-    final double _boxImageSize = (MediaQuery.of(context).size.width / 4);
+    final double _boxImageSize = _tabletMode
+        ? 100 + _mediaQueryData.textScaleFactor * 10
+        : _mediaQueryData.size.shortestSide / 4;
     return FadeIn(
       child: Container(
         foregroundDecoration: product.userWishlisted == true
@@ -256,7 +260,8 @@ class ProductItem extends StatelessWidget {
                 ],
               ),
               Positioned(
-                bottom: 14,
+                bottom: _tabletMode ? null : 14,
+                top: !_tabletMode ? null : _boxImageSize + 14 - 35,
                 right: 12,
                 child: Semantics(
                   button: true,

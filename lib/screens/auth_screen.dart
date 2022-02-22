@@ -33,9 +33,11 @@ class _AuthScreenState extends State<AuthScreen> {
             child: ElevatedButton(
               style: ButtonStyle(
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                )),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
               ),
               onPressed: () async {
                 try {

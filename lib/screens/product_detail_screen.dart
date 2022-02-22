@@ -40,7 +40,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final apiToken = Provider.of<Auth>(context, listen: false).token;
     final cart = Provider.of<Cart>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
-    final _boxImageSize = MediaQuery.of(context).size.width * 0.75;
+    final _tabletMode = MediaQuery.of(context).size.width >= 600 ? true : false;
+    final _boxImageSize =
+        MediaQuery.of(context).size.shortestSide * (_tabletMode ? 0.4 : 0.75);
     const fields =
         "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url,all_stock";
 
