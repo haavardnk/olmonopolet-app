@@ -16,10 +16,16 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authData = Provider.of<Auth>(context);
+    final _mediaQueryData = MediaQuery.of(context);
+    final _authData = Provider.of<Auth>(context);
     return Scaffold(
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(30, 120, 30, 30),
+        padding: EdgeInsets.fromLTRB(
+          _mediaQueryData.size.width * 0.10,
+          120,
+          _mediaQueryData.size.width * 0.10,
+          30,
+        ),
         children: <Widget>[
           Center(
             child:
@@ -41,7 +47,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               onPressed: () async {
                 try {
-                  await authData.authenticate();
+                  await _authData.authenticate();
                 } catch (error) {
                   await showDialog(
                     context: context,
@@ -108,7 +114,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 'Logg inn senere...',
                 style: TextStyle(fontSize: 16),
               ),
-              onPressed: () => authData.skipLogin(true),
+              onPressed: () => _authData.skipLogin(true),
             ),
           ),
         ],
