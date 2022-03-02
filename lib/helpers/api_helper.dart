@@ -56,7 +56,7 @@ class ApiHelper {
   }
 
   static Future<List<Product>> getProductList(
-      int page, Filter filter, String apiToken) async {
+      int page, Filter filter, String apiToken, int pageSize) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,user_checked_in,user_wishlisted,volume,price_per_volume';
@@ -67,7 +67,7 @@ class ApiHelper {
         : {};
     try {
       final response = await http.get(
-        _apiProductUrlBuilder(fields, page, filter),
+        _apiProductUrlBuilder(fields, page, filter, pageSize),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -184,7 +184,8 @@ class ApiHelper {
   }
 }
 
-Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
+Uri _apiProductUrlBuilder(
+    String fields, int page, Filter filter, int pageSize) {
   var string = ('$_baseUrl'
       'beers/'
       '?fields=$fields'
@@ -202,7 +203,7 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
       '&search=${filter.search}'
       '&release=${filter.release}'
       '&page=$page'
-      '&page_size=15');
+      '&page_size=$pageSize');
   if (filter.storeId.isNotEmpty) {
     string = string + '&store=${filter.storeId}';
   }
