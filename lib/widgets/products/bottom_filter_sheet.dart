@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 import '../../providers/auth.dart';
-import 'multiselect_stores.dart';
+import 'multiselect.dart';
 
 class BottomFilterSheet extends StatefulWidget {
   const BottomFilterSheet({Key? key}) : super(key: key);
@@ -271,6 +271,42 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                         );
                       },
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Land',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      Semantics(
+                        label: 'Reset valgte land',
+                        button: true,
+                        child: InkWell(
+                          onTap: () {
+                            mystate(() {
+                              filters.selectedCountries = [];
+                              filters.setCountry();
+                            });
+                          },
+                          child: const Text('Velg alle',
+                              style: TextStyle(color: Colors.pink)),
+                        ),
+                      )
+                    ],
+                  ),
+                  DropDownMultiSelect(
+                    onChanged: (List<String> x) {
+                      mystate(() {
+                        filters.selectedCountries = x;
+                        filters.setCountry();
+                      });
+                    },
+                    options: filters.countryList,
+                    selectedValues: filters.selectedCountries,
+                    whenEmpty: 'Alle land',
                   ),
                   const SizedBox(
                     height: 10,

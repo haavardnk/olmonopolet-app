@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/cart.dart';
 import '../../providers/filter.dart';
-import '../products/multiselect_stores.dart';
+import '../products/multiselect.dart';
 
 class BottomStoreSheet extends StatefulWidget {
   final Function initCartSettings;

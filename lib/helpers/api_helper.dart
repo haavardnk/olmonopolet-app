@@ -166,6 +166,7 @@ Uri _apiProductUrlBuilder(String fields, int page, Filter filter) {
       '&abv_low=${filter.abvLow}'
       '&ordering=${filter.sortBy}'
       '&style=${filter.style}'
+      '&country=${filter.country}'
       '&product_selection=${filter.productSelection}'
       '&search=${filter.search}'
       '&release=${filter.release}'

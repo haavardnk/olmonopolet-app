@@ -10,14 +10,14 @@ var _theState = RM.inject(() => _TheState());
 class _SelectRow extends StatelessWidget {
   final Function(bool) onChange;
   final bool selected;
-  final Store store;
+  final Store? store;
   final String text;
 
   const _SelectRow(
       {Key? key,
       required this.onChange,
       required this.selected,
-      required this.store,
+      this.store,
       required this.text})
       : super(key: key);
 
@@ -33,16 +33,19 @@ class _SelectRow extends StatelessWidget {
             _theState.notify();
           },
         ),
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(child: Text(text)),
-              if (store.distance != null)
-                Text((store.distance! / 1000).toStringAsFixed(1) + 'km'),
-            ],
-          ),
-        )
+        if (store == null)
+          Text(text)
+        else
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(child: Text(text)),
+                if (store!.distance != null)
+                  Text((store!.distance! / 1000).toStringAsFixed(1) + 'km'),
+              ],
+            ),
+          )
       ],
     );
   }
@@ -50,7 +53,7 @@ class _SelectRow extends StatelessWidget {
 
 class DropDownMultiSelect extends StatefulWidget {
   final List<String> options;
-  final List<Store> stores;
+  final List<Store>? stores;
   final List<String> selectedValues;
   final Function(List<String>) onChanged;
   final String? whenEmpty;
@@ -58,7 +61,7 @@ class DropDownMultiSelect extends StatefulWidget {
   const DropDownMultiSelect({
     Key? key,
     required this.options,
-    required this.stores,
+    this.stores,
     required this.selectedValues,
     required this.onChanged,
     required this.whenEmpty,
@@ -120,8 +123,10 @@ class _DropDownMultiSelectState extends State<DropDownMultiSelect> {
                           return _SelectRow(
                             selected: widget.selectedValues.contains(x),
                             text: x,
-                            store: widget.stores
-                                .firstWhere((element) => element.name == x),
+                            store: widget.stores != null
+                                ? widget.stores!
+                                    .firstWhere((element) => element.name == x)
+                                : null,
                             onChange: (isSelected) {
                               if (isSelected) {
                                 var ns = widget.selectedValues;
