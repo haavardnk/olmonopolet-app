@@ -42,9 +42,7 @@ class ApiHelper {
     final url = Uri.parse(
         '${_baseUrl}beers/?beers=$productIds&store=$stores&fields=vmp_id,stock');
     try {
-      final response = await http.get(
-        url,
-      );
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         final List<dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))['results'];
@@ -70,6 +68,39 @@ class ApiHelper {
     try {
       final response = await http.get(
         _apiProductUrlBuilder(fields, page, filter),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse =
+            json.decode(utf8.decode(response.bodyBytes))['results'];
+        List<Product> products = List<Product>.from(
+          jsonResponse.map(
+            (product) => Product.fromJson(product),
+          ),
+        );
+        return products;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
+
+  static Future<List<Product>> getProductsData(
+      String productIds, String apiToken) async {
+    const fields =
+        'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
+        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,volume,price_per_volume';
+    final Map<String, String> headers = apiToken.isNotEmpty
+        ? {
+            'Authorization': 'Token $apiToken',
+          }
+        : {};
+    final url = Uri.parse('${_baseUrl}beers/?beers=$productIds&fields=$fields');
+    try {
+      final response = await http.get(
+        url,
         headers: headers,
       );
       if (response.statusCode == 200) {
