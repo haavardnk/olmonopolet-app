@@ -65,6 +65,7 @@ class _ProductListViewState extends State<ProductListView> {
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<Product>(
                     animateTransitions: true,
+                    transitionDuration: const Duration(milliseconds: 300),
                     itemBuilder: (context, item, index) => ProductItem(
                       product: item,
                     ),
@@ -85,6 +86,9 @@ class _ProductListViewState extends State<ProductListView> {
                 )
               : PagedGridView<int, Product>(
                   pagingController: _pagingController,
+                  showNewPageProgressIndicatorAsGridChild: false,
+                  showNewPageErrorIndicatorAsGridChild: false,
+                  showNoMoreItemsIndicatorAsGridChild: false,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     mainAxisExtent: 100 + _mediaQueryData.textScaleFactor * 48,
                     crossAxisCount: _mediaQueryData.size.width ~/
