@@ -19,24 +19,14 @@ class ProductListView extends StatefulWidget {
 }
 
 class _ProductListViewState extends State<ProductListView> {
-  static const _pageSize = 15;
+  late int _pageSize;
   final PagingController<int, Product> _pagingController =
-      PagingController(firstPageKey: 1);
-
-  @override
-  void initState() {
-    _pagingController.addPageRequestListener((pageKey) {
-      final filters = Provider.of<Filter>(context, listen: false).filters;
-      final apiToken = Provider.of<Auth>(context, listen: false).token;
-      _fetchPage(pageKey, filters, apiToken);
-    });
-    super.initState();
-  }
+      PagingController(firstPageKey: 1, invisibleItemsThreshold: 5);
 
   Future<void> _fetchPage(int pageKey, Filter filters, String apiToken) async {
     try {
       final newItems =
-          await ApiHelper.getProductList(pageKey, filters, apiToken);
+          await ApiHelper.getProductList(pageKey, filters, apiToken, _pageSize);
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
@@ -51,6 +41,18 @@ class _ProductListViewState extends State<ProductListView> {
 
   @override
   Widget build(BuildContext context) {
+    final _mediaQueryData = MediaQuery.of(context);
+    _pageSize = _mediaQueryData.size.width ~/
+                (350 + _mediaQueryData.textScaleFactor * 21) >=
+            2
+        ? 24
+        : 14;
+    _pagingController.addPageRequestListener((pageKey) {
+      final filters = Provider.of<Filter>(context, listen: false).filters;
+      final apiToken = Provider.of<Auth>(context, listen: false).token;
+      _fetchPage(pageKey, filters, apiToken);
+    });
+
     return RefreshIndicator(
       onRefresh: () => Future.sync(
         () => _pagingController.refresh(),
@@ -58,26 +60,54 @@ class _ProductListViewState extends State<ProductListView> {
       child: Consumer<Filter>(
         builder: (context, value, _) {
           _pagingController.refresh();
-          return PagedListView<int, Product>.separated(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<Product>(
-              itemBuilder: (context, item, index) => ProductItem(
-                product: item,
-              ),
-              firstPageErrorIndicatorBuilder: (_) => FirstPageErrorIndicator(
-                onTryAgain: () => _pagingController.refresh(),
-              ),
-              newPageErrorIndicatorBuilder: (_) => NewPageErrorIndicator(
-                onTap: () => _pagingController.retryLastFailedRequest(),
-              ),
-              noItemsFoundIndicatorBuilder: (_) =>
-                  const NoItemsFoundIndicator(),
-            ),
-            separatorBuilder: (context, index) => Divider(
-              height: 0,
-              color: Colors.grey[400],
-            ),
-          );
+          return _mediaQueryData.size.width < 600
+              ? PagedListView<int, Product>.separated(
+                  pagingController: _pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<Product>(
+                    animateTransitions: true,
+                    itemBuilder: (context, item, index) => ProductItem(
+                      product: item,
+                    ),
+                    firstPageErrorIndicatorBuilder: (_) =>
+                        FirstPageErrorIndicator(
+                      onTryAgain: () => _pagingController.refresh(),
+                    ),
+                    newPageErrorIndicatorBuilder: (_) => NewPageErrorIndicator(
+                      onTap: () => _pagingController.retryLastFailedRequest(),
+                    ),
+                    noItemsFoundIndicatorBuilder: (_) =>
+                        const NoItemsFoundIndicator(),
+                  ),
+                  separatorBuilder: (context, index) => Divider(
+                    height: 0,
+                    color: Colors.grey[400],
+                  ),
+                )
+              : PagedGridView<int, Product>(
+                  pagingController: _pagingController,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    mainAxisExtent: 100 + _mediaQueryData.textScaleFactor * 48,
+                    crossAxisCount: _mediaQueryData.size.width ~/
+                                (350 + _mediaQueryData.textScaleFactor * 21) <=
+                            4
+                        ? _mediaQueryData.size.width ~/
+                            (350 + _mediaQueryData.textScaleFactor * 21)
+                        : 4,
+                  ),
+                  builderDelegate: PagedChildBuilderDelegate<Product>(
+                    itemBuilder: (context, item, index) => ProductItem(
+                      product: item,
+                    ),
+                    firstPageErrorIndicatorBuilder: (_) =>
+                        FirstPageErrorIndicator(
+                      onTryAgain: () => _pagingController.refresh(),
+                    ),
+                    newPageErrorIndicatorBuilder: (_) => NewPageErrorIndicator(
+                      onTap: () => _pagingController.retryLastFailedRequest(),
+                    ),
+                    noItemsFoundIndicatorBuilder: (_) =>
+                        const NoItemsFoundIndicator(),
+                  ));
         },
       ),
     );

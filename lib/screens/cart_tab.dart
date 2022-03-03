@@ -9,8 +9,12 @@ class CartTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData _mediaQueryData = MediaQuery.of(context);
     final cartData = Provider.of<Cart>(context);
-    final double boxImageSize = (MediaQuery.of(context).size.width / 4);
+    final _tabletMode = _mediaQueryData.size.width >= 600 ? true : false;
+    final double _boxImageSize = _tabletMode
+        ? 100 + _mediaQueryData.textScaleFactor * 10
+        : _mediaQueryData.size.shortestSide / 4;
     return Scaffold(
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -34,7 +38,7 @@ class CartTab extends StatelessWidget {
                                       ),
                                     CartElement(
                                       index,
-                                      boxImageSize,
+                                      _boxImageSize,
                                       cartData.items.values.elementAt(index),
                                       cartData,
                                     ),

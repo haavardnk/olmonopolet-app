@@ -40,7 +40,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final apiToken = Provider.of<Auth>(context, listen: false).token;
     final cart = Provider.of<Cart>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
-    final _boxImageSize = MediaQuery.of(context).size.width * 0.75;
+    final _mediaQueryData = MediaQuery.of(context);
+    final _tabletMode = _mediaQueryData.size.width >= 600 ? true : false;
+    final _boxImageSize =
+        _mediaQueryData.size.shortestSide * (_tabletMode ? 0.4 : 0.75);
     const fields =
         "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url,all_stock";
 
@@ -67,6 +70,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               Expanded(
                 child: ListView(
+                  padding: _tabletMode &&
+                          _mediaQueryData.orientation == Orientation.landscape
+                      ? EdgeInsets.symmetric(
+                          horizontal: _mediaQueryData.size.width * 0.15)
+                      : null,
                   children: [
                     Container(
                       foregroundDecoration: product.userWishlisted == true
@@ -522,7 +530,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 25),
+                padding: _tabletMode &&
+                        _mediaQueryData.orientation == Orientation.landscape
+                    ? EdgeInsets.fromLTRB(_mediaQueryData.size.width * 0.15, 12,
+                        _mediaQueryData.size.width * 0.15, 25)
+                    : EdgeInsets.fromLTRB(12, 12, 12, 25),
                 decoration: BoxDecoration(
                   color: Theme.of(context).bottomAppBarColor,
                   boxShadow: [
@@ -558,7 +570,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       children: [
                         Container(
                           alignment: Alignment.center,
-                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                          padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
                           decoration: BoxDecoration(
                             color: Colors.pink,
                             border: Border.all(
