@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 import '../../providers/auth.dart';
-import 'multiselect_stores.dart';
+import 'multiselect.dart';
 
 class BottomFilterSheet extends StatefulWidget {
   const BottomFilterSheet({Key? key}) : super(key: key);
@@ -66,8 +66,9 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
   }
 
   Widget _showPopup() {
+    final _mediaQueryData = MediaQuery.of(context);
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: _mediaQueryData.size.height * 0.7,
       child:
           StatefulBuilder(builder: (BuildContext context, StateSetter mystate) {
         return Column(
@@ -85,7 +86,13 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
             ),
             Flexible(
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: _mediaQueryData.size.width > 600 &&
+                        _mediaQueryData.orientation == Orientation.landscape
+                    ? EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: _mediaQueryData.size.width * 0.15,
+                      )
+                    : const EdgeInsets.all(16),
                 children: <Widget>[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -271,6 +278,42 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
                         );
                       },
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Land',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      Semantics(
+                        label: 'Reset valgte land',
+                        button: true,
+                        child: InkWell(
+                          onTap: () {
+                            mystate(() {
+                              filters.selectedCountries = [];
+                              filters.setCountry();
+                            });
+                          },
+                          child: const Text('Velg alle',
+                              style: TextStyle(color: Colors.pink)),
+                        ),
+                      )
+                    ],
+                  ),
+                  DropDownMultiSelect(
+                    onChanged: (List<String> x) {
+                      mystate(() {
+                        filters.selectedCountries = x;
+                        filters.setCountry();
+                      });
+                    },
+                    options: filters.countryList,
+                    selectedValues: filters.selectedCountries,
+                    whenEmpty: 'Alle land',
                   ),
                   const SizedBox(
                     height: 10,

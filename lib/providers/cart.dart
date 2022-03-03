@@ -19,6 +19,12 @@ class CartItem {
 }
 
 class Cart with ChangeNotifier {
+  late String _apiToken;
+
+  void update(String token) {
+    _apiToken = token;
+  }
+
   Map<int, CartItem> _items = {};
   List<int> itemsInStock = [];
   List<String> cartSelectedStores = [];
@@ -165,6 +171,38 @@ class Cart with ChangeNotifier {
       if (greyNoStock || hideNoStock) {
         checkCartStockStatus();
       }
+      updateCartItemsData();
+    }
+  }
+
+  Future<void> updateCartItemsData() async {
+    if (_items.isNotEmpty) {
+      final productIds = _items.keys.toList().join(',');
+      final updatedProducts =
+          await ApiHelper.getProductsData(productIds, _apiToken);
+      updatedProducts.forEach((product) {
+        _items[product.id] = CartItem(
+          product: Product(
+            id: product.id,
+            name: product.name,
+            style: product.style,
+            price: product.price,
+            volume: product.volume,
+            pricePerVolume: product.pricePerVolume,
+            stock: product.stock,
+            rating: product.rating,
+            checkins: product.checkins,
+            abv: product.abv,
+            imageUrl: product.imageUrl,
+            userRating: product.userRating,
+            userWishlisted: product.userWishlisted,
+          ),
+          quantity: _items[product.id]!.quantity,
+          inStock: _items[product.id]!.inStock,
+        );
+        updateDb(product.id);
+      });
+      notifyListeners();
     }
   }
 

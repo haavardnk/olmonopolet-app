@@ -8,6 +8,7 @@ import '../helpers/location_helper.dart';
 class Filter with ChangeNotifier {
   String search = '';
   String storeId = '';
+  String country = '';
   String style = '';
   String productSelection = '';
   String priceHigh = '';
@@ -94,6 +95,55 @@ class Filter with ChangeNotifier {
     {'Sider': 'cider'},
     {'Stout': 'stout'},
     {'Surøl': 'sour,wild ale,lambic,fruit beer'},
+  ];
+
+  List<String> selectedCountries = [];
+  List<String> countryList = [
+    'Argentina',
+    'Australia',
+    'Belgia',
+    'Canada',
+    'Danmark',
+    'EU',
+    'England',
+    'Estland',
+    'Frankrike',
+    'Færøyene',
+    'Hellas',
+    'India',
+    'Irland',
+    'Island',
+    'Italia',
+    'Japan',
+    'Kina',
+    'Kroatia',
+    'Latvia',
+    'Litauen',
+    'Mexico',
+    'Nederland',
+    'New Zealand',
+    'Norge',
+    'Palestina',
+    'Peru',
+    'Polen',
+    'Portugal',
+    'Russland',
+    'Serbia',
+    'Singapore',
+    'Skottland',
+    'Spania',
+    'Storbritannia',
+    'Sveits',
+    'Sverige',
+    'Sør-Afrika',
+    'Thailand',
+    'Tsjekkia',
+    'Tyrkia',
+    'Tyskland',
+    'USA',
+    'Ungarn',
+    'Wales',
+    'Østerrike'
   ];
 
   List<bool> productSelectionSelectedList = List<bool>.filled(5, false);
@@ -305,6 +355,22 @@ class Filter with ChangeNotifier {
     prefs.setStringList('selectedStores', selectedStores);
   }
 
+  void setCountry() {
+    if (selectedCountries.isEmpty) {
+      country = '';
+    } else {
+      String temporaryCountries = '';
+      selectedCountries.forEach((countryName) {
+        if (temporaryCountries.isNotEmpty) {
+          temporaryCountries += ',';
+        }
+        temporaryCountries += countryName;
+      });
+      country = temporaryCountries;
+    }
+    notifyListeners();
+  }
+
   Future<void> loadLastStore() async {
     final prefs = await SharedPreferences.getInstance();
     storeId = prefs.getString('storeId') ?? '';
@@ -323,6 +389,8 @@ class Filter with ChangeNotifier {
     sortIndex = 'Global rating - Høy til lav';
     storeId = '';
     selectedStores = [];
+    country = '';
+    selectedCountries = [];
     style = '';
     productSelection = '';
     priceHigh = '';

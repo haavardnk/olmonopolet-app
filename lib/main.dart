@@ -17,10 +17,7 @@ import './providers/cart.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
-    runApp(const MyApp());
-  });
+  runApp(const MyApp());
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
@@ -91,8 +88,10 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(
             create: (ctx) => Filter(),
           ),
-          ChangeNotifierProvider(
+          ChangeNotifierProxyProvider<Auth, Cart>(
             create: (ctx) => Cart(),
+            update: (ctx, auth, previousCart) =>
+                previousCart!..update(auth.token),
           ),
         ],
         child: Consumer<Auth>(builder: (ctx, auth, _) {
