@@ -66,8 +66,9 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
   }
 
   Widget _showPopup() {
+    final _mediaQueryData = MediaQuery.of(context);
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: _mediaQueryData.size.height * 0.7,
       child:
           StatefulBuilder(builder: (BuildContext context, StateSetter mystate) {
         return Column(
@@ -85,7 +86,13 @@ class _BottomFilterSheetState extends State<BottomFilterSheet> {
             ),
             Flexible(
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: _mediaQueryData.size.width > 600 &&
+                        _mediaQueryData.orientation == Orientation.landscape
+                    ? EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: _mediaQueryData.size.width * 0.15,
+                      )
+                    : const EdgeInsets.all(16),
                 children: <Widget>[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
