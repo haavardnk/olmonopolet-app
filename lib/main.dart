@@ -85,7 +85,6 @@ class _MyAppState extends State<MyApp> {
         await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,
-      provisional: true,
       sound: true,
     );
     print('User granted permission: ${settings.authorizationStatus}');
