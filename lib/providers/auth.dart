@@ -22,8 +22,12 @@ class Auth with ChangeNotifier {
     return _skipLogin || _apiToken.isNotEmpty;
   }
 
-  String get token {
+  String get apiToken {
     return _apiToken;
+  }
+
+  String get untappdToken {
+    return _untappdToken;
   }
 
   void skipLogin(bool value) async {
@@ -58,7 +62,9 @@ class Auth with ChangeNotifier {
       _untappdToken = untappdToken ?? '';
       // Get Untappd profile
       final untappdProfileResponse = await http.get(
-          Uri.parse('$profileUrl?access_token=$_untappdToken&compact=true'));
+        Uri.parse('$profileUrl?access_token=$_untappdToken&compact=true'),
+        headers: {'User-Agent': 'app:Beermonopoly'},
+      );
       final untappdProfileData = json.decode(untappdProfileResponse.body);
       userName = untappdProfileData['response']['user']['user_name'];
       userAvatarUrl = untappdProfileData['response']['user']['user_avatar'];

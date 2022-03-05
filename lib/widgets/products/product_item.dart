@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/product.dart';
 import '../../providers/cart.dart';
+import '../../providers/auth.dart';
 import '../../screens/product_detail_screen.dart';
 import '../rating_widget.dart';
 import '../item_popup_menu.dart';
