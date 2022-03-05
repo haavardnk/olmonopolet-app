@@ -15,6 +15,7 @@ class Product {
     this.userWishlisted,
     this.vmpUrl,
     this.untappdUrl,
+    this.untappdId,
   });
 
   factory Product.fromJson(Map<String, dynamic> product) => Product(
@@ -40,6 +41,7 @@ class Product {
             : false,
         vmpUrl: product['vmp_url'],
         untappdUrl: product['untpd_url'],
+        untappdId: product['untpd_id'],
       );
 
   final int id;
@@ -57,4 +59,5 @@ class Product {
   final bool? userWishlisted;
   final String? vmpUrl;
   final String? untappdUrl;
+  final int? untappdId;
 }
