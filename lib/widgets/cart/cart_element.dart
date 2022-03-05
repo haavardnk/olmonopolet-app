@@ -11,6 +11,7 @@ import '../../providers/filter.dart';
 import '../../screens/product_detail_screen.dart';
 import '../../helpers/api_helper.dart';
 import '../rating_widget.dart';
+import '../item_popup_menu.dart';
 
 class CartElement extends StatefulWidget {
   final int index;
@@ -48,6 +49,14 @@ class _CartElementState extends State<CartElement> {
     final apiToken = Provider.of<Auth>(context, listen: false).token;
     final filters = Provider.of<Filter>(context, listen: false);
     int quantity = widget.cartItem.quantity;
+    late Offset tapPosition;
+    RenderBox overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+
+    void getPosition(TapDownDetails detail) {
+      tapPosition = detail.globalPosition;
+    }
+
     return !widget.cartItem.inStock &&
             widget.cartData.hideNoStock &&
             widget.cartData.cartStoreId.isNotEmpty
@@ -88,6 +97,13 @@ class _CartElementState extends State<CartElement> {
                     arguments: widget.cartItem.product,
                   );
                 },
+                onTapDown: getPosition,
+                onLongPress: () => showPopupMenu(
+                  context,
+                  tapPosition,
+                  overlay,
+                  widget.cartItem.product,
+                ),
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
                   curve: Curves.fastOutSlowIn,
