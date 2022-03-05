@@ -59,7 +59,8 @@ class ApiHelper {
       int page, Filter filter, String apiToken, int pageSize) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,volume,price_per_volume';
+        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
+        'volume,price_per_volume,vmp_url,untpd_url';
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',
@@ -91,7 +92,8 @@ class ApiHelper {
       String productIds, String apiToken) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,volume,price_per_volume';
+        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
+        'volume,price_per_volume,vmp_url,untpd_url';
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',
