@@ -23,10 +23,10 @@ class _ProductListViewState extends State<ProductListView> {
   final PagingController<int, Product> _pagingController =
       PagingController(firstPageKey: 1, invisibleItemsThreshold: 5);
 
-  Future<void> _fetchPage(int pageKey, Filter filters, String apiToken) async {
+  Future<void> _fetchPage(int pageKey, Filter filters, Auth auth) async {
     try {
       final newItems =
-          await ApiHelper.getProductList(pageKey, filters, apiToken, _pageSize);
+          await ApiHelper.getProductList(pageKey, filters, auth, _pageSize);
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
@@ -49,8 +49,8 @@ class _ProductListViewState extends State<ProductListView> {
         : 14;
     _pagingController.addPageRequestListener((pageKey) {
       final filters = Provider.of<Filter>(context, listen: false).filters;
-      final apiToken = Provider.of<Auth>(context, listen: false).token;
-      _fetchPage(pageKey, filters, apiToken);
+      final auth = Provider.of<Auth>(context, listen: false);
+      _fetchPage(pageKey, filters, auth);
     });
 
     return RefreshIndicator(

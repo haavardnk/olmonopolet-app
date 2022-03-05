@@ -136,7 +136,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProxyProvider<Auth, Cart>(
             create: (ctx) => Cart(),
             update: (ctx, auth, previousCart) =>
-                previousCart!..update(auth.token),
+                previousCart!..update(auth.apiToken),
           ),
         ],
         child: Consumer<Auth>(builder: (ctx, auth, _) {

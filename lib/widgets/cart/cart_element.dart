@@ -46,7 +46,7 @@ class _CartElementState extends State<CartElement> {
   @override
   Widget build(BuildContext context) {
     const fields = "all_stock";
-    final apiToken = Provider.of<Auth>(context, listen: false).token;
+    final apiToken = Provider.of<Auth>(context, listen: false).apiToken;
     final filters = Provider.of<Filter>(context, listen: false);
     int quantity = widget.cartItem.quantity;
     late Offset tapPosition;

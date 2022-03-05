@@ -37,7 +37,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final product = ModalRoute.of(context)!.settings.arguments as Product;
-    final apiToken = Provider.of<Auth>(context, listen: false).token;
+    final apiToken = Provider.of<Auth>(context, listen: false).apiToken;
     final cart = Provider.of<Cart>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
     final _mediaQueryData = MediaQuery.of(context);
