@@ -507,7 +507,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           onPressed: () {
                             snapshot.hasData &&
                                     snapshot.data!['untpd_url'] != null
-                                ? _launchInBrowser(snapshot.data!['untpd_url'])
+                                ? launch(snapshot.data!['untpd_url'])
                                 : null;
                           },
                           label: const Text('Untappd.com'),
@@ -519,7 +519,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           snapshot.hasData && snapshot.data!['vmp_url'] != null
-                              ? _launchInBrowser(snapshot.data!['vmp_url'])
+                              ? launch(snapshot.data!['vmp_url'])
                               : null;
                         },
                         label: const Text('Vinmonopolet.no'),
@@ -624,17 +624,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         },
       ),
     );
-  }
-
-  Future<void> _launchInBrowser(String url) async {
-    if (!await launch(
-      url,
-      forceSafariVC: false,
-      forceWebView: false,
-      headers: <String, String>{'my_header_key': 'my_header_value'},
-    )) {
-      throw 'Could not launch $url';
-    }
   }
 
   Widget _showPopup(BuildContext context, int productId) {
