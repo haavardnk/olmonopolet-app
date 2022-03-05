@@ -45,7 +45,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final _boxImageSize =
         _mediaQueryData.size.shortestSide * (_tabletMode ? 0.4 : 0.75);
     const fields =
-        "label_hd_url,ibu,description,brewery,country,product_selection,vmp_url,untpd_url,all_stock";
+        "label_hd_url,ibu,description,brewery,country,product_selection,all_stock";
 
     return Scaffold(
       appBar: AppBar(
@@ -505,9 +505,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            snapshot.hasData &&
-                                    snapshot.data!['untpd_url'] != null
-                                ? launch(snapshot.data!['untpd_url'])
+                            product.untappdUrl != null
+                                ? launch(product.untappdUrl!)
                                 : null;
                           },
                           label: const Text('Untappd.com'),
@@ -518,8 +517,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          snapshot.hasData && snapshot.data!['vmp_url'] != null
-                              ? launch(snapshot.data!['vmp_url'])
+                          product.vmpUrl != null
+                              ? launch(product.vmpUrl!)
                               : null;
                         },
                         label: const Text('Vinmonopolet.no'),
