@@ -4,11 +4,13 @@ import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/product.dart';
 import '../../providers/cart.dart';
 import '../../screens/product_detail_screen.dart';
 import '../rating_widget.dart';
+import '../item_popup_menu.dart';
 
 class ProductItem extends StatelessWidget {
   const ProductItem({required this.product, Key? key}) : super(key: key);
@@ -23,6 +25,14 @@ class ProductItem extends StatelessWidget {
     final double _boxImageSize = _tabletMode
         ? 100 + _mediaQueryData.textScaleFactor * 10
         : _mediaQueryData.size.shortestSide / 4;
+    late Offset tapPosition;
+    RenderBox overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+
+    void getPosition(TapDownDetails detail) {
+      tapPosition = detail.globalPosition;
+    }
+
     return FadeIn(
       child: Container(
         foregroundDecoration: product.userWishlisted == true
@@ -63,6 +73,9 @@ class ProductItem extends StatelessWidget {
                           arguments: product,
                         );
                       },
+                      onTapDown: getPosition,
+                      onLongPress: () =>
+                          showPopupMenu(context, tapPosition, overlay, product),
                       child: Container(
                         margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
                         child: Container(
