@@ -8,6 +8,7 @@ import '../providers/auth.dart';
 import '../providers/cart.dart';
 import '../providers/filter.dart';
 import '../helpers/api_helper.dart';
+import '../helpers/untappd_helper.dart';
 import '../models/product.dart';
 import '../widgets/rating_widget.dart';
 
@@ -21,6 +22,9 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  late bool wishlisted;
+  bool init = false;
+
   List<dynamic> _stockList = [];
   List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
     stockList = snapshot.data!['all_stock'];
@@ -37,7 +41,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final product = ModalRoute.of(context)!.settings.arguments as Product;
-    final apiToken = Provider.of<Auth>(context, listen: false).apiToken;
+    final auth = Provider.of<Auth>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
     final _mediaQueryData = MediaQuery.of(context);
@@ -46,6 +50,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         _mediaQueryData.size.shortestSide * (_tabletMode ? 0.4 : 0.75);
     const fields =
         "label_hd_url,ibu,description,brewery,country,product_selection,all_stock";
+
+    if (init == false) {
+      wishlisted = product.userWishlisted ?? false;
+      init = true;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -58,7 +67,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Theme.of(context).appBarTheme.iconTheme, //change your color here
       ),
       body: FutureBuilder(
-        future: ApiHelper.getDetailedProductInfo(product.id, apiToken, fields),
+        future:
+            ApiHelper.getDetailedProductInfo(product.id, auth.apiToken, fields),
         builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
           if (snapshot.hasData &&
               snapshot.data!['all_stock'] != null &&
@@ -77,7 +87,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       : null,
                   children: [
                     Container(
-                      foregroundDecoration: product.userWishlisted == true
+                      foregroundDecoration: wishlisted == true
                           ? const RotatedCornerDecoration(
                               color: Color(0xff01aed6),
                               textSpan: TextSpan(text: 'Ønsket'),
@@ -477,8 +487,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                     ),
+                    if (auth.isAuth)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
+                        child: ElevatedButton.icon(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Color(0xff01aed6))),
+                          onPressed: () async {
+                            bool success = !wishlisted
+                                ? await UntappdHelper.addToWishlist(
+                                    auth.apiToken, auth.untappdToken, product)
+                                : await UntappdHelper.removeFromWishlist(
+                                    auth.apiToken, auth.untappdToken, product);
+                            setState(() {
+                              if (!wishlisted && success) {
+                                wishlisted = true;
+                                cart.updateCartItemsData();
+                              } else if (wishlisted && success) {
+                                wishlisted = false;
+                                cart.updateCartItemsData();
+                              }
+                            });
+                          },
+                          label: Text(!wishlisted
+                              ? 'Legg i Untappd ønskeliste'
+                              : 'Fjern fra Untappd ønskeliste'),
+                          icon: Icon(!wishlisted
+                              ? Icons.playlist_add
+                              : Icons.playlist_remove),
+                        ),
+                      ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
+                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                       child: ElevatedButton.icon(
                         onPressed: () {
                           showModalBottomSheet<void>(
@@ -547,6 +588,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 child: GestureDetector(
                   onTap: () {
                     cart.addItem(product.id, product);
+                    cart.updateCartItemsData();
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

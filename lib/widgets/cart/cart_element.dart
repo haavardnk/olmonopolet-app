@@ -29,6 +29,7 @@ class CartElement extends StatefulWidget {
 
 class _CartElementState extends State<CartElement> {
   bool _expanded = false;
+  late bool wishlisted;
 
   List<dynamic> _stockList = [];
   List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
@@ -44,9 +45,16 @@ class _CartElementState extends State<CartElement> {
   }
 
   @override
+  void initState() {
+    wishlisted = widget.cartItem.product.userWishlisted ?? false;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const fields = "all_stock";
-    final apiToken = Provider.of<Auth>(context, listen: false).apiToken;
+    final auth = Provider.of<Auth>(context, listen: false);
+    final apiToken = auth.apiToken;
     final filters = Provider.of<Filter>(context, listen: false);
     int quantity = widget.cartItem.quantity;
     late Offset tapPosition;
@@ -98,12 +106,27 @@ class _CartElementState extends State<CartElement> {
                   );
                 },
                 onTapDown: getPosition,
-                onLongPress: () => showPopupMenu(
-                  context,
-                  tapPosition,
-                  overlay,
-                  widget.cartItem.product,
-                ),
+                onLongPress: () {
+                  showPopupMenu(
+                    context,
+                    auth,
+                    wishlisted,
+                    tapPosition,
+                    overlay,
+                    widget.cartItem.product,
+                  ).then(
+                    (value) => setState(() {
+                      if (value == 'wishlistAdded') {
+                        wishlisted = true;
+                        widget.cartData.updateCartItemsData();
+                      }
+                      if (value == 'wishlistRemoved') {
+                        wishlisted = false;
+                        widget.cartData.updateCartItemsData();
+                      }
+                    }),
+                  );
+                },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
                   curve: Curves.fastOutSlowIn,
@@ -126,18 +149,17 @@ class _CartElementState extends State<CartElement> {
                                   )
                                 : null,
                             child: Container(
-                              foregroundDecoration:
-                                  widget.cartItem.product.userWishlisted == true
-                                      ? const RotatedCornerDecoration(
-                                          color: Color(0xff01aed6),
-                                          geometry: BadgeGeometry(
-                                            width: 25,
-                                            height: 25,
-                                            cornerRadius: 0,
-                                            alignment: BadgeAlignment.topRight,
-                                          ),
-                                        )
-                                      : null,
+                              foregroundDecoration: wishlisted == true
+                                  ? const RotatedCornerDecoration(
+                                      color: Color(0xff01aed6),
+                                      geometry: BadgeGeometry(
+                                        width: 25,
+                                        height: 25,
+                                        cornerRadius: 0,
+                                        alignment: BadgeAlignment.topRight,
+                                      ),
+                                    )
+                                  : null,
                               child: Container(
                                 foregroundDecoration:
                                     widget.cartItem.product.userRating != null
