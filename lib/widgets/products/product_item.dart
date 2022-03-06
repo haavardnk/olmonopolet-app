@@ -4,7 +4,6 @@ import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/product.dart';
 import '../../providers/cart.dart';
@@ -13,13 +12,26 @@ import '../../screens/product_detail_screen.dart';
 import '../rating_widget.dart';
 import '../item_popup_menu.dart';
 
-class ProductItem extends StatelessWidget {
+class ProductItem extends StatefulWidget {
   const ProductItem({required this.product, Key? key}) : super(key: key);
 
   final Product product;
 
   @override
+  State<ProductItem> createState() => _ProductItemState();
+}
+
+class _ProductItemState extends State<ProductItem> {
+  late bool wishlisted;
+  @override
+  void initState() {
+    wishlisted = widget.product.userWishlisted ?? false;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<Auth>(context, listen: false);
     final MediaQueryData _mediaQueryData = MediaQuery.of(context);
     final _tabletMode = _mediaQueryData.size.shortestSide >= 600 ? true : false;
     final cart = Provider.of<Cart>(context, listen: false);
@@ -36,7 +48,7 @@ class ProductItem extends StatelessWidget {
 
     return FadeIn(
       child: Container(
-        foregroundDecoration: product.userWishlisted == true
+        foregroundDecoration: wishlisted == true
             ? const RotatedCornerDecoration(
                 color: Color(0xff01aed6),
                 geometry: BadgeGeometry(
@@ -48,7 +60,7 @@ class ProductItem extends StatelessWidget {
               )
             : null,
         child: Container(
-          foregroundDecoration: product.userRating != null
+          foregroundDecoration: widget.product.userRating != null
               ? const RotatedCornerDecoration(
                   color: Color(0xFFFBC02D),
                   geometry: BadgeGeometry(
@@ -64,19 +76,38 @@ class ProductItem extends StatelessWidget {
               Column(
                 children: [
                   Semantics(
-                    label: product.name,
+                    label: widget.product.name,
                     button: true,
                     child: GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onTap: () {
                         Navigator.of(context).pushNamed(
                           ProductDetailScreen.routeName,
-                          arguments: product,
+                          arguments: widget.product,
                         );
                       },
                       onTapDown: getPosition,
-                      onLongPress: () =>
-                          showPopupMenu(context, tapPosition, overlay, product),
+                      onLongPress: () {
+                        showPopupMenu(
+                          context,
+                          auth,
+                          wishlisted,
+                          tapPosition,
+                          overlay,
+                          widget.product,
+                        ).then(
+                          (value) => setState(() {
+                            if (value == 'wishlistAdded') {
+                              wishlisted = true;
+                              cart.updateCartItemsData();
+                            }
+                            if (value == 'wishlistRemoved') {
+                              wishlisted = false;
+                              cart.updateCartItemsData();
+                            }
+                          }),
+                        );
+                      },
                       child: Container(
                         margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
                         child: Container(
@@ -89,10 +120,10 @@ class ProductItem extends StatelessWidget {
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(5)),
                                 child: Hero(
-                                  tag: product.id,
-                                  child: product.imageUrl != null
+                                  tag: widget.product.id,
+                                  child: widget.product.imageUrl != null
                                       ? ProgressiveImage(
-                                          image: product.imageUrl ?? '',
+                                          image: widget.product.imageUrl ?? '',
                                           height: _boxImageSize,
                                           width: _boxImageSize,
                                           imageError:
@@ -113,7 +144,7 @@ class ProductItem extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      product.name,
+                                      widget.product.name,
                                       style: const TextStyle(
                                         fontSize: 14,
                                       ),
@@ -125,14 +156,14 @@ class ProductItem extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                            'Kr ${product.price.toStringAsFixed(2)}',
+                                            'Kr ${widget.product.price.toStringAsFixed(2)}',
                                             style: const TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           Text(
-                                            ' - Kr ${product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                            ' - Kr ${widget.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
                                             style: const TextStyle(
                                               fontSize: 11,
                                             ),
@@ -143,7 +174,7 @@ class ProductItem extends StatelessWidget {
                                     Container(
                                       margin: const EdgeInsets.only(top: 5),
                                       child: Text(
-                                        product.style,
+                                        widget.product.style,
                                         style: const TextStyle(
                                           fontSize: 12,
                                         ),
@@ -151,26 +182,28 @@ class ProductItem extends StatelessWidget {
                                     ),
                                     Container(
                                       margin: const EdgeInsets.only(top: 5),
-                                      child: product.userRating == null
+                                      child: widget.product.userRating == null
                                           ? Row(
                                               children: [
                                                 Text(
-                                                  product.rating != null
-                                                      ? '${product.rating!.toStringAsFixed(2)} '
+                                                  widget.product.rating != null
+                                                      ? '${widget.product.rating!.toStringAsFixed(2)} '
                                                       : '0 ',
                                                   style: const TextStyle(
                                                     fontSize: 12,
                                                   ),
                                                 ),
                                                 createRatingBar(
-                                                    rating:
-                                                        product.rating != null
-                                                            ? product.rating!
-                                                            : 0,
+                                                    rating: widget.product
+                                                                .rating !=
+                                                            null
+                                                        ? widget.product.rating!
+                                                        : 0,
                                                     size: 18),
                                                 Text(
-                                                  product.checkins != null
-                                                      ? ' ${NumberFormat.compact().format(product.checkins)}'
+                                                  widget.product.checkins !=
+                                                          null
+                                                      ? ' ${NumberFormat.compact().format(widget.product.checkins)}'
                                                       : '',
                                                   style: const TextStyle(
                                                     fontSize: 12,
@@ -181,8 +214,8 @@ class ProductItem extends StatelessWidget {
                                           : Row(
                                               children: [
                                                 Text(
-                                                  product.rating != null
-                                                      ? 'Global: ${product.rating!.toStringAsFixed(2)}'
+                                                  widget.product.rating != null
+                                                      ? 'Global: ${widget.product.rating!.toStringAsFixed(2)}'
                                                       : '0 ',
                                                   style: const TextStyle(
                                                     fontSize: 12,
@@ -195,8 +228,9 @@ class ProductItem extends StatelessWidget {
                                                 ),
                                                 const SizedBox(width: 8),
                                                 Text(
-                                                  product.userRating != null
-                                                      ? 'Din: ${product.userRating!.toStringAsFixed(2)} '
+                                                  widget.product.userRating !=
+                                                          null
+                                                      ? 'Din: ${widget.product.userRating!.toStringAsFixed(2)} '
                                                       : '0 ',
                                                   style: const TextStyle(
                                                     fontSize: 12,
@@ -215,12 +249,12 @@ class ProductItem extends StatelessWidget {
                                       margin: const EdgeInsets.only(top: 5),
                                       child: Row(
                                         children: [
-                                          if (product.stock != null &&
-                                              product.stock != 0)
+                                          if (widget.product.stock != null &&
+                                              widget.product.stock != 0)
                                             Row(
                                               children: [
                                                 Text(
-                                                  'På lager: ${product.stock}',
+                                                  'På lager: ${widget.product.stock}',
                                                   style: const TextStyle(
                                                     fontSize: 11,
                                                     height: 0.9,
@@ -236,22 +270,22 @@ class ProductItem extends StatelessWidget {
                                           Row(
                                             children: [
                                               Text(
-                                                product.abv != null
-                                                    ? '${product.abv!.toStringAsFixed(1)}%'
+                                                widget.product.abv != null
+                                                    ? '${widget.product.abv!.toStringAsFixed(1)}%'
                                                     : '',
                                                 style: const TextStyle(
                                                   fontSize: 11,
                                                   height: 0.9,
                                                 ),
                                               ),
-                                              if (product.abv != null)
+                                              if (widget.product.abv != null)
                                                 VerticalDivider(
                                                   width: 15,
                                                   thickness: 1,
                                                   color: Colors.grey[300],
                                                 ),
                                               Text(
-                                                '${product.volume}l',
+                                                '${widget.product.volume}l',
                                                 style: const TextStyle(
                                                   fontSize: 11,
                                                   height: 0.9,
@@ -282,7 +316,8 @@ class ProductItem extends StatelessWidget {
                   label: 'Legg i handleliste',
                   child: InkWell(
                     onTap: () {
-                      cart.addItem(product.id, product);
+                      cart.addItem(widget.product.id, widget.product);
+                      cart.updateCartItemsData();
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -294,7 +329,7 @@ class ProductItem extends StatelessWidget {
                           action: SnackBarAction(
                             label: 'ANGRE',
                             onPressed: () {
-                              cart.removeSingleItem(product.id);
+                              cart.removeSingleItem(widget.product.id);
                             },
                           ),
                         ),
@@ -321,7 +356,7 @@ class ProductItem extends StatelessWidget {
                                 size: 20,
                               ),
                             ),
-                            if (cart.items.keys.contains(product.id))
+                            if (cart.items.keys.contains(widget.product.id))
                               Positioned(
                                 right: 7,
                                 top: 4,
@@ -336,7 +371,8 @@ class ProductItem extends StatelessWidget {
                                     minHeight: 11,
                                   ),
                                   child: Text(
-                                    cart.items[product.id]!.quantity.toString(),
+                                    cart.items[widget.product.id]!.quantity
+                                        .toString(),
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 10,
