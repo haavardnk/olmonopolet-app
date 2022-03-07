@@ -99,6 +99,8 @@ class _ProductListViewState extends State<ProductListView> {
                         : 4,
                   ),
                   builderDelegate: PagedChildBuilderDelegate<Product>(
+                    animateTransitions: true,
+                    transitionDuration: const Duration(milliseconds: 300),
                     itemBuilder: (context, item, index) => ProductItem(
                       product: item,
                     ),
