@@ -2,10 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:rate_my_app/rate_my_app.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'firebase_options.dart';
 import 'screens/home_screen.dart';
 import './screens/auth_screen.dart';
 import './screens/splash_screen.dart';
@@ -15,18 +18,49 @@ import './providers/filter.dart';
 import './providers/auth.dart';
 import './providers/cart.dart';
 
-void main() {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  print('Handling a background message ${message.messageId}');
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  final channel = const AndroidNotificationChannel(
+    'olmonopolet',
+    'Ølmonopolet Notifikasjoner',
+    description:
+        'Denne kanalen er brukt for å annonsere tilgjengelighet av nye Ølslipp og annen funksjonalitet.',
+    importance: Importance.high,
+  );
+
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
   runApp(const MyApp());
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
-  // Override behavior methods and getters like dragDevices
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
-        // etc.
       };
 }
 
@@ -46,6 +80,16 @@ class _MyAppState extends State<MyApp> {
     remindLaunches: 10,
   );
 
+  Future<void> requestNotificationPermission() async {
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    print('User granted permission: ${settings.authorizationStatus}');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +100,7 @@ class _MyAppState extends State<MyApp> {
         rateMyApp.showRateDialog(context);
       }
     });
+    requestNotificationPermission();
   }
 
   @override
@@ -91,7 +136,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProxyProvider<Auth, Cart>(
             create: (ctx) => Cart(),
             update: (ctx, auth, previousCart) =>
-                previousCart!..update(auth.token),
+                previousCart!..update(auth.apiToken),
           ),
         ],
         child: Consumer<Auth>(builder: (ctx, auth, _) {

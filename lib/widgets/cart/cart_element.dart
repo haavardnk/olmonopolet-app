@@ -11,6 +11,7 @@ import '../../providers/filter.dart';
 import '../../screens/product_detail_screen.dart';
 import '../../helpers/api_helper.dart';
 import '../rating_widget.dart';
+import '../item_popup_menu.dart';
 
 class CartElement extends StatefulWidget {
   final int index;
@@ -28,6 +29,7 @@ class CartElement extends StatefulWidget {
 
 class _CartElementState extends State<CartElement> {
   bool _expanded = false;
+  late bool wishlisted;
 
   List<dynamic> _stockList = [];
   List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
@@ -43,468 +45,555 @@ class _CartElementState extends State<CartElement> {
   }
 
   @override
+  void initState() {
+    wishlisted = widget.cartItem.product.userWishlisted ?? false;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const fields = "all_stock";
-    final apiToken = Provider.of<Auth>(context, listen: false).token;
+    final auth = Provider.of<Auth>(context, listen: false);
+    final apiToken = auth.apiToken;
     final filters = Provider.of<Filter>(context, listen: false);
     int quantity = widget.cartItem.quantity;
+    late Offset tapPosition;
+    RenderBox overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+
+    void getPosition(TapDownDetails detail) {
+      tapPosition = detail.globalPosition;
+    }
+
     return !widget.cartItem.inStock &&
             widget.cartData.hideNoStock &&
             widget.cartData.cartStoreId.isNotEmpty
         ? Wrap()
-        : Semantics(
-            label: widget.cartItem.product.name,
-            button: true,
-            child: GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                  ProductDetailScreen.routeName,
-                  arguments: widget.cartItem.product,
-                );
-              },
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                curve: Curves.fastOutSlowIn,
-                height: _expanded == true
-                    ? widget.boxImageSize +
-                        110 +
-                        MediaQuery.of(context).textScaleFactor * 10
-                    : widget.boxImageSize + 24,
-                child: Stack(
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          foregroundDecoration: !widget.cartItem.inStock &&
-                                  widget.cartData.greyNoStock &&
-                                  widget.cartData.cartStoreId.isNotEmpty
-                              ? BoxDecoration(
-                                  color: Colors.grey,
-                                  backgroundBlendMode: BlendMode.saturation,
-                                )
-                              : null,
-                          child: Container(
-                            foregroundDecoration:
-                                widget.cartItem.product.userWishlisted == true
-                                    ? const RotatedCornerDecoration(
-                                        color: Color(0xff01aed6),
-                                        geometry: BadgeGeometry(
-                                          width: 25,
-                                          height: 25,
-                                          cornerRadius: 0,
-                                          alignment: BadgeAlignment.topRight,
-                                        ),
-                                      )
-                                    : null,
+        : Dismissible(
+            key: Key(widget.cartItem.product.id.toString()),
+            direction: DismissDirection.startToEnd,
+            confirmDismiss: (direction) async {
+              final countBefore = widget.cartData.itemCount;
+              await showPopupDelete(widget.index, widget.boxImageSize,
+                  widget.cartItem, widget.cartData, context);
+              final countAfter = widget.cartData.itemCount;
+              if (countBefore == countAfter) {
+                return false;
+              } else {
+                return true;
+              }
+            },
+            background: Container(
+              color: Colors.pink,
+              padding: EdgeInsets.only(left: 50),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.delete,
+                  )
+                ],
+              ),
+            ),
+            child: Semantics(
+              label: widget.cartItem.product.name,
+              button: true,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  Navigator.of(context).pushNamed(
+                    ProductDetailScreen.routeName,
+                    arguments: widget.cartItem.product,
+                  );
+                },
+                onTapDown: getPosition,
+                onLongPress: () {
+                  showPopupMenu(
+                    context,
+                    auth,
+                    wishlisted,
+                    tapPosition,
+                    overlay,
+                    widget.cartItem.product,
+                  ).then(
+                    (value) => setState(() {
+                      if (value == 'wishlistAdded') {
+                        wishlisted = true;
+                        widget.cartData.updateCartItemsData();
+                      }
+                      if (value == 'wishlistRemoved') {
+                        wishlisted = false;
+                        widget.cartData.updateCartItemsData();
+                      }
+                    }),
+                  );
+                },
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.fastOutSlowIn,
+                  height: _expanded == true
+                      ? widget.boxImageSize +
+                          110 +
+                          MediaQuery.of(context).textScaleFactor * 10
+                      : widget.boxImageSize + 24,
+                  child: Stack(
+                    children: [
+                      Column(
+                        children: [
+                          Container(
+                            foregroundDecoration: !widget.cartItem.inStock &&
+                                    widget.cartData.greyNoStock &&
+                                    widget.cartData.cartStoreId.isNotEmpty
+                                ? BoxDecoration(
+                                    color: Colors.grey,
+                                    backgroundBlendMode: BlendMode.saturation,
+                                  )
+                                : null,
                             child: Container(
-                              foregroundDecoration:
-                                  widget.cartItem.product.userRating != null
-                                      ? const RotatedCornerDecoration(
-                                          color: Color(0xFFFBC02D),
-                                          geometry: BadgeGeometry(
-                                            width: 25,
-                                            height: 25,
-                                            cornerRadius: 0,
-                                            alignment: BadgeAlignment.topLeft,
-                                          ),
-                                        )
-                                      : null,
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    child: Hero(
-                                      tag: widget.cartItem.product.id,
-                                      child: widget.cartItem.product.imageUrl !=
-                                              null
-                                          ? ProgressiveImage(
-                                              image: widget.cartItem.product
-                                                      .imageUrl ??
-                                                  '',
-                                              height: widget.boxImageSize,
-                                              width: widget.boxImageSize,
-                                              imageError:
-                                                  'assets/images/placeholder.png',
-                                            )
-                                          : Image.asset(
-                                              'assets/images/placeholder.png',
-                                              height: widget.boxImageSize,
-                                              width: widget.boxImageSize,
+                              foregroundDecoration: wishlisted == true
+                                  ? const RotatedCornerDecoration(
+                                      color: Color(0xff01aed6),
+                                      geometry: BadgeGeometry(
+                                        width: 25,
+                                        height: 25,
+                                        cornerRadius: 0,
+                                        alignment: BadgeAlignment.topRight,
+                                      ),
+                                    )
+                                  : null,
+                              child: Container(
+                                foregroundDecoration:
+                                    widget.cartItem.product.userRating != null
+                                        ? const RotatedCornerDecoration(
+                                            color: Color(0xFFFBC02D),
+                                            geometry: BadgeGeometry(
+                                              width: 25,
+                                              height: 25,
+                                              cornerRadius: 0,
+                                              alignment: BadgeAlignment.topLeft,
                                             ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            widget.cartItem.product.name,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Container(
-                                            margin:
-                                                const EdgeInsets.only(top: 5),
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
-                                                  style: const TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                if (widget.cartItem.product
-                                                        .pricePerVolume !=
-                                                    null)
-                                                  Expanded(
-                                                    child: Text(
-                                                      ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                                      style: const TextStyle(
-                                                          fontSize: 11,
-                                                          overflow: TextOverflow
-                                                              .ellipsis),
-                                                    ),
-                                                  )
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            margin:
-                                                const EdgeInsets.only(top: 5),
-                                            child: widget.cartItem.product
-                                                        .userRating ==
+                                          )
+                                        : null,
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      child: Hero(
+                                        tag: widget.cartItem.product.id,
+                                        child:
+                                            widget.cartItem.product.imageUrl !=
                                                     null
-                                                ? Row(
-                                                    children: [
-                                                      Text(
-                                                        widget.cartItem.product
-                                                                    .rating !=
-                                                                null
-                                                            ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
-                                                            : '0 ',
+                                                ? ProgressiveImage(
+                                                    image: widget.cartItem
+                                                            .product.imageUrl ??
+                                                        '',
+                                                    height: widget.boxImageSize,
+                                                    width: widget.boxImageSize,
+                                                    imageError:
+                                                        'assets/images/placeholder.png',
+                                                  )
+                                                : Image.asset(
+                                                    'assets/images/placeholder.png',
+                                                    height: widget.boxImageSize,
+                                                    width: widget.boxImageSize,
+                                                  ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              widget.cartItem.product.name,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
+                                                    style: const TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  if (widget.cartItem.product
+                                                          .pricePerVolume !=
+                                                      null)
+                                                    Expanded(
+                                                      child: Text(
+                                                        ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
                                                         style: const TextStyle(
-                                                          fontSize: 12,
-                                                        ),
+                                                            fontSize: 11,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis),
                                                       ),
-                                                      createRatingBar(
-                                                          rating: widget
+                                                    )
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: widget.cartItem.product
+                                                          .userRating ==
+                                                      null
+                                                  ? Row(
+                                                      children: [
+                                                        Text(
+                                                          widget
                                                                       .cartItem
                                                                       .product
                                                                       .rating !=
                                                                   null
-                                                              ? widget
-                                                                  .cartItem
-                                                                  .product
-                                                                  .rating!
-                                                              : 0,
-                                                          size: 18),
-                                                      Text(
-                                                        widget.cartItem.product
-                                                                    .checkins !=
-                                                                null
-                                                            ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
-                                                            : '',
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                : Row(
-                                                    children: [
-                                                      Text(
-                                                        widget.cartItem.product
-                                                                    .rating !=
-                                                                null
-                                                            ? 'Global: ${widget.cartItem.product.rating!.toStringAsFixed(2)}'
-                                                            : '0 ',
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      Icon(
-                                                        Icons.star,
-                                                        color:
-                                                            Colors.yellow[700],
-                                                        size: 18,
-                                                      ),
-                                                      const SizedBox(width: 8),
-                                                      Text(
-                                                        widget.cartItem.product
-                                                                    .userRating !=
-                                                                null
-                                                            ? 'Din: ${widget.cartItem.product.userRating!.toStringAsFixed(2)} '
-                                                            : '0 ',
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      Icon(
-                                                        Icons.star,
-                                                        color:
-                                                            Colors.yellow[700],
-                                                        size: 18,
-                                                      ),
-                                                    ],
-                                                  ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Container(
-                                        height: widget.boxImageSize - 31,
-                                        width: 40,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 1,
-                                            color: Colors.grey[400]!,
-                                          ),
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(5),
-                                          ),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child: Semantics(
-                                                    label: 'Legg til en',
-                                                    button: true,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        widget.cartData.addItem(
-                                                          widget.cartItem
-                                                              .product.id,
-                                                          widget
-                                                              .cartItem.product,
-                                                        );
-                                                      },
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                10, 0, 10, 2),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              const BorderRadius
-                                                                  .all(
-                                                            Radius.circular(5),
+                                                              ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
+                                                              : '0 ',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 12,
                                                           ),
                                                         ),
-                                                        child: const Icon(
-                                                            Icons.add,
-                                                            size: 18),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Semantics(
-                                                    label: 'Fjern en',
-                                                    button: true,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        quantity == 1
-                                                            ? showPopupDelete(
-                                                                widget.index,
-                                                                widget
-                                                                    .boxImageSize,
-                                                                widget.cartItem,
-                                                                widget.cartData,
-                                                                context)
-                                                            : widget.cartData
-                                                                .removeSingleItem(
-                                                                    widget
+                                                        createRatingBar(
+                                                            rating: widget
                                                                         .cartItem
                                                                         .product
-                                                                        .id);
-                                                      },
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                10, 2, 10, 0),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              const BorderRadius
-                                                                  .all(
-                                                            Radius.circular(5),
+                                                                        .rating !=
+                                                                    null
+                                                                ? widget
+                                                                    .cartItem
+                                                                    .product
+                                                                    .rating!
+                                                                : 0,
+                                                            size: 18),
+                                                        Text(
+                                                          widget
+                                                                      .cartItem
+                                                                      .product
+                                                                      .checkins !=
+                                                                  null
+                                                              ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
+                                                              : '',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 12,
                                                           ),
                                                         ),
-                                                        child: const Icon(
-                                                            Icons.remove,
-                                                            size: 18),
-                                                      ),
+                                                      ],
+                                                    )
+                                                  : Row(
+                                                      children: [
+                                                        Text(
+                                                          widget
+                                                                      .cartItem
+                                                                      .product
+                                                                      .rating !=
+                                                                  null
+                                                              ? 'Global: ${widget.cartItem.product.rating!.toStringAsFixed(2)}'
+                                                              : '0 ',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                        Icon(
+                                                          Icons.star,
+                                                          color: Colors
+                                                              .yellow[700],
+                                                          size: 18,
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 8),
+                                                        Text(
+                                                          widget
+                                                                      .cartItem
+                                                                      .product
+                                                                      .userRating !=
+                                                                  null
+                                                              ? 'Din: ${widget.cartItem.product.userRating!.toStringAsFixed(2)} '
+                                                              : '0 ',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                        Icon(
+                                                          Icons.star,
+                                                          color: Colors
+                                                              .yellow[700],
+                                                          size: 18,
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                ),
-                                              ],
                                             ),
-                                            Center(
-                                              child: Text(
-                                                quantity.toString(),
-                                              ),
-                                            )
                                           ],
                                         ),
                                       ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Semantics(
-                                        label:
-                                            'Vis butikker med varen på lager',
-                                        button: true,
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              _expanded = !_expanded;
-                                            });
-                                          },
-                                          child: Container(
-                                            height: 28,
-                                            width: 40,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                width: 1,
-                                                color: Colors.grey[400]!,
-                                              ),
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                Radius.circular(5),
-                                              ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Container(
+                                          height: widget.boxImageSize - 31,
+                                          width: 40,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: 1,
+                                              color: Colors.grey[400]!,
                                             ),
-                                            child: Icon(
-                                              Icons.store_outlined,
-                                              size: 17,
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(5),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (_expanded == true)
-                          FutureBuilder(
-                              future: ApiHelper.getDetailedProductInfo(
-                                  widget.cartItem.product.id, apiToken, fields),
-                              builder: (context,
-                                  AsyncSnapshot<Map<String, dynamic>>
-                                      snapshot) {
-                                if (snapshot.hasData &&
-                                    snapshot.data!['all_stock'] != null &&
-                                    filters.storeList.isNotEmpty) {
-                                  _stockList = _sortStockList(
-                                      _stockList, snapshot, filters.storeList);
-                                }
-                                return Expanded(
-                                  child: snapshot.connectionState ==
-                                          ConnectionState.waiting
-                                      ? FadeIn(
-                                          duration: Duration(milliseconds: 500),
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        )
-                                      : Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              12, 0, 12, 12),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          child: Stack(
                                             children: [
-                                              if (_stockList.isNotEmpty)
-                                                Expanded(
-                                                  child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount:
-                                                        _stockList.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Column(
-                                                        children: [
-                                                          FadeIn(
-                                                            duration: Duration(
-                                                                milliseconds:
-                                                                    300),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  _stockList[
-                                                                          index]
-                                                                      [
-                                                                      'store_name'],
-                                                                ),
-                                                                Text(
-                                                                  'På lager: ${_stockList[index]['quantity']}',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ],
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Semantics(
+                                                      label: 'Legg til en',
+                                                      button: true,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          widget.cartData
+                                                              .addItem(
+                                                            widget.cartItem
+                                                                .product.id,
+                                                            widget.cartItem
+                                                                .product,
+                                                          );
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  10, 0, 10, 2),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                const BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  5),
                                                             ),
                                                           ),
-                                                          Divider(height: 5),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              if (_stockList.isEmpty)
-                                                Expanded(
-                                                  child: Center(
-                                                    child: FadeIn(
-                                                      duration: Duration(
-                                                          milliseconds: 300),
-                                                      child: Text(
-                                                        'Ingen butikker har denne på lager',
+                                                          child: const Icon(
+                                                              Icons.add,
+                                                              size: 18),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                )
+                                                  Expanded(
+                                                    child: Semantics(
+                                                      label: 'Fjern en',
+                                                      button: true,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          quantity == 1
+                                                              ? showPopupDelete(
+                                                                  widget.index,
+                                                                  widget
+                                                                      .boxImageSize,
+                                                                  widget
+                                                                      .cartItem,
+                                                                  widget
+                                                                      .cartData,
+                                                                  context)
+                                                              : widget.cartData
+                                                                  .removeSingleItem(
+                                                                      widget
+                                                                          .cartItem
+                                                                          .product
+                                                                          .id);
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  10, 2, 10, 0),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                const BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  5),
+                                                            ),
+                                                          ),
+                                                          child: const Icon(
+                                                              Icons.remove,
+                                                              size: 18),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  quantity.toString(),
+                                                ),
+                                              )
                                             ],
                                           ),
                                         ),
-                                );
-                              }),
-                      ],
-                    ),
-                  ],
+                                        SizedBox(
+                                          height: 3,
+                                        ),
+                                        Semantics(
+                                          label:
+                                              'Vis butikker med varen på lager',
+                                          button: true,
+                                          child: InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                _expanded = !_expanded;
+                                              });
+                                            },
+                                            child: Container(
+                                              height: 28,
+                                              width: 40,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  width: 1,
+                                                  color: Colors.grey[400]!,
+                                                ),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                  Radius.circular(5),
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                Icons.store_outlined,
+                                                size: 17,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_expanded == true)
+                            FutureBuilder(
+                                future: ApiHelper.getDetailedProductInfo(
+                                    widget.cartItem.product.id,
+                                    apiToken,
+                                    fields),
+                                builder: (context,
+                                    AsyncSnapshot<Map<String, dynamic>>
+                                        snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.data!['all_stock'] != null &&
+                                      filters.storeList.isNotEmpty) {
+                                    _stockList = _sortStockList(_stockList,
+                                        snapshot, filters.storeList);
+                                  }
+                                  return Expanded(
+                                    child: snapshot.connectionState ==
+                                            ConnectionState.waiting
+                                        ? FadeIn(
+                                            duration:
+                                                Duration(milliseconds: 500),
+                                            child: Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                          )
+                                        : Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                12, 0, 12, 12),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                if (_stockList.isNotEmpty)
+                                                  Expanded(
+                                                    child: ListView.builder(
+                                                      shrinkWrap: true,
+                                                      itemCount:
+                                                          _stockList.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        return Column(
+                                                          children: [
+                                                            FadeIn(
+                                                              duration: Duration(
+                                                                  milliseconds:
+                                                                      300),
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    _stockList[
+                                                                            index]
+                                                                        [
+                                                                        'store_name'],
+                                                                  ),
+                                                                  Text(
+                                                                    'På lager: ${_stockList[index]['quantity']}',
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Divider(height: 5),
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                if (_stockList.isEmpty)
+                                                  Expanded(
+                                                    child: Center(
+                                                      child: FadeIn(
+                                                        duration: Duration(
+                                                            milliseconds: 300),
+                                                        child: Text(
+                                                          'Ingen butikker har denne på lager',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                              ],
+                                            ),
+                                          ),
+                                  );
+                                }),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -512,8 +601,8 @@ class _CartElementState extends State<CartElement> {
   }
 }
 
-void showPopupDelete(int index, double boxImageSize, CartItem cartItem,
-    Cart cartData, BuildContext context) {
+Future<void> showPopupDelete(int index, double boxImageSize, CartItem cartItem,
+    Cart cartData, BuildContext context) async {
   Widget cancelButton = TextButton(
     onPressed: () {
       Navigator.pop(context);
@@ -530,6 +619,8 @@ void showPopupDelete(int index, double boxImageSize, CartItem cartItem,
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(bottom: 80.0),
           content: Text(
             'Produktet har blitt fjernet fra handlelisten din.',
             textAlign: TextAlign.center,

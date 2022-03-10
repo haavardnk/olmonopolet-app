@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../models/product.dart';
 import '../models/store.dart';
 import '../providers/filter.dart';
+import '../providers/auth.dart';
 
 //const _baseUrl = 'http://127.0.0.1:8000/';
 const _baseUrl = 'https://api.beermonopoly.com/';
@@ -56,13 +57,14 @@ class ApiHelper {
   }
 
   static Future<List<Product>> getProductList(
-      int page, Filter filter, String apiToken, int pageSize) async {
+      int page, Filter filter, Auth auth, int pageSize) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,volume,price_per_volume';
-    final Map<String, String> headers = apiToken.isNotEmpty
+        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
+        'volume,price_per_volume,vmp_url,untpd_url,untpd_id';
+    final Map<String, String> headers = auth.apiToken.isNotEmpty
         ? {
-            'Authorization': 'Token $apiToken',
+            'Authorization': 'Token ${auth.apiToken}',
           }
         : {};
     try {
@@ -79,6 +81,9 @@ class ApiHelper {
           ),
         );
         return products;
+      } else if (response.statusCode == 401) {
+        auth.logout();
+        return [];
       } else {
         throw GenericHttpException();
       }
@@ -91,7 +96,8 @@ class ApiHelper {
       String productIds, String apiToken) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,volume,price_per_volume';
+        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
+        'volume,price_per_volume,vmp_url,untpd_url,untpd_id';
     final Map<String, String> headers = apiToken.isNotEmpty
         ? {
             'Authorization': 'Token $apiToken',
