@@ -186,6 +186,24 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
       throw NoConnectionException();
     }
   }
+
+  static Future<void> updateFcmToken(String fcmToken, String apiToken) async {
+    try {
+      final response = await http.post(
+          Uri.parse('${_baseUrl}notifications/set_token/?token=${fcmToken}'),
+          headers: {
+            'Authorization': 'Token $apiToken',
+          });
+      if (response.statusCode == 200) {
+        print(response.body);
+        return;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
 }
 
 Uri _apiProductUrlBuilder(
