@@ -204,6 +204,24 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
       throw NoConnectionException();
     }
   }
+
+  static Future<void> deleteUserAccount(Auth auth) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${_baseUrl}auth/delete/'),
+        headers: {
+          'Authorization': 'Token ${auth.apiToken}',
+        },
+      );
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
 }
 
 Uri _apiProductUrlBuilder(
