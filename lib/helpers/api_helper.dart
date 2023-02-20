@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
 
 import '../models/product.dart';
 import '../models/store.dart';
@@ -68,10 +69,13 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
           }
         : {};
     try {
-      final response = await http.get(
-        _apiStockChangeUrlBuilder(page, pageSize, store),
-        headers: headers,
+      final response = await retry(
+        () => http.get(
+          _apiStockChangeUrlBuilder(page, pageSize, store),
+          headers: headers,
+        ),
       );
+
       if (response.statusCode == 200) {
         final jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))['results'];
@@ -105,12 +109,14 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
           }
         : {};
     try {
-      final response = await http.get(
-        release == null
-            ? _apiProductUrlBuilder(fields, page, filter, pageSize)
-            : _apiReleaseProductUrlBuilder(
-                fields, page, filter, release, pageSize),
-        headers: headers,
+      final response = await retry(
+        () => http.get(
+          release == null
+              ? _apiProductUrlBuilder(fields, page, filter, pageSize)
+              : _apiReleaseProductUrlBuilder(
+                  fields, page, filter, release, pageSize),
+          headers: headers,
+        ),
       );
       if (response.statusCode == 200) {
         final jsonResponse =
@@ -342,11 +348,6 @@ Uri _apiReleaseProductUrlBuilder(
       '&ordering=${filter.releaseSortBy}'
       '&page=$page'
       '&page_size=$pageSize');
-  if (filter.checkIn == 1 || filter.sortBy.contains('checkin__rating')) {
-    string = string + '&user_checkin=True';
-  } else if (filter.checkIn == 2) {
-    string = string + '&user_checkin=False';
-  }
 
   final url = Uri.parse(string);
   return url;
