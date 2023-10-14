@@ -42,8 +42,7 @@ class Auth with ChangeNotifier {
   Future<void> authenticate() async {
     const oauthUrl =
         'https://auth.example.com/   const callbackUrl = 'com.beermonopoly.olmonopolet';
-    const apiUrl = 'https://api.example.com/   //const apiUrl = 'http://127.0.0.1:8000/auth/untappd/';
-    const profileUrl = 'https://api.example.com/v4/   try {
+    const apiUrl = 'https://api.example.com/   const profileUrl = 'https://api.example.com/v4/   try {
       // Get Untappd token
       final untappdResponse = await FlutterWebAuth.authenticate(
           url: oauthUrl, callbackUrlScheme: callbackUrl);
