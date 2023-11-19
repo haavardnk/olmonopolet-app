@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:retry/retry.dart';
 
 import '../models/product.dart';
 import '../models/store.dart';
@@ -14,10 +13,10 @@ import '../providers/auth.dart';
 //const _baseUrl = 'http://127.0.0.1:8000/';
 const _baseUrl = 'https://api.example.com/ApiHelper {
   static Future<Map<String, dynamic>> getDetailedProductInfo(
-      int productId, String apiToken, String fields) async {
-    final Map<String, String> headers = apiToken.isNotEmpty
+      http.Client http, int productId, Auth auth, String fields) async {
+    final Map<String, String> headers = auth.apiToken.isNotEmpty
         ? {
-            'Authorization': 'Token $apiToken',
+            'Authorization': 'Token ${auth.apiToken}',
           }
         : {};
     final url = Uri.parse(
@@ -31,6 +30,9 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
         final Map<String, dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))['results'][0];
         return jsonResponse;
+      } else if (response.statusCode == 401) {
+        auth.logout();
+        return {};
       } else {
         throw GenericHttpException();
       }
@@ -40,9 +42,9 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   }
 
   static Future<List<dynamic>> checkStock(
-      String productIds, String stores) async {
+      http.Client http, String productIds, String store) async {
     final url = Uri.parse(
-        '${_baseUrl}beers/?beers=$productIds&store=$stores&fields=vmp_id,stock');
+        '${_baseUrl}beers/?beers=$productIds&store=$store&fields=vmp_id,stock');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -58,18 +60,16 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   }
 
   static Future<List<StockChange>> getStockChangeList(
-      int page, Auth auth, int pageSize, String store) async {
+      http.Client http, int page, Auth auth, int pageSize, String store) async {
     final Map<String, String> headers = auth.apiToken.isNotEmpty
         ? {
             'Authorization': 'Token ${auth.apiToken}',
           }
         : {};
     try {
-      final response = await retry(
-        () => http.get(
-          _apiStockChangeUrlBuilder(page, pageSize, store),
-          headers: headers,
-        ),
+      final response = await http.get(
+        _apiStockChangeUrlBuilder(page, pageSize, store),
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -93,7 +93,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   }
 
   static Future<List<Product>> getProductList(
-      int page, Filter filter, Auth auth, int pageSize,
+      http.Client http, int page, Filter filter, Auth auth, int pageSize,
       [Release? release = null]) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
@@ -105,14 +105,12 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
           }
         : {};
     try {
-      final response = await retry(
-        () => http.get(
-          release == null
-              ? _apiProductUrlBuilder(fields, page, filter, pageSize)
-              : _apiReleaseProductUrlBuilder(
-                  fields, page, filter, release, pageSize),
-          headers: headers,
-        ),
+      final response = await http.get(
+        release == null
+            ? _apiProductUrlBuilder(fields, page, filter, pageSize)
+            : _apiReleaseProductUrlBuilder(
+                fields, page, filter, release, pageSize),
+        headers: headers,
       );
       if (response.statusCode == 200) {
         final jsonResponse =
@@ -135,7 +133,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   }
 
   static Future<List<Product>> getProductsData(
-      String productIds, String apiToken) async {
+      http.Client http, String productIds, String apiToken) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
@@ -169,7 +167,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   }
 
   static Future<void> submitUntappdMatch(
-      int productId, String untappdUrl) async {
+      http.Client http, int productId, String untappdUrl) async {
     final jsonBody = json.encode({
       'beer': productId,
       'suggested_url': untappdUrl,
@@ -192,7 +190,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
     }
   }
 
-  static Future<List<Store>> getStoreList() async {
+  static Future<List<Store>> getStoreList(http.Client http) async {
     const fields = "store_id,name,gps_lat,gps_long";
     try {
       final response = await http.get(_apiStoreUrlBuilder(fields));
@@ -213,7 +211,8 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
     }
   }
 
-  static Future<List<String>> getCheckedInStyles(String apiToken) async {
+  static Future<List<String>> getCheckedInStyles(
+      http.Client http, String apiToken) async {
     final Map<String, String> headers = {
       'Authorization': 'Token $apiToken',
     };
@@ -235,7 +234,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
     }
   }
 
-  static Future<List<Release>> getReleaseList() async {
+  static Future<List<Release>> getReleaseList(http.Client http) async {
     const fields = "name,release_date,beer_count,product_selections";
 
     final response = await http.get(_apiReleaseUrlBuilder(fields));
@@ -253,7 +252,8 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
     }
   }
 
-  static Future<void> updateFcmToken(String fcmToken, String apiToken) async {
+  static Future<void> updateFcmToken(
+      http.Client http, String fcmToken, String apiToken) async {
     try {
       final response = await http.post(
           Uri.parse('${_baseUrl}notifications/set_token/?token=${fcmToken}'),
@@ -271,7 +271,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
     }
   }
 
-  static Future<void> deleteUserAccount(Auth auth) async {
+  static Future<void> deleteUserAccount(http.Client http, Auth auth) async {
     try {
       final response = await http.delete(
         Uri.parse('${_baseUrl}auth/delete/'),

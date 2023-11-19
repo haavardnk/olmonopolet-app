@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 import '../models/product.dart';
 
 const _apiBaseUrl = 'https://api.example.com/_untappdBaseUrl = 'https://api.example.com/v4/UntappdHelper {
-  static Future<bool> addToWishlist(
-      String apiToken, String untappdToken, Product product) async {
+  static Future<bool> addToWishlist(http.Client http, String apiToken,
+      String untappdToken, Product product) async {
     try {
       final untappdResponse = await http.get(
         Uri.parse('$_untappdBaseUrl' +
@@ -35,8 +35,8 @@ const _apiBaseUrl = 'https://api.example.com/_untappdBaseUrl = 'https://api.exam
     }
   }
 
-  static Future<bool> removeFromWishlist(
-      String apiToken, String untappdToken, Product product) async {
+  static Future<bool> removeFromWishlist(http.Client http, String apiToken,
+      String untappdToken, Product product) async {
     try {
       final untappdResponse = await http.get(
         Uri.parse('$_untappdBaseUrl' +
