@@ -1,7 +1,7 @@
 name: beermonopoly
 description: An app to find good beers on Vinmonopolet
 publish_to: "none"
-version: 2.2.4+145
+version: 2.2.5+146
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -65,5 +65,3 @@ flutter:
     - assets/images/placeholder.png
     - assets/images/default_avatar.png
     - assets/images/logo_transparent.png
-    - assets/images/untappd_logo.png
-    - assets/images/powered_by_untappd.png
