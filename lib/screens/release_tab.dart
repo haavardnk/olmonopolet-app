@@ -29,12 +29,12 @@ class _ReleaseTabState extends State<ReleaseTab> {
     List<int> years = [];
 
     void _getReleaseYears() {
-      filters.releaseList.forEach((release) {
+      for (var release in filters.releaseList) {
         if (years.contains(release.releaseDate!.year)) {
-          return;
+          continue;
         }
         years.add(release.releaseDate!.year);
-      });
+      }
     }
 
     String _createProductSelectionText(List<String> productSelections) {
@@ -45,8 +45,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
       if (productSelections.length == 1) {
         productSelectionText = productSelections[0];
       } else {
-        productSelections.forEach(
-          (element) {
+        for (var element in productSelections) {
             if (productSelections.indexOf(element) ==
                 productSelections.length - 1) {
               productSelectionText += element;
@@ -59,8 +58,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
                 productSelectionText += " og ";
               }
             }
-          },
-        );
+          }
       }
       return productSelectionText;
     }
@@ -69,7 +67,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        title: FittedBox(
+        title: const FittedBox(
           fit: BoxFit.contain,
           child: Text(
             'Nyhetslanseringer',
@@ -89,7 +87,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
                     title: Text(
                       year.toString(),
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     initiallyExpanded: year == years[0] ? true : false,
                     shape: const Border(),
@@ -115,7 +113,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
                                     ),
                                   ],
                                 ),
-                                trailing: Column(
+                                trailing: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.arrow_forward),
@@ -143,7 +141,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
                                 },
                                 title: Text(
                                   release.releaseDate != null
-                                      ? '${toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO').format(release.releaseDate!))}'
+                                      ? toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO').format(release.releaseDate!))
                                       : release.name,
                                   style: const TextStyle(
                                     fontSize: 15,
@@ -186,7 +184,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
                                               1]
                                           .releaseDate!
                                           .year)
-                                Divider()
+                                const Divider()
                             ],
                           ),
                     ],

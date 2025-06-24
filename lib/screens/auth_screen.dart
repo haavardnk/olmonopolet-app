@@ -76,7 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     'Logg inn med Untappd',
                     textAlign: TextAlign.center,
                   ),
-                  Column()
+                  const Column()
                 ],
               ),
             ),

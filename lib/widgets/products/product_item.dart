@@ -40,7 +40,7 @@ class _ProductItemState extends State<ProductItem> {
     final MediaQueryData _mediaQueryData = MediaQuery.of(context);
     final _tabletMode = _mediaQueryData.size.shortestSide >= 600 ? true : false;
     final cart = Provider.of<Cart>(context, listen: false);
-    final countries = countryList;
+    const countries = countryList;
     final double _boxImageSize = _tabletMode
         ? 100 + _mediaQueryData.textScaleFactor * 10
         : _mediaQueryData.size.shortestSide / 4;
@@ -87,7 +87,7 @@ class _ProductItemState extends State<ProductItem> {
                           'product': widget.product,
                           'herotag': heroTag
                         }),
-                    screen: ProductDetailScreen(),
+                    screen: const ProductDetailScreen(),
                     pageTransitionAnimation: PageTransitionAnimation.cupertino,
                     withNavBar: true,
                   );
@@ -178,31 +178,27 @@ class _ProductItemState extends State<ProductItem> {
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            Container(
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Kr ${widget.product.price.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Kr ${widget.product.price.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  Text(
-                                    ' - Kr ${widget.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Container(
-                              child: Text(
-                                widget.product.style,
-                                style: const TextStyle(
-                                  fontSize: 12,
                                 ),
+                                Text(
+                                  ' - Kr ${widget.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                )
+                              ],
+                            ),
+                            Text(
+                              widget.product.style,
+                              style: const TextStyle(
+                                fontSize: 12,
                               ),
                             ),
                             Container(
@@ -327,7 +323,7 @@ class _ProductItemState extends State<ProductItem> {
                                                   .length >
                                               1)
                                         Text(
-                                          '${productSelectionAbrevationList[widget.product.product_selection]}',
+                                          '${productSelectionAbrevationList[widget.product.productSelection]}',
                                           style: const TextStyle(
                                             fontSize: 11,
                                             height: 0.9,
@@ -359,12 +355,12 @@ class _ProductItemState extends State<ProductItem> {
                     cart.updateCartItemsData();
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
+                      const SnackBar(
+                        content: Text(
                           'Lagt til i handlelisten!',
                           textAlign: TextAlign.center,
                         ),
-                        duration: const Duration(seconds: 2),
+                        duration: Duration(seconds: 2),
                       ),
                     );
                   },

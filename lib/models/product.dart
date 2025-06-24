@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Product extends Equatable {
-  Product({
+  const Product({
     required this.id,
     required this.name,
     required this.style,
@@ -19,7 +19,7 @@ class Product extends Equatable {
     this.untappdUrl,
     this.untappdId,
     this.country,
-    this.product_selection,
+    this.productSelection,
   });
 
   factory Product.fromJson(Map<String, dynamic> product) => Product(
@@ -43,14 +43,12 @@ class Product extends Equatable {
                 product['user_checked_in'].isNotEmpty
             ? product['user_checked_in'][0]['rating']
             : null,
-        userWishlisted: product['user_wishlisted'] != null
-            ? product['user_wishlisted']
-            : false,
+        userWishlisted: product['user_wishlisted'] ?? false,
         vmpUrl: product['vmp_url'],
         untappdUrl: product['untpd_url'],
         untappdId: product['untpd_id'],
         country: product['country'],
-        product_selection: product['product_selection'],
+        productSelection: product['product_selection'],
       );
 
   @override
@@ -72,7 +70,7 @@ class Product extends Equatable {
         untappdUrl,
         untappdId,
         country,
-        product_selection,
+        productSelection,
       ];
 
   final int id;
@@ -92,5 +90,5 @@ class Product extends Equatable {
   final String? untappdUrl;
   final int? untappdId;
   final String? country;
-  final String? product_selection;
+  final String? productSelection;
 }

@@ -56,7 +56,7 @@ class _ProductListViewState extends State<ProductList> {
             2
         ? 24
         : 14;
-    if (!_pagingController.hasListeners)
+    if (!_pagingController.hasListeners) {
       _pagingController.addPageRequestListener((pageKey) {
         final filters = Provider.of<Filter>(context, listen: false).filters;
         final auth = Provider.of<Auth>(context, listen: false);
@@ -64,6 +64,7 @@ class _ProductListViewState extends State<ProductList> {
             Provider.of<HttpClient>(context, listen: false).apiClient;
         _fetchPage(client, pageKey, filters, auth);
       });
+    }
 
     return RefreshIndicator(
       onRefresh: () => Future.sync(
@@ -92,7 +93,7 @@ class _ProductListViewState extends State<ProductList> {
                     noItemsFoundIndicatorBuilder: (_) =>
                         const NoItemsFoundIndicator(),
                   ),
-                  separatorBuilder: (context, index) => Divider(
+                  separatorBuilder: (context, index) => const Divider(
                     height: 0,
                   ),
                 )

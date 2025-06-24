@@ -50,7 +50,7 @@ void main() {
         "raises NoConnectionException on SocketException",
         () async {
           when(() => mockClient.get(any(), headers: {})).thenAnswer(((_) async {
-            throw SocketException('No connection');
+            throw const SocketException('No connection');
           }));
 
           expect(
@@ -153,7 +153,7 @@ void main() {
         "raises NoConnectionException on SocketException",
         () async {
           when(() => mockClient.get(any())).thenAnswer(((_) async {
-            throw SocketException('No connection');
+            throw const SocketException('No connection');
           }));
 
           expect(
@@ -219,7 +219,7 @@ void main() {
                 any(),
                 headers: {},
               )).thenAnswer(((_) async {
-            throw SocketException('No connection');
+            throw const SocketException('No connection');
           }));
 
           expect(
@@ -277,12 +277,12 @@ void main() {
               StockChange(
                 store: '472',
                 quantity: 21,
-                stock_updated:
+                stockUpdated:
                     DateTime.parse("2024-01-06T00:16:49.751890+01:00"),
-                stocked_at: DateTime.parse("2024-01-06T00:16:49.751471"),
-                unstocked_at: null,
-                stock_unstock_at: DateTime.parse("2024-01-06T00:16:49.751471"),
-                product: Product(
+                stockedAt: DateTime.parse("2024-01-06T00:16:49.751471"),
+                unstockedAt: null,
+                stockUnstockAt: DateTime.parse("2024-01-06T00:16:49.751471"),
+                product: const Product(
                   id: 16655102,
                   name: "Parish Ghost In The Machine DIPA",
                   style: "IPA - Imperial / Double New England / Hazy",
@@ -351,12 +351,12 @@ void main() {
               StockChange(
                 store: '472',
                 quantity: 21,
-                stock_updated:
+                stockUpdated:
                     DateTime.parse("2024-01-06T00:16:49.751890+01:00"),
-                stocked_at: DateTime.parse("2024-01-06T00:16:49.751471"),
-                unstocked_at: null,
-                stock_unstock_at: DateTime.parse("2024-01-06T00:16:49.751471"),
-                product: Product(
+                stockedAt: DateTime.parse("2024-01-06T00:16:49.751471"),
+                unstockedAt: null,
+                stockUnstockAt: DateTime.parse("2024-01-06T00:16:49.751471"),
+                product: const Product(
                   id: 16655102,
                   name: "Parish Ghost In The Machine DIPA",
                   style: "IPA - Imperial / Double New England / Hazy",
@@ -402,7 +402,7 @@ void main() {
                 any(),
                 headers: {},
               )).thenAnswer(((_) async {
-            throw SocketException('No connection');
+            throw const SocketException('No connection');
           }));
 
           expect(
@@ -465,12 +465,12 @@ void main() {
           expect(
             productList,
             [
-              Product(
+              const Product(
                 id: 16655602,
                 untappdId: 5575146,
                 name: "Marlobobo Wildberry Vanilla Trail 2022",
                 country: "Norge",
-                product_selection: "Tilleggsutvalget",
+                productSelection: "Tilleggsutvalget",
                 style: "Mjod",
                 price: 384.8,
                 volume: 0.375,
@@ -562,12 +562,12 @@ void main() {
           expect(
             productList,
             [
-              Product(
+              const Product(
                 id: 16655602,
                 untappdId: 5575146,
                 name: "Marlobobo Wildberry Vanilla Trail 2022",
                 country: "Norge",
-                product_selection: "Tilleggsutvalget",
+                productSelection: "Tilleggsutvalget",
                 style: "Mead - Melomel",
                 price: 384.8,
                 volume: 0.375,
@@ -621,7 +621,7 @@ void main() {
                 any(),
                 headers: {},
               )).thenAnswer(((_) async {
-            throw SocketException('No connection');
+            throw const SocketException('No connection');
           }));
 
           expect(

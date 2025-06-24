@@ -11,7 +11,7 @@ Future<void> popupDialog(BuildContext context, List<Widget> buttons,
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18),
         ),
       ],
     ),

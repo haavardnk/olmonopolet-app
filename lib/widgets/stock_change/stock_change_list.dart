@@ -54,7 +54,7 @@ class _StockChangeListViewState extends State<StockChangeList> {
             2
         ? 24
         : 14;
-    if (!_pagingController.hasListeners)
+    if (!_pagingController.hasListeners) {
       _pagingController.addPageRequestListener((pageKey) {
         final filters = Provider.of<Filter>(context, listen: false).filters;
         final auth = Provider.of<Auth>(context, listen: false);
@@ -62,6 +62,7 @@ class _StockChangeListViewState extends State<StockChangeList> {
             Provider.of<HttpClient>(context, listen: false).apiClient;
         _fetchPage(client, pageKey, filters, auth);
       });
+    }
 
     return RefreshIndicator(
       onRefresh: () => Future.sync(
@@ -83,7 +84,7 @@ class _StockChangeListViewState extends State<StockChangeList> {
                         return StockChangeItem(
                           stockChange: item,
                           lastDate: _pagingController
-                              .itemList![index - 1].stock_unstock_at,
+                              .itemList![index - 1].stockUnstockAt,
                         );
                       }
                     },

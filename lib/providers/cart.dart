@@ -195,7 +195,7 @@ class Cart with ChangeNotifier {
       final productIds = _items.keys.toList().join(',');
       final updatedProducts =
           await ApiHelper.getProductsData(_client, productIds, _apiToken);
-      updatedProducts.forEach((product) {
+      for (var product in updatedProducts) {
         _items[product.id] = CartItem(
           product: Product(
               id: product.id,
@@ -219,7 +219,7 @@ class Cart with ChangeNotifier {
           inStock: _items[product.id]!.inStock,
         );
         updateDb(product.id);
-      });
+      }
       notifyListeners();
     }
   }
@@ -248,9 +248,9 @@ class Cart with ChangeNotifier {
       var response =
           await ApiHelper.checkStock(_client, cartItemIds, cartStoreId);
       itemsInStock = [];
-      response.forEach((element) {
+      for (var element in response) {
         itemsInStock.add(element['vmp_id']);
-      });
+      }
       _items.forEach((key, value) {
         if (itemsInStock.contains(value.product.id)) {
           value.inStock = true;
@@ -267,13 +267,13 @@ class Cart with ChangeNotifier {
       cartStoreId = '';
     } else {
       String temporaryStores = '';
-      cartSelectedStores.forEach((storeName) {
+      for (var storeName in cartSelectedStores) {
         if (temporaryStores.isNotEmpty) {
           temporaryStores += ',';
         }
         temporaryStores +=
             storeList.firstWhere((element) => element.name == storeName).id;
-      });
+      }
       cartStoreId = temporaryStores;
     }
     notifyListeners();
@@ -284,7 +284,7 @@ class Cart with ChangeNotifier {
     final sorted = _items.entries.toList();
     if (cartSortIndex == 'Alkohol - Høy til lav') {
       sorted
-        ..sort(
+        .sort(
           (a, b) {
             int result;
             if (a.value.product.abv == null) {
@@ -299,7 +299,7 @@ class Cart with ChangeNotifier {
         );
     } else if (cartSortIndex == 'Alkohol - Lav til høy') {
       sorted
-        ..sort(
+        .sort(
           (a, b) {
             int result;
             if (a.value.product.abv == null) {
@@ -314,7 +314,7 @@ class Cart with ChangeNotifier {
         );
     } else if (cartSortIndex == 'Din rating - Høy til lav') {
       sorted
-        ..sort(
+        .sort(
           (a, b) {
             int result;
             if (a.value.product.userRating == null) {
@@ -330,7 +330,7 @@ class Cart with ChangeNotifier {
         );
     } else if (cartSortIndex == 'Din rating - Lav til høy') {
       sorted
-        ..sort(
+        .sort(
           (a, b) {
             int result;
             if (a.value.product.userRating == null) {
@@ -346,7 +346,7 @@ class Cart with ChangeNotifier {
         );
     } else if (cartSortIndex == 'Global rating - Høy til lav') {
       sorted
-        ..sort(
+        .sort(
           (a, b) {
             int result;
             if (a.value.product.rating == null) {
@@ -362,7 +362,7 @@ class Cart with ChangeNotifier {
         );
     } else if (cartSortIndex == 'Global rating - Lav til høy') {
       sorted
-        ..sort(
+        .sort(
           (a, b) {
             int result;
             if (a.value.product.rating == null) {
@@ -378,33 +378,33 @@ class Cart with ChangeNotifier {
         );
     } else if (cartSortIndex == 'Navn - A til Å') {
       sorted
-        ..sort(
+        .sort(
           (a, b) => a.value.product.name.compareTo(b.value.product.name),
         );
     } else if (cartSortIndex == 'Navn - Å til A') {
       sorted
-        ..sort(
+        .sort(
           (a, b) => b.value.product.name.compareTo(a.value.product.name),
         );
     } else if (cartSortIndex == 'Pris - Høy til lav') {
       sorted
-        ..sort(
+        .sort(
           (a, b) => b.value.product.price.compareTo(a.value.product.price),
         );
     } else if (cartSortIndex == 'Pris - Lav til høy') {
       sorted
-        ..sort(
+        .sort(
           (a, b) => a.value.product.price.compareTo(b.value.product.price),
         );
     } else if (cartSortIndex == 'Pris per liter - Høy til lav') {
       sorted
-        ..sort(
+        .sort(
           (a, b) => b.value.product.pricePerVolume!
               .compareTo(a.value.product.pricePerVolume!),
         );
     } else if (cartSortIndex == 'Pris per liter - Lav til høy') {
       sorted
-        ..sort(
+        .sort(
           (a, b) => a.value.product.pricePerVolume!
               .compareTo(b.value.product.pricePerVolume!),
         );

@@ -10,9 +10,8 @@ const _apiBaseUrl = 'https://api.example.com/_untappdBaseUrl = 'https://api.exam
       String untappdToken, Product product) async {
     try {
       final untappdResponse = await http.get(
-        Uri.parse('$_untappdBaseUrl' +
-            'user/wishlist/add' +
-            '?access_token=$untappdToken&bid=${product.untappdId}'),
+        Uri.parse(_untappdBaseUrl +
+            'user/wishlist/add?access_token=$untappdToken&bid=${product.untappdId}'),
         headers: {'User-Agent': 'app:Beermonopoly'},
       );
       bool inWishlist =
@@ -39,9 +38,8 @@ const _apiBaseUrl = 'https://api.example.com/_untappdBaseUrl = 'https://api.exam
       String untappdToken, Product product) async {
     try {
       final untappdResponse = await http.get(
-        Uri.parse('$_untappdBaseUrl' +
-            'user/wishlist/delete' +
-            '?access_token=$untappdToken&bid=${product.untappdId}'),
+        Uri.parse(_untappdBaseUrl +
+            'user/wishlist/delete?access_token=$untappdToken&bid=${product.untappdId}'),
         headers: {'User-Agent': 'app:Beermonopoly'},
       );
       bool notInWishlist =

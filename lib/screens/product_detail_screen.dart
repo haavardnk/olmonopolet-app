@@ -37,11 +37,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   List<dynamic> _stockList = [];
   List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
     stockList = snapshot.data!['all_stock'];
-    Map<String, int> order = new Map.fromIterable(
-      storeList.map((e) => e.name).toList(),
-      key: (key) => key,
-      value: (key) => storeList.map((e) => e.name).toList().indexOf(key),
-    );
+    Map<String, int> order = { for (var key in storeList.map((e) => e.name).toList()) key : storeList.map((e) => e.name).toList().indexOf(key) };
     stockList.sort(
         (a, b) => order[a['store_name']]!.compareTo(order[b['store_name']]!));
     return stockList;
@@ -57,7 +53,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
-    final countries = countryList;
+    const countries = countryList;
     final _mediaQueryData = MediaQuery.of(context);
     final _tabletMode = _mediaQueryData.size.width >= 600 ? true : false;
     final _boxImageSize =
@@ -75,7 +71,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detaljer'),
+        title: const Text('Detaljer'),
         surfaceTintColor: Colors.transparent,
         actions: [
           PopupMenuButton(itemBuilder: (context) {
@@ -90,7 +86,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Icon(!wishlisted
                             ? Icons.playlist_add
                             : Icons.playlist_remove),
-                        VerticalDivider(width: 5),
+                        const VerticalDivider(width: 5),
                         Text(!wishlisted
                             ? 'Legg i Untappd ønskeliste'
                             : 'Fjern fra Untappd ønskeliste'),
@@ -104,8 +100,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   fit: BoxFit.fitWidth,
                   child: Row(
                     children: [
-                      Icon(Icons.report),
-                      VerticalDivider(width: 5),
+                      const Icon(Icons.report),
+                      const VerticalDivider(width: 5),
                       Text(
                         product.rating != null
                             ? 'Rapporter feil Untappd match'
@@ -116,7 +112,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
-              PopupMenuItem<int>(
+              const PopupMenuItem<int>(
                 value: 2,
                 child: FittedBox(
                   fit: BoxFit.fitWidth,
@@ -129,7 +125,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
-              PopupMenuItem<int>(
+              const PopupMenuItem<int>(
                 value: 3,
                 child: FittedBox(
                   fit: BoxFit.fitWidth,
@@ -184,7 +180,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               label: Text(cart.items.keys.contains(product.id)
                   ? cart.items[product.id]!.quantity.toString()
                   : ''),
-              child: Icon(Icons.add_shopping_cart),
+              child: const Icon(Icons.add_shopping_cart),
             ),
           ),
           onPressed: () {
@@ -350,7 +346,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height / 8,
                           ),
-                          Center(
+                          const Center(
                             child: CircularProgressIndicator(),
                           ),
                         ],
@@ -464,7 +460,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                                       [
                                                                       'rating'],
                                                                   size: 18,
-                                                                  color: Color(
+                                                                  color: const Color(
                                                                       0xff01aed6)),
                                                             ],
                                                           )
@@ -489,7 +485,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                                       null)
                                                                 Text(
                                                                   ' - ${snapshot.data!['user_checked_in'][0]['count']}',
-                                                                  style: TextStyle(
+                                                                  style: const TextStyle(
                                                                       fontSize:
                                                                           14),
                                                                 )
@@ -528,7 +524,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                   ],
                                                 ),
                                                 if (_numRatings > 1)
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 5,
                                                   ),
                                                 if (_numRatings > 1)
@@ -575,7 +571,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                                         [
                                                                         'rating'],
                                                                     size: 18,
-                                                                    color: Color(
+                                                                    color: const Color(
                                                                         0xff01aed6)),
                                                               ],
                                                             )
@@ -602,7 +598,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                                 children: [
                                                                   Text(
                                                                     'Venner - ${snapshot.data!['friends_checked_in'].length}',
-                                                                    style: TextStyle(
+                                                                    style: const TextStyle(
                                                                         fontSize:
                                                                             14),
                                                                   ),
@@ -625,7 +621,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                                       rating:
                                                                           _friendsRating,
                                                                       size: 18,
-                                                                      color: Color(
+                                                                      color: const Color(
                                                                           0xff01aed6)),
                                                                 ],
                                                               )
@@ -898,8 +894,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Årgang'),
+                                          const SizedBox(
+                                            child: Text('Årgang'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -921,8 +917,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Smak'),
+                                          const SizedBox(
+                                            child: Text('Smak'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -945,8 +941,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Lukt'),
+                                          const SizedBox(
+                                            child: Text('Lukt'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -969,8 +965,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Farge'),
+                                          const SizedBox(
+                                            child: Text('Farge'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -993,8 +989,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Passer til'),
+                                          const SizedBox(
+                                            child: Text('Passer til'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1017,8 +1013,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Lagring'),
+                                          const SizedBox(
+                                            child: Text('Lagring'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1041,8 +1037,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Råstoff'),
+                                          const SizedBox(
+                                            child: Text('Råstoff'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1065,8 +1061,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Metode'),
+                                          const SizedBox(
+                                            child: Text('Metode'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1088,8 +1084,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Allergen'),
+                                          const SizedBox(
+                                            child: Text('Allergen'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1111,8 +1107,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Bryggeri'),
+                                          const SizedBox(
+                                            child: Text('Bryggeri'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1132,8 +1128,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Land'),
+                                          const SizedBox(
+                                            child: Text('Land'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1150,7 +1146,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                         .isNotEmpty)
                                                   Row(
                                                     children: [
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         width: 3,
                                                       ),
                                                       Flag.fromString(
@@ -1173,8 +1169,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                   Row(
                                     children: [
-                                      Container(
-                                        child: const Text('Varenummer'),
+                                      const SizedBox(
+                                        child: Text('Varenummer'),
                                         width: 115,
                                       ),
                                       Flexible(
@@ -1193,8 +1189,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     FadeIn(
                                       child: Row(
                                         children: [
-                                          Container(
-                                            child: const Text('Utvalg'),
+                                          const SizedBox(
+                                            child: Text('Utvalg'),
                                             width: 115,
                                           ),
                                           Flexible(
@@ -1213,7 +1209,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               height: 15,
                             ),
                             ExpansionTile(
-                              title: Text("Vis butikker med varen på lager",
+                              title: const Text("Vis butikker med varen på lager",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -1295,15 +1291,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     Text(snapshot.data!['description']),
                                   if (snapshot.hasData &&
                                       snapshot.data!['description'] == '')
-                                    Center(
-                                      child: const Text(
+                                    const Center(
+                                      child: Text(
                                         'Mangler beskrivelse',
                                       ),
                                     ),
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 60,
                             )
                           ],
@@ -1468,7 +1464,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           ),
           Container(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
             height: _mediaQueryData.size.height * 0.4 - 28,
             width: _mediaQueryData.size.width,
             child: ListView.builder(
@@ -1485,10 +1481,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 radius: 16,
                                 foregroundImage:
                                     NetworkImage(checkins[index]['avatar']),
-                                backgroundImage: AssetImage(
+                                backgroundImage: const AssetImage(
                                     'assets/images/default_avatar.png'),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10,
                               ),
                               Text(
@@ -1521,7 +1517,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           )
                         ],
                       ),
-                      Divider(
+                      const Divider(
                         height: 10,
                       )
                     ],

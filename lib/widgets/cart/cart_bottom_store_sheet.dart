@@ -58,7 +58,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
           },
         );
       },
-      icon: Icon(
+      icon: const Icon(
         Icons.settings,
         semanticLabel: "Instillinger",
       ),
@@ -92,16 +92,16 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                       child: DropdownSearch<String>(
-                        popupProps: PopupProps.dialog(),
+                        popupProps: const PopupProps.dialog(),
                         dropdownDecoratorProps: DropDownDecoratorProps(
                           dropdownSearchDecoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
                             isDense: true,
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               vertical: 23,
                               horizontal: 10,
                             ),
@@ -110,7 +110,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                         dropdownBuilder: (context, selectedItem) {
                           return Text(
                             selectedItem!,
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 16),
                           );
                         },
                         items: _sortList.map((value) => value!).toList(),
@@ -130,8 +130,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     SwitchListTile(
-                      contentPadding: EdgeInsets.only(left: 16, right: 4),
-                      title: Text(
+                      contentPadding: const EdgeInsets.only(left: 16, right: 4),
+                      title: const Text(
                           'Grå ut dersom ingen på lager i valgte butikker'),
                       value: cart.greyNoStock,
                       activeColor: Theme.of(context).colorScheme.primary,
@@ -144,9 +144,9 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       },
                     ),
                     SwitchListTile(
-                      contentPadding: EdgeInsets.only(left: 16, right: 4),
+                      contentPadding: const EdgeInsets.only(left: 16, right: 4),
                       title:
-                          Text('Skjul dersom ingen på lager i valgte butikker'),
+                          const Text('Skjul dersom ingen på lager i valgte butikker'),
                       value: cart.hideNoStock,
                       activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
@@ -158,8 +158,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       },
                     ),
                     SwitchListTile(
-                      contentPadding: EdgeInsets.only(left: 16, right: 4),
-                      title: Text('Bruk butikkvalg fra oversikt'),
+                      contentPadding: const EdgeInsets.only(left: 16, right: 4),
+                      title: const Text('Bruk butikkvalg fra oversikt'),
                       value: cart.useOverviewStoreSelection,
                       activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
@@ -172,7 +172,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                     ),
                     if (!cart.useOverviewStoreSelection)
                       FadeIn(
-                        duration: Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 300),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -201,7 +201,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                             searchFieldProps: TextFieldProps(
                                               decoration: InputDecoration(
                                                 labelText: 'Søk',
-                                                prefixIcon: Icon(Icons.search),
+                                                prefixIcon: const Icon(Icons.search),
                                                 border: OutlineInputBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -213,7 +213,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                             itemBuilder:
                                                 (context, item, isSelected) {
                                               return Container(
-                                                margin: EdgeInsets.symmetric(
+                                                margin: const EdgeInsets.symmetric(
                                                     horizontal: 8),
                                                 child: ListTile(
                                                   title: Text(item),
@@ -233,7 +233,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                                       .reduce((a, b) =>
                                                           a + ', ' + b)
                                                   : 'Velg butikker',
-                                              style: TextStyle(fontSize: 16),
+                                              style: const TextStyle(fontSize: 16),
                                             );
                                           },
                                           dropdownDecoratorProps:
@@ -248,7 +248,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                               ),
                                               isDense: true,
                                               contentPadding:
-                                                  EdgeInsets.symmetric(
+                                                  const EdgeInsets.symmetric(
                                                 vertical: 23,
                                                 horizontal: 10,
                                               ),
@@ -269,7 +269,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                               cart.cartSelectedStores,
                                         ),
                                       )
-                                    : Center(
+                                    : const Center(
                                         child: CircularProgressIndicator(),
                                       );
                               },

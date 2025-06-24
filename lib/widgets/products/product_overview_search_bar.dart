@@ -40,7 +40,7 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
         child: TextFormField(
           controller: _search,
           maxLines: 1,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
           ),
           onChanged: (textValue) {
@@ -68,11 +68,11 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-            focusedBorder: UnderlineInputBorder(
+            focusedBorder: const UnderlineInputBorder(
                 borderSide: BorderSide(
               color: Colors.transparent,
             )),
-            enabledBorder: UnderlineInputBorder(
+            enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(
                 color: Colors.transparent,
               ),

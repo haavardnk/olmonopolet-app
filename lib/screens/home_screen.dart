@@ -19,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  PersistentTabController _controller = PersistentTabController();
+  final PersistentTabController _controller = PersistentTabController();
 
   Future<void> setupInteractedMessage(
       PersistentTabController _controller) async {
@@ -53,9 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     List<PersistentTabConfig> _tabs = [
       PersistentTabConfig(
-        screen: ProductOverviewTab(),
+        screen: const ProductOverviewTab(),
         item: ItemConfig(
-          icon: Icon(Icons.liquor),
+          icon: const Icon(Icons.liquor),
           activeForegroundColor:
               Theme.of(context).colorScheme.onSecondaryContainer,
           inactiveForegroundColor:
@@ -66,9 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       PersistentTabConfig(
-        screen: ReleaseTab(),
+        screen: const ReleaseTab(),
         item: ItemConfig(
-          icon: Icon(Icons.new_releases_outlined),
+          icon: const Icon(Icons.new_releases_outlined),
           activeForegroundColor:
               Theme.of(context).colorScheme.onSecondaryContainer,
           inactiveForegroundColor:
@@ -79,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       PersistentTabConfig(
-        screen: StockChangeTab(),
+        screen: const StockChangeTab(),
         item: ItemConfig(
-          icon: Icon(Icons.swap_vert),
+          icon: const Icon(Icons.swap_vert),
           activeForegroundColor:
               Theme.of(context).colorScheme.onSecondaryContainer,
           inactiveForegroundColor:
@@ -92,12 +92,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       PersistentTabConfig(
-        screen: CartTab(),
+        screen: const CartTab(),
         item: ItemConfig(
           icon: Consumer<Cart>(
             builder: (_, cart, __) => Badge(
               label: Text(cart.itemCount.toString()),
-              child: Icon(Icons.receipt_long),
+              child: const Icon(Icons.receipt_long),
               isLabelVisible: cart.itemCount > 0,
             ),
           ),
@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
       tabs: _tabs,
       resizeToAvoidBottomInset: true,
       avoidBottomPadding: true,
-      navBarOverlap: NavBarOverlap.none(),
+      navBarOverlap: const NavBarOverlap.none(),
       backgroundColor: Theme.of(context).canvasColor,
       navBarBuilder: (navBarConfig) => Style6BottomNavBar(
         navBarConfig: navBarConfig,

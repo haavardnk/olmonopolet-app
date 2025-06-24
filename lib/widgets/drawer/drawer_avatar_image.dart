@@ -20,8 +20,8 @@ class DrawerAvatarImage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         radius: 65,
       ),
-      placeholder: (context, url) => CircularProgressIndicator(),
-      errorWidget: (context, url, error) => Icon(Icons.error),
+      placeholder: (context, url) => const CircularProgressIndicator(),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
     );
   }
 }

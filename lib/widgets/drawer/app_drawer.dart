@@ -7,7 +7,6 @@ import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import '../../providers/auth.dart';
 import '../../helpers/app_launcher.dart';
 import '../../screens/about_screen.dart';
-import '../../widgets/drawer/drawer_auth_button.dart';
 import '../../widgets/drawer/drawer_avatar_image.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -51,7 +50,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 ),
                 Text(
                   authData.userName,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ],
             ),
@@ -98,8 +97,8 @@ class _AppDrawerState extends State<AppDrawer> {
             onTap: () {
               pushScreen(
                 context,
-                settings: RouteSettings(name: AboutScreen.routeName),
-                screen: AboutScreen(),
+                settings: const RouteSettings(name: AboutScreen.routeName),
+                screen: const AboutScreen(),
               );
             },
           ),

@@ -17,13 +17,13 @@ class AboutScreen extends StatelessWidget {
         iconTheme:
             Theme.of(context).appBarTheme.iconTheme, //change your color here
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: const Text(
+              child: Text(
                 'Informasjon',
                 style: TextStyle(
                   fontSize: 16,
@@ -31,19 +31,19 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(
+            SizedBox(
               height: 16,
             ),
             Text(
               "Ølmonopolet er en app som kontinuerlig innhenter data fra Vinmonopolet og Untappd "
               "for å gi deg den best mulige tjenesten for å finne det beste ølet som er på lager til enhver tid.",
             ),
-            const SizedBox(
+            SizedBox(
               height: 16,
             ),
             Align(
               alignment: Alignment.centerLeft,
-              child: const Text(
+              child: Text(
                 'Data fra Vinmonopolet',
                 style: TextStyle(
                   fontSize: 14,
@@ -51,7 +51,7 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(
+            SizedBox(
               height: 10,
             ),
             Text(
@@ -59,12 +59,12 @@ class AboutScreen extends StatelessWidget {
               "Denne informasjonen inkluderer detaljer om ølutvalg og lagerstatus. "
               "Nøyaktig når dataen oppdateres kan variere fra dag til dag.",
             ),
-            const SizedBox(
+            SizedBox(
               height: 16,
             ),
             Align(
               alignment: Alignment.centerLeft,
-              child: const Text(
+              child: Text(
                 'Data fra Untappd',
                 style: TextStyle(
                   fontSize: 14,
@@ -72,7 +72,7 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(
+            SizedBox(
               height: 10,
             ),
             Text(
@@ -84,7 +84,7 @@ class AboutScreen extends StatelessWidget {
                 // "Etter dette vil alle nye innsjekkinger bli hentet inn en gang per dag. "
                 // "Din ønskeliste og venneliste vil også bli hentet inn en gang per dag.",
                 ),
-            const SizedBox(
+            SizedBox(
               height: 10,
             ),
             Text(
@@ -92,12 +92,12 @@ class AboutScreen extends StatelessWidget {
               "Derfor kan du støte på øl hvor metadataen er feil. Du kan rapportere dette ved å bruke knappen "
               "'Rapporter feil Untappd match' på detaljsiden for hvert enkelt øl.",
             ),
-            const SizedBox(
+            SizedBox(
               height: 16,
             ),
             Align(
               alignment: Alignment.centerLeft,
-              child: const Text(
+              child: Text(
                 'Vilkår',
                 style: TextStyle(
                   fontSize: 14,
@@ -105,7 +105,7 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(
+            SizedBox(
               height: 10,
             ),
             Text(

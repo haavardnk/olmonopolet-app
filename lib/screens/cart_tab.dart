@@ -22,14 +22,14 @@ class CartTab extends StatelessWidget {
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        title: FittedBox(
+        title: const FittedBox(
           fit: BoxFit.contain,
           child: Text(
             'Handleliste',
           ),
         ),
-        actions: [
-          const CartBottomStoreSheet(),
+        actions: const [
+          CartBottomStoreSheet(),
         ],
       ),
       drawer: const AppDrawer(),
@@ -42,39 +42,37 @@ class CartTab extends StatelessWidget {
                   ? ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
-                        Container(
-                          child: Column(
-                            children: List.generate(
-                              cartData.itemCount,
-                              (index) {
-                                return Column(
-                                  children: [
-                                    if (index != 0)
-                                      Divider(
-                                        height: 1,
-                                      ),
-                                    CartElement(
-                                      index,
-                                      _boxImageSize,
-                                      cartData.items.values.elementAt(index),
-                                      cartData,
+                        Column(
+                          children: List.generate(
+                            cartData.itemCount,
+                            (index) {
+                              return Column(
+                                children: [
+                                  if (index != 0)
+                                    const Divider(
+                                      height: 1,
                                     ),
-                                    if (index == cartData.itemCount - 1 &&
-                                        cartData.hideNoStock &&
-                                        cartData.cartStoreId.isNotEmpty &&
-                                        (cartData.itemsInStock.length !=
-                                            cartData.itemCount))
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Center(
-                                          child: Text(
-                                              '${cartData.itemCount - cartData.itemsInStock.length} skjulte produkter'),
-                                        ),
-                                      )
-                                  ],
-                                );
-                              },
-                            ),
+                                  CartElement(
+                                    index,
+                                    _boxImageSize,
+                                    cartData.items.values.elementAt(index),
+                                    cartData,
+                                  ),
+                                  if (index == cartData.itemCount - 1 &&
+                                      cartData.hideNoStock &&
+                                      cartData.cartStoreId.isNotEmpty &&
+                                      (cartData.itemsInStock.length !=
+                                          cartData.itemCount))
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: Text(
+                                            '${cartData.itemCount - cartData.itemsInStock.length} skjulte produkter'),
+                                      ),
+                                    )
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -121,8 +119,8 @@ class CartTab extends StatelessWidget {
           onPressed: () {
             cartData.clear();
           },
-          label: Text('Tøm'),
-          icon: Icon(Icons.delete_sweep_outlined),
+          label: const Text('Tøm'),
+          icon: const Icon(Icons.delete_sweep_outlined),
         )
       ],
     );

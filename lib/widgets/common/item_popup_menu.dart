@@ -14,7 +14,7 @@ Future<String?> showPopupMenu(BuildContext context, Auth auth, bool wishlisted,
   final untappdToken = auth.untappdToken;
   final client = Provider.of<HttpClient>(context).untappdClient;
   var value = await showMenu<String>(
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
         Radius.circular(8.0),
       ),
@@ -23,7 +23,7 @@ Future<String?> showPopupMenu(BuildContext context, Auth auth, bool wishlisted,
         RelativeRect.fromSize(tapPosition & const Size(40, 40), overlay.size),
     items: <PopupMenuEntry<String>>[
       if (wishlisted == false && auth.isAuth)
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'addWishlist',
           child: Row(
             children: <Widget>[
@@ -33,7 +33,7 @@ Future<String?> showPopupMenu(BuildContext context, Auth auth, bool wishlisted,
           ),
         ),
       if (wishlisted == true && auth.isAuth)
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'removeWishlist',
           child: Row(
             children: <Widget>[
@@ -43,7 +43,7 @@ Future<String?> showPopupMenu(BuildContext context, Auth auth, bool wishlisted,
           ),
         ),
       if (product.untappdUrl != null)
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'untappd',
           child: Row(
             children: <Widget>[
@@ -53,7 +53,7 @@ Future<String?> showPopupMenu(BuildContext context, Auth auth, bool wishlisted,
           ),
         ),
       if (product.vmpUrl != null)
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'vinmonopolet',
           child: Row(
             children: <Widget>[

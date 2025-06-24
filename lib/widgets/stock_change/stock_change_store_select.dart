@@ -20,7 +20,7 @@ class StockChangeStoreSelect extends StatelessWidget {
     return Visibility(
       maintainState: true,
       visible: false,
-      child: Container(
+      child: SizedBox(
         width: 10,
         child: DropdownSearch<String>(
           key: _openDropDownProgKey,
@@ -30,7 +30,7 @@ class StockChangeStoreSelect extends StatelessWidget {
             searchFieldProps: TextFieldProps(
               decoration: InputDecoration(
                 labelText: 'Søk',
-                prefixIcon: Icon(
+                prefixIcon: const Icon(
                   Icons.search,
                 ),
                 border: OutlineInputBorder(
@@ -40,7 +40,7 @@ class StockChangeStoreSelect extends StatelessWidget {
             ),
             itemBuilder: (context, item, isSelected) {
               return Container(
-                margin: EdgeInsets.symmetric(horizontal: 8),
+                margin: const EdgeInsets.symmetric(horizontal: 8),
                 child: ListTile(
                   title: Text(item),
                   subtitle: Text(filters.storeList.isNotEmpty &&
@@ -59,8 +59,8 @@ class StockChangeStoreSelect extends StatelessWidget {
                   Consumer<Filter>(
                     builder: (context, _, __) {
                       return SwitchListTile(
-                        contentPadding: EdgeInsets.only(left: 12, right: 4),
-                        title: Text(
+                        contentPadding: const EdgeInsets.only(left: 12, right: 4),
+                        title: const Text(
                           'Husk valgt butikk',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),

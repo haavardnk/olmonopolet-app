@@ -9,10 +9,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'firebase_options.dart';
-import './screens/auth_screen.dart';
 import './screens/product_detail_screen.dart';
 import 'screens/home_screen.dart';
-import './screens/splash_screen.dart';
 import './screens/about_screen.dart';
 import './providers/filter.dart';
 import './providers/auth.dart';
@@ -23,21 +21,17 @@ import './assets/color_schemes.g.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   print('Handling a background message ${message.messageId}');
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  final channel = const AndroidNotificationChannel(
+  const channel = AndroidNotificationChannel(
     'olmonopolet',
     'Ølmonopolet Notifikasjoner',
     description:
@@ -153,7 +147,7 @@ class _MyAppState extends State<MyApp> {
           }
 
           return MaterialApp(
-            localizationsDelegates: [
+            localizationsDelegates: const [
               DefaultMaterialLocalizations.delegate,
               DefaultWidgetsLocalizations.delegate,
             ],
@@ -184,7 +178,7 @@ class _MyAppState extends State<MyApp> {
                     actionsBuilder: (context, stars) {
                       return [
                         TextButton(
-                          child: Text('OK'),
+                          child: const Text('OK'),
                           onPressed: () async {
                             await rateMyApp.callEvent(
                                 RateMyAppEventType.rateButtonPressed);

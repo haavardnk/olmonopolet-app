@@ -41,8 +41,8 @@ class _ReleaseSortState extends State<ProductOverviewReleaseSort> {
                             builder: (context, _, __) {
                               return SwitchListTile(
                                 contentPadding:
-                                    EdgeInsets.only(left: 12, right: 4),
-                                title: Text(
+                                    const EdgeInsets.only(left: 12, right: 4),
+                                title: const Text(
                                   'Husk valgt sortering',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),

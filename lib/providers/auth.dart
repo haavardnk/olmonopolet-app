@@ -33,7 +33,7 @@ class Auth with ChangeNotifier {
     return _apiToken;
   }
 
-  void set apiToken(token) {
+  set apiToken(token) {
     _apiToken = token;
   }
 

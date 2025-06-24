@@ -65,7 +65,7 @@ class _ProductOverviewBottomFilterSheetState
           },
         ).whenComplete(() => filters.setFilters());
       },
-      icon: Icon(
+      icon: const Icon(
         Icons.filter_list,
         semanticLabel: "Filter",
       ),
@@ -105,8 +105,8 @@ class _ProductOverviewBottomFilterSheetState
                               mystate,
                             );
                           },
-                          icon: Icon(Icons.settings),
-                          label: Text('Instillinger')),
+                          icon: const Icon(Icons.settings),
+                          label: const Text('Instillinger')),
                       TextButton(
                           onPressed: () {
                             filters.resetFilters();
@@ -115,13 +115,13 @@ class _ProductOverviewBottomFilterSheetState
                             _alcoholRange = filters.alcoholRange;
                             Navigator.pop(context);
                           },
-                          child: Text('Reset Alle')),
+                          child: const Text('Reset Alle')),
                     ],
                   ),
                 ],
               ),
             ),
-            Divider(
+            const Divider(
               height: 1,
             ),
             Flexible(
@@ -175,7 +175,7 @@ class _ProductOverviewBottomFilterSheetState
                                   searchFieldProps: TextFieldProps(
                                     decoration: InputDecoration(
                                       labelText: 'Søk',
-                                      prefixIcon: Icon(
+                                      prefixIcon: const Icon(
                                         Icons.search,
                                       ),
                                       border: OutlineInputBorder(
@@ -186,7 +186,7 @@ class _ProductOverviewBottomFilterSheetState
                                   itemBuilder: (context, item, isSelected) {
                                     return Container(
                                       margin:
-                                          EdgeInsets.symmetric(horizontal: 8),
+                                          const EdgeInsets.symmetric(horizontal: 8),
                                       child: ListTile(
                                         title: Text(item),
                                         subtitle: Text(filters
@@ -209,7 +209,7 @@ class _ProductOverviewBottomFilterSheetState
                                         ? filters.selectedStores
                                             .reduce((a, b) => a + ', ' + b)
                                         : 'Alle butikker',
-                                    style: TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16),
                                   );
                                 },
                                 dropdownDecoratorProps: DropDownDecoratorProps(
@@ -218,7 +218,7 @@ class _ProductOverviewBottomFilterSheetState
                                       borderRadius: BorderRadius.circular(24),
                                     ),
                                     isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(
+                                    contentPadding: const EdgeInsets.symmetric(
                                       vertical: 23,
                                       horizontal: 10,
                                     ),
@@ -236,19 +236,19 @@ class _ProductOverviewBottomFilterSheetState
                                 selectedItems: filters.selectedStores,
                               ),
                             )
-                          : Center(child: CircularProgressIndicator());
+                          : const Center(child: CircularProgressIndicator());
                     },
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Pris',
+                      Text('Pris',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
-                      const Text('Pris per liter',
+                      Text('Pris per liter',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                     ],
@@ -308,16 +308,16 @@ class _ProductOverviewBottomFilterSheetState
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                     child: DropdownSearch<String>(
-                      popupProps: PopupProps.dialog(),
+                      popupProps: const PopupProps.dialog(),
                       dropdownDecoratorProps: DropDownDecoratorProps(
                         dropdownSearchDecoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
                           ),
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             vertical: 23,
                             horizontal: 10,
                           ),
@@ -326,7 +326,7 @@ class _ProductOverviewBottomFilterSheetState
                       dropdownBuilder: (context, selectedItem) {
                         return Text(
                           selectedItem!,
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         );
                       },
                       items: _sortList.map((value) => value!).toList(),
@@ -374,7 +374,7 @@ class _ProductOverviewBottomFilterSheetState
                               ),
                             ),
                           ),
-                          SizedBox(width: 15),
+                          const SizedBox(width: 15),
                           Semantics(
                             label: 'Velg alle stiler',
                             button: true,
@@ -426,7 +426,7 @@ class _ProductOverviewBottomFilterSheetState
                                     return FilterChip(
                                       label: Text(styleList[index]),
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(
+                                          side: const BorderSide(
                                             width: 1,
                                           ),
                                           borderRadius:
@@ -460,7 +460,7 @@ class _ProductOverviewBottomFilterSheetState
                                     searchFieldProps: TextFieldProps(
                                       decoration: InputDecoration(
                                         labelText: 'Søk',
-                                        prefixIcon: Icon(
+                                        prefixIcon: const Icon(
                                           Icons.search,
                                         ),
                                         border: OutlineInputBorder(
@@ -472,7 +472,7 @@ class _ProductOverviewBottomFilterSheetState
                                     itemBuilder: (context, item, isSelected) {
                                       return Container(
                                         margin:
-                                            EdgeInsets.symmetric(horizontal: 8),
+                                            const EdgeInsets.symmetric(horizontal: 8),
                                         child: ListTile(
                                           title: Text(item),
                                         ),
@@ -485,7 +485,7 @@ class _ProductOverviewBottomFilterSheetState
                                             children: [
                                               Padding(
                                                 padding:
-                                                    EdgeInsets.only(top: 8),
+                                                    const EdgeInsets.only(top: 8),
                                                 child: ElevatedButton(
                                                   onPressed: () {
                                                     _multiKey.currentState!
@@ -497,11 +497,11 @@ class _ProductOverviewBottomFilterSheetState
                                                   },
                                                   style:
                                                       ElevatedButton.styleFrom(
-                                                    minimumSize: Size(50, 30),
+                                                    minimumSize: const Size(50, 30),
                                                     textStyle:
-                                                        TextStyle(fontSize: 13),
+                                                        const TextStyle(fontSize: 13),
                                                     padding:
-                                                        EdgeInsets.symmetric(
+                                                        const EdgeInsets.symmetric(
                                                             horizontal: 10),
                                                   ),
                                                   child: const Text('Alle'),
@@ -509,7 +509,7 @@ class _ProductOverviewBottomFilterSheetState
                                               ),
                                               if (authData.isAuth)
                                                 Padding(
-                                                  padding: EdgeInsets.only(
+                                                  padding: const EdgeInsets.only(
                                                       left: 8,
                                                       top: 8,
                                                       right: 8),
@@ -530,10 +530,10 @@ class _ProductOverviewBottomFilterSheetState
                                                       style: ElevatedButton
                                                           .styleFrom(
                                                         minimumSize:
-                                                            Size(50, 30),
-                                                        textStyle: TextStyle(
+                                                            const Size(50, 30),
+                                                        textStyle: const TextStyle(
                                                             fontSize: 13),
-                                                        padding: EdgeInsets
+                                                        padding: const EdgeInsets
                                                             .symmetric(
                                                                 horizontal: 10),
                                                       ),
@@ -543,7 +543,7 @@ class _ProductOverviewBottomFilterSheetState
                                               if (authData.isAuth)
                                                 Padding(
                                                   padding:
-                                                      EdgeInsets.only(top: 8),
+                                                      const EdgeInsets.only(top: 8),
                                                   child: ElevatedButton(
                                                     onPressed: () {
                                                       _multiKey.currentState
@@ -560,11 +560,11 @@ class _ProductOverviewBottomFilterSheetState
                                                     },
                                                     style: ElevatedButton
                                                         .styleFrom(
-                                                      minimumSize: Size(50, 30),
-                                                      textStyle: TextStyle(
+                                                      minimumSize: const Size(50, 30),
+                                                      textStyle: const TextStyle(
                                                           fontSize: 13),
                                                       padding:
-                                                          EdgeInsets.symmetric(
+                                                          const EdgeInsets.symmetric(
                                                               horizontal: 10),
                                                     ),
                                                     child: const Text(
@@ -583,7 +583,7 @@ class _ProductOverviewBottomFilterSheetState
                                       filters.style.isNotEmpty
                                           ? filters.selectedStyles.join(', ')
                                           : 'Alle stiler',
-                                      style: TextStyle(fontSize: 16),
+                                      style: const TextStyle(fontSize: 16),
                                       maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
                                     );
@@ -595,7 +595,7 @@ class _ProductOverviewBottomFilterSheetState
                                         borderRadius: BorderRadius.circular(24),
                                       ),
                                       isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(
+                                      contentPadding: const EdgeInsets.symmetric(
                                         vertical: 23,
                                         horizontal: 10,
                                       ),
@@ -652,7 +652,7 @@ class _ProductOverviewBottomFilterSheetState
                         searchFieldProps: TextFieldProps(
                           decoration: InputDecoration(
                             labelText: 'Søk',
-                            prefixIcon: Icon(Icons.search),
+                            prefixIcon: const Icon(Icons.search),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
@@ -665,7 +665,7 @@ class _ProductOverviewBottomFilterSheetState
                               ? filters.selectedCountries
                                   .reduce((a, b) => a + ', ' + b)
                               : 'Alle land',
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         );
                       },
                       dropdownDecoratorProps: DropDownDecoratorProps(
@@ -674,7 +674,7 @@ class _ProductOverviewBottomFilterSheetState
                             borderRadius: BorderRadius.circular(24),
                           ),
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             vertical: 23,
                             horizontal: 10,
                           ),
@@ -720,19 +720,19 @@ class _ProductOverviewBottomFilterSheetState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
+                      const Row(
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.ideographic,
                         children: [
-                          const Text(
+                          Text(
                             'Allergener',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(
+                          SizedBox(
                             width: 5,
                           ),
-                          const Text(
+                          Text(
                             '(NB: Ekskluderer valgte)',
                             style: TextStyle(fontSize: 12),
                           ),
@@ -848,19 +848,19 @@ class _ProductOverviewBottomFilterSheetState
                   const SizedBox(
                     height: 10,
                   ),
-                  Row(
+                  const Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.ideographic,
                     children: [
-                      const Text(
+                      Text(
                         'Bestilling',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(
+                      SizedBox(
                         width: 5,
                       ),
-                      const Text(
+                      Text(
                         '(NB: Ikke filtrer på butikklager)',
                         style: TextStyle(fontSize: 12),
                       ),
@@ -905,9 +905,9 @@ class _ProductOverviewBottomFilterSheetState
                                 },
                               ),
                             )
-                          : Center(
+                          : const Center(
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(8.0),
                                 child: Text('Ingen aktive ølslipp.'),
                               ),
                             );
@@ -975,7 +975,7 @@ class _ProductOverviewBottomFilterSheetState
     return ChoiceChip(
       label: Text(value),
       shape: RoundedRectangleBorder(
-          side: BorderSide(
+          side: const BorderSide(
             width: 1,
           ),
           borderRadius: BorderRadius.circular(24)),
@@ -998,7 +998,7 @@ class _ProductOverviewBottomFilterSheetState
     return FilterChip(
       label: Text(value),
       shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1), borderRadius: BorderRadius.circular(24)),
+          side: const BorderSide(width: 1), borderRadius: BorderRadius.circular(24)),
       selected: selectedData[index],
       onSelected: (bool selected) {
         mystate(() {
@@ -1034,7 +1034,7 @@ class _ProductOverviewBottomFilterSheetState
             'Stil utvalg',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Consumer<Filter>(
@@ -1059,7 +1059,7 @@ class _ProductOverviewBottomFilterSheetState
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 40,
           ),
           Row(
@@ -1076,13 +1076,13 @@ class _ProductOverviewBottomFilterSheetState
                   onTap: () {
                     mystate(() {
                       if (filters.filterSaveSettings[0]['save'] == true) {
-                        filters.filterSaveSettings.forEach((element) {
+                        for (var element in filters.filterSaveSettings) {
                           element['save'] = false;
-                        });
+                        }
                       } else {
-                        filters.filterSaveSettings.forEach((element) {
+                        for (var element in filters.filterSaveSettings) {
                           element['save'] = true;
-                        });
+                        }
                       }
                       filters.saveFilterSettings();
                     });
@@ -1098,10 +1098,10 @@ class _ProductOverviewBottomFilterSheetState
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Container(
+          SizedBox(
             height: 400,
             width: 300,
             child: ListView.builder(

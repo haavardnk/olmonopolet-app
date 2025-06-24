@@ -11,7 +11,7 @@ class Release {
         releaseDate: release['release_date'] != null
             ? DateTime.parse(release['release_date'].split("+")[0])
             : null,
-        beerCount: release['beer_count'] ?? null,
+        beerCount: release['beer_count'],
         productSelections: [...release['product_selections']],
       );
 

@@ -38,11 +38,10 @@ class _CartElementState extends State<CartElement> {
   List<dynamic> _stockList = [];
   List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
     stockList = snapshot.data!['all_stock'];
-    Map<String, int> order = new Map.fromIterable(
-      storeList.map((e) => e.name).toList(),
-      key: (key) => key,
-      value: (key) => storeList.map((e) => e.name).toList().indexOf(key),
-    );
+    Map<String, int> order = {
+      for (var key in storeList.map((e) => e.name).toList())
+        key: storeList.map((e) => e.name).toList().indexOf(key)
+    };
     stockList.sort(
         (a, b) => order[a['store_name']]!.compareTo(order[b['store_name']]!));
     return stockList;
@@ -73,7 +72,7 @@ class _CartElementState extends State<CartElement> {
     return !widget.cartItem.inStock &&
             widget.cartData.hideNoStock &&
             widget.cartData.cartStoreId.isNotEmpty
-        ? Wrap()
+        ? const Wrap()
         : Dismissible(
             key: Key(widget.cartItem.product.id.toString()),
             direction: DismissDirection.startToEnd,
@@ -90,8 +89,8 @@ class _CartElementState extends State<CartElement> {
             },
             background: Container(
               color: Colors.pink,
-              padding: EdgeInsets.only(left: 50),
-              child: Row(
+              padding: const EdgeInsets.only(left: 50),
+              child: const Row(
                 children: <Widget>[
                   Icon(
                     Icons.delete,
@@ -114,7 +113,7 @@ class _CartElementState extends State<CartElement> {
                         'herotag': heroTag
                       },
                     ),
-                    screen: ProductDetailScreen(),
+                    screen: const ProductDetailScreen(),
                     pageTransitionAnimation: PageTransitionAnimation.cupertino,
                     withNavBar: true,
                   );
@@ -144,7 +143,7 @@ class _CartElementState extends State<CartElement> {
                   );
                 },
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.fastOutSlowIn,
                   height: _expanded == true
                       ? widget.boxImageSize +
@@ -241,147 +240,131 @@ class _CartElementState extends State<CartElement> {
                                       width: 10,
                                     ),
                                     Expanded(
-                                      child: Container(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              widget.cartItem.product.name,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            widget.cartItem.product.name,
+                                            style: const TextStyle(
+                                              fontSize: 14,
                                             ),
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
-                                                    style: const TextStyle(
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  if (widget.cartItem.product
-                                                          .pricePerVolume !=
-                                                      null)
-                                                    Expanded(
-                                                      child: Text(
-                                                        ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                                        style: const TextStyle(
-                                                            fontSize: 11,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis),
-                                                      ),
-                                                    )
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: widget.cartItem.product
-                                                          .userRating ==
-                                                      null
-                                                  ? Row(
-                                                      children: [
-                                                        Text(
-                                                          widget
-                                                                      .cartItem
-                                                                      .product
-                                                                      .rating !=
-                                                                  null
-                                                              ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
-                                                              : '0 ',
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                        createRatingBar(
-                                                            rating: widget
-                                                                        .cartItem
-                                                                        .product
-                                                                        .rating !=
-                                                                    null
-                                                                ? widget
-                                                                    .cartItem
-                                                                    .product
-                                                                    .rating!
-                                                                : 0,
-                                                            size: 18,
-                                                            color: Colors
-                                                                .yellow[700]!),
-                                                        Text(
-                                                          widget
-                                                                      .cartItem
-                                                                      .product
-                                                                      .checkins !=
-                                                                  null
-                                                              ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
-                                                              : '',
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  : Row(
-                                                      children: [
-                                                        Text(
-                                                          widget
-                                                                      .cartItem
-                                                                      .product
-                                                                      .rating !=
-                                                                  null
-                                                              ? 'Global: ${widget.cartItem.product.rating!.toStringAsFixed(2)}'
-                                                              : '0 ',
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                        Icon(
-                                                          Icons.star,
-                                                          color: Colors
-                                                              .yellow[700],
-                                                          size: 18,
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 8),
-                                                        Text(
-                                                          widget
-                                                                      .cartItem
-                                                                      .product
-                                                                      .userRating !=
-                                                                  null
-                                                              ? 'Din: ${widget.cartItem.product.userRating!.toStringAsFixed(2)} '
-                                                              : '0 ',
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                        Icon(
-                                                          Icons.star,
-                                                          color: Colors
-                                                              .yellow[700],
-                                                          size: 18,
-                                                        ),
-                                                      ],
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Container(
+                                            margin:
+                                                const EdgeInsets.only(top: 5),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
+                                                  style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                if (widget.cartItem.product
+                                                        .pricePerVolume !=
+                                                    null)
+                                                  Expanded(
+                                                    child: Text(
+                                                      ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                                                      style: const TextStyle(
+                                                          fontSize: 11,
+                                                          overflow: TextOverflow
+                                                              .ellipsis),
                                                     ),
+                                                  )
+                                              ],
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                          Container(
+                                            margin:
+                                                const EdgeInsets.only(top: 5),
+                                            child: widget.cartItem.product
+                                                        .userRating ==
+                                                    null
+                                                ? Row(
+                                                    children: [
+                                                      Text(
+                                                        widget.cartItem.product
+                                                                    .rating !=
+                                                                null
+                                                            ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
+                                                            : '0 ',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      createRatingBar(
+                                                          rating: widget
+                                                                      .cartItem
+                                                                      .product
+                                                                      .rating !=
+                                                                  null
+                                                              ? widget
+                                                                  .cartItem
+                                                                  .product
+                                                                  .rating!
+                                                              : 0,
+                                                          size: 18,
+                                                          color: Colors
+                                                              .yellow[700]!),
+                                                      Text(
+                                                        widget.cartItem.product
+                                                                    .checkins !=
+                                                                null
+                                                            ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
+                                                            : '',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    children: [
+                                                      Text(
+                                                        widget.cartItem.product
+                                                                    .rating !=
+                                                                null
+                                                            ? 'Global: ${widget.cartItem.product.rating!.toStringAsFixed(2)}'
+                                                            : '0 ',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      Icon(
+                                                        Icons.star,
+                                                        color:
+                                                            Colors.yellow[700],
+                                                        size: 18,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        widget.cartItem.product
+                                                                    .userRating !=
+                                                                null
+                                                            ? 'Din: ${widget.cartItem.product.userRating!.toStringAsFixed(2)} '
+                                                            : '0 ',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      Icon(
+                                                        Icons.star,
+                                                        color:
+                                                            Colors.yellow[700],
+                                                        size: 18,
+                                                      ),
+                                                    ],
+                                                  ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 10,
                                     ),
                                     Column(
@@ -428,9 +411,9 @@ class _CartElementState extends State<CartElement> {
                                                                   .fromLTRB(
                                                                   10, 0, 10, 2),
                                                           decoration:
-                                                              BoxDecoration(
+                                                              const BoxDecoration(
                                                             borderRadius:
-                                                                const BorderRadius
+                                                                BorderRadius
                                                                     .all(
                                                               Radius.circular(
                                                                   5),
@@ -477,9 +460,9 @@ class _CartElementState extends State<CartElement> {
                                                                   .fromLTRB(
                                                                   10, 2, 10, 0),
                                                           decoration:
-                                                              BoxDecoration(
+                                                              const BoxDecoration(
                                                             borderRadius:
-                                                                const BorderRadius
+                                                                BorderRadius
                                                                     .all(
                                                               Radius.circular(
                                                                   5),
@@ -507,7 +490,7 @@ class _CartElementState extends State<CartElement> {
                                             ],
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 3,
                                         ),
                                         Semantics(
@@ -566,7 +549,7 @@ class _CartElementState extends State<CartElement> {
                                 return Expanded(
                                   child: snapshot.connectionState ==
                                           ConnectionState.waiting
-                                      ? FadeIn(
+                                      ? const FadeIn(
                                           duration: Duration(milliseconds: 500),
                                           child: Center(
                                             child: CircularProgressIndicator(),
@@ -590,9 +573,10 @@ class _CartElementState extends State<CartElement> {
                                                       return Column(
                                                         children: [
                                                           FadeIn(
-                                                            duration: Duration(
-                                                                milliseconds:
-                                                                    300),
+                                                            duration:
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        300),
                                                             child: Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
@@ -613,14 +597,15 @@ class _CartElementState extends State<CartElement> {
                                                               ],
                                                             ),
                                                           ),
-                                                          Divider(height: 5),
+                                                          const Divider(
+                                                              height: 5),
                                                         ],
                                                       );
                                                     },
                                                   ),
                                                 ),
                                               if (_stockList.isEmpty)
-                                                Expanded(
+                                                const Expanded(
                                                   child: Center(
                                                     child: FadeIn(
                                                       duration: Duration(

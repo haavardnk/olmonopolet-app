@@ -94,7 +94,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
 
   static Future<List<Product>> getProductList(
       http.Client http, int page, Filter filter, Auth auth, int pageSize,
-      [Release? release = null]) async {
+      [Release? release]) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
@@ -256,7 +256,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
       http.Client http, String fcmToken, String apiToken) async {
     try {
       final response = await http.post(
-          Uri.parse('${_baseUrl}notifications/set_token/?token=${fcmToken}'),
+          Uri.parse('${_baseUrl}notifications/set_token/?token=$fcmToken'),
           headers: {
             'Authorization': 'Token $apiToken',
           });

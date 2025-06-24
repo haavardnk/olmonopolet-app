@@ -176,7 +176,7 @@ class Filter with ChangeNotifier {
       style = '';
     } else {
       String temporaryStyles = '';
-      selectedStyles.forEach((styleName) {
+      for (var styleName in selectedStyles) {
         if (temporaryStyles.isNotEmpty) {
           temporaryStyles += ',';
         }
@@ -185,7 +185,7 @@ class Filter with ChangeNotifier {
         } else if (styleChoice == 1) {
           temporaryStyles += styleName;
         }
-      });
+      }
       style = temporaryStyles;
     }
     notifyListeners();
@@ -287,12 +287,12 @@ class Filter with ChangeNotifier {
       country = '';
     } else {
       String temporaryCountries = '';
-      selectedCountries.forEach((countryName) {
+      for (var countryName in selectedCountries) {
         if (temporaryCountries.isNotEmpty) {
           temporaryCountries += ',';
         }
         temporaryCountries += countryName;
-      });
+      }
       country = temporaryCountries;
     }
     notifyListeners();
@@ -313,13 +313,13 @@ class Filter with ChangeNotifier {
         storeId = '';
       } else {
         String temporaryStores = '';
-        selectedStores.forEach((storeName) {
+        for (var storeName in selectedStores) {
           if (temporaryStores.isNotEmpty) {
             temporaryStores += ',';
           }
           temporaryStores +=
               storeList.firstWhere((element) => element.name == storeName).id;
-        });
+        }
         storeId = temporaryStores;
       }
     }
@@ -365,21 +365,21 @@ class Filter with ChangeNotifier {
   void saveFilterSettings() async {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    filterSaveSettings.forEach((filter) {
+    for (var filter in filterSaveSettings) {
       prefs.setBool(filter['name'] + 'Last', filter['save']);
-    });
+    }
   }
 
   Future<void> loadFilterSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    filterSaveSettings.forEach((filter) {
+    for (var filter in filterSaveSettings) {
       filter['save'] = prefs.getBool(filter['name'] + 'Last') ?? filter['save'];
-    });
+    }
   }
 
   void saveFilters() async {
     final prefs = await SharedPreferences.getInstance();
-    filterSaveSettings.forEach((filter) {
+    for (var filter in filterSaveSettings) {
       if (filter['name'] == 'store' && filter['save'] == true) {
         prefs.setString('storeId', storeId);
         prefs.setStringList('selectedStores', selectedStores);
@@ -448,13 +448,13 @@ class Filter with ChangeNotifier {
       if (filter['name'] == 'wishlisted' && filter['save'] == true) {
         prefs.setInt('wishlisted', wishlisted);
       }
-    });
+    }
   }
 
   Future<void> loadFilters() async {
     await loadFilterSettings();
     final prefs = await SharedPreferences.getInstance();
-    filterSaveSettings.forEach((filter) {
+    for (var filter in filterSaveSettings) {
       if (filter['name'] == 'store' && filter['save'] == true) {
         storeId = prefs.getString('storeId') ?? '';
         selectedStores = prefs.getStringList('selectedStores') ?? [];
@@ -536,7 +536,7 @@ class Filter with ChangeNotifier {
       if (filter['name'] == 'wishlisted' && filter['save'] == true) {
         wishlisted = prefs.getInt('wishlisted') ?? 0;
       }
-    });
+    }
     notifyListeners();
   }
 }

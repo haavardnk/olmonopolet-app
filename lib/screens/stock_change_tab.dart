@@ -41,7 +41,7 @@ class _StockChangeTabState extends State<StockChangeTab> {
             onPressed: () {
               _openDropDownProgKey.currentState?.openDropDownSearch();
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.store,
               semanticLabel: "Velg butikk",
             ),
@@ -52,11 +52,11 @@ class _StockChangeTabState extends State<StockChangeTab> {
       body: Consumer<Filter>(
         builder: (context, _, __) {
           return filters.stockChangeStoreId.isNotEmpty
-              ? StockChangeList()
+              ? const StockChangeList()
               : Center(
                   child: FilledButton.tonalIcon(
-                    label: Text('Velg butikk'),
-                    icon: Icon(Icons.store),
+                    label: const Text('Velg butikk'),
+                    icon: const Icon(Icons.store),
                     onPressed: () {
                       _openDropDownProgKey.currentState?.openDropDownSearch();
                     },

@@ -29,7 +29,7 @@ class ProductOverviewTab extends StatelessWidget {
                 fit: BoxFit.contain,
                 child: Text(
                   release!.releaseDate != null
-                      ? '${toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO').format(release!.releaseDate!))}'
+                      ? toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO').format(release!.releaseDate!))
                       : release!.name,
                 ),
               )
@@ -69,7 +69,7 @@ class ProductOverviewTab extends StatelessWidget {
                 ? PreferredSize(
                     child: ProductOverviewReleaseProductSelection(
                         release: release),
-                    preferredSize: Size.fromHeight(kToolbarHeight),
+                    preferredSize: const Size.fromHeight(kToolbarHeight),
                   )
                 : null,
       ),
