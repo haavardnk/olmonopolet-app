@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
-import '../../providers/auth.dart';
 import '../../helpers/app_launcher.dart';
 import '../../screens/about_screen.dart';
-import '../../widgets/drawer/drawer_avatar_image.dart';
+import '../../utils/environment.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -33,27 +31,13 @@ class _AppDrawerState extends State<AppDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final authData = Provider.of<Auth>(context);
-
     return Drawer(
       elevation: 3,
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
           const SizedBox(height: 70),
-          if (authData.isAuth)
-            Column(
-              children: [
-                DrawerAvatarImage(authData: authData),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  authData.userName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-              ],
-            ),
+
           const Divider(),
           ListTile(
             trailing: Icon(
@@ -87,7 +71,7 @@ class _AppDrawerState extends State<AppDrawer> {
             trailing: const Icon(Icons.email),
             title: const Text('Gi tilbakemelding'),
             onTap: () {
-              launchUrl(Uri.parse('mailto:post@olmonopolet.app'));
+              launchUrl(Uri.parse('mailto:${Environment.feedbackEmail}'));
             },
           ),
           const Divider(),

@@ -20,6 +20,7 @@ dependencies:
   flag: ^7.0.0
   firebase_analytics: ^11.0.0
   firebase_core: ^3.1.1
+  flutter_dotenv: ^5.1.0
   firebase_messaging: ^15.0.2
   flutter:
     sdk: flutter
@@ -65,3 +66,4 @@ flutter:
     - assets/images/placeholder.png
     - assets/images/default_avatar.png
     - assets/images/logo_transparent.png
+    - .env

@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:io' show Platform;
 
 import '../models/product.dart';
+import '../utils/environment.dart';
 
 class AppLauncher {
   static Future<void> launchUntappd(Product product) async {
@@ -22,15 +23,16 @@ class AppLauncher {
       iosUrlScheme: 'fb://',
       androidPackageName: 'com.facebook.katana',
     );
+    final pageId = Environment.facebookPageId;
     if (facebookInstalled == true || facebookInstalled == 1) {
       if (Platform.isAndroid) {
-        launchUrl(Uri.parse('fb://page/151737917033944'));
+        launchUrl(Uri.parse('fb://page/$pageId'));
       }
       if (Platform.isIOS) {
-        launchUrl(Uri.parse('fb://profile/151737917033944'));
+        launchUrl(Uri.parse('fb://profile/$pageId'));
       }
     } else {
-      launchUrl(Uri.parse('https://www.facebook.com/BeermonopolyNO'));
+      launchUrl(Uri.parse(Environment.facebookUrl));
     }
   }
 }

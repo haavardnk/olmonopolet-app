@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/http_exception.dart';
 import '../helpers/api_helper.dart';
+import '../utils/environment.dart';
 
 class Auth with ChangeNotifier {
   String _apiToken = '';
@@ -49,12 +50,17 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> authenticate() async {
-    const oauthUrl =
-        'https://auth.example.com/   const callbackUrl = 'com.beermonopoly.olmonopolet';
-    const apiUrl = 'https://api.example.com/   const profileUrl = 'https://api.example.com/v4/   try {
+    final authUrl = Environment.authUrl;
+    final callbackUrl = Environment.authCallbackUrl;
+    final apiUrl = Environment.apiAuthUrl;
+    final profileUrl = Environment.untappdProfileUrl;
+    final oauthUrl = '$authUrl?callback=$callbackUrl';
+    final callbackScheme = callbackUrl.split('://')[0];
+
+    try {
       // Get Untappd token
       final untappdResponse = await FlutterWebAuth2.authenticate(
-          url: oauthUrl, callbackUrlScheme: callbackUrl);
+          url: oauthUrl, callbackUrlScheme: callbackScheme);
       final untappdToken =
           Uri.parse(untappdResponse).queryParameters['access_token'];
       // Get API token

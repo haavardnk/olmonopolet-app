@@ -9,9 +9,9 @@ import '../models/release.dart';
 import '../models/stock_change.dart';
 import '../providers/filter.dart';
 import '../providers/auth.dart';
+import '../utils/environment.dart';
 
-//const _baseUrl = 'http://127.0.0.1:8000/';
-const _baseUrl = 'https://api.example.com/ApiHelper {
+class ApiHelper {
   static Future<Map<String, dynamic>> getDetailedProductInfo(
       http.Client http, int productId, Auth auth, String fields) async {
     final Map<String, String> headers = auth.apiToken.isNotEmpty
@@ -20,7 +20,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
           }
         : {};
     final url = Uri.parse(
-        '${_baseUrl}beers/?beers=$productId&fields=$fields&all_stock=true');
+        '${Environment.apiBaseUrl}beers/?beers=$productId&fields=$fields&all_stock=true');
     try {
       final response = await http.get(
         url,
@@ -44,7 +44,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   static Future<List<dynamic>> checkStock(
       http.Client http, String productIds, String store) async {
     final url = Uri.parse(
-        '${_baseUrl}beers/?beers=$productIds&store=$store&fields=vmp_id,stock');
+        '${Environment.apiBaseUrl}beers/?beers=$productIds&store=$store&fields=vmp_id,stock');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -143,7 +143,8 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
             'Authorization': 'Token $apiToken',
           }
         : {};
-    final url = Uri.parse('${_baseUrl}beers/?beers=$productIds&fields=$fields');
+    final url = Uri.parse(
+        '${Environment.apiBaseUrl}beers/?beers=$productIds&fields=$fields');
     try {
       final response = await http.get(
         url,
@@ -174,7 +175,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
     });
     try {
       final response = await http.post(
-        Uri.parse('${_baseUrl}wrongmatch/'),
+        Uri.parse('${Environment.apiBaseUrl}wrongmatch/'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -218,7 +219,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
     };
     try {
       final response = await http.post(
-        Uri.parse('${_baseUrl}auth/checked_in_styles'),
+        Uri.parse('${Environment.apiBaseUrl}auth/checked_in_styles'),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -256,7 +257,8 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
       http.Client http, String fcmToken, String apiToken) async {
     try {
       final response = await http.post(
-          Uri.parse('${_baseUrl}notifications/set_token/?token=$fcmToken'),
+          Uri.parse(
+              '${Environment.apiBaseUrl}notifications/set_token/?token=$fcmToken'),
           headers: {
             'Authorization': 'Token $apiToken',
           });
@@ -274,7 +276,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
   static Future<void> deleteUserAccount(http.Client http, Auth auth) async {
     try {
       final response = await http.delete(
-        Uri.parse('${_baseUrl}auth/delete/'),
+        Uri.parse('${Environment.apiBaseUrl}auth/delete/'),
         headers: {
           'Authorization': 'Token ${auth.apiToken}',
         },
@@ -292,7 +294,7 @@ const _baseUrl = 'https://api.example.com/ApiHelper {
 
 Uri _apiProductUrlBuilder(
     String fields, int page, Filter filter, int pageSize) {
-  var string = ('$_baseUrl'
+  var string = ('${Environment.apiBaseUrl}'
       'beers/'
       '?fields=$fields'
       '&active=True'
@@ -337,7 +339,7 @@ Uri _apiProductUrlBuilder(
 
 Uri _apiReleaseProductUrlBuilder(
     String fields, int page, Filter filter, Release release, int pageSize) {
-  var string = ('$_baseUrl'
+  var string = ('${Environment.apiBaseUrl}'
       'beers/'
       '?fields=$fields'
       '&release=${release.name}'
@@ -354,7 +356,7 @@ Uri _apiReleaseProductUrlBuilder(
 }
 
 Uri _apiStockChangeUrlBuilder(int page, int pageSize, String store) {
-  var string = ('$_baseUrl'
+  var string = ('${Environment.apiBaseUrl}'
       'stockchange/'
       '?store=$store'
       '&page=$page'
@@ -366,7 +368,7 @@ Uri _apiStockChangeUrlBuilder(int page, int pageSize, String store) {
 
 Uri _apiStoreUrlBuilder(String fields) {
   final url = Uri.parse(
-    '$_baseUrl'
+    '${Environment.apiBaseUrl}'
     'stores/'
     '?fields=$fields'
     '&page_size=500',
@@ -376,7 +378,7 @@ Uri _apiStoreUrlBuilder(String fields) {
 
 Uri _apiReleaseUrlBuilder(String fields) {
   final url = Uri.parse(
-    '$_baseUrl'
+    '${Environment.apiBaseUrl}'
     'release/'
     '?fields=$fields',
   );
