@@ -118,8 +118,6 @@ PODS:
   - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - integration_test (0.0.1):
-    - Flutter
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -150,7 +148,6 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
-  - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - rate_my_app (from `.symlinks/plugins/rate_my_app/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -188,8 +185,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
-  integration_test:
-    :path: ".symlinks/plugins/integration_test/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   rate_my_app:
@@ -219,7 +214,6 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 0dfca1a4b534d123de3945e28f77869d10d0d600
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
-  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47

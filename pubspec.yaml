@@ -1,9 +1,10 @@
 name: beermonopoly
 description: An app to find good beers on Vinmonopolet
 publish_to: "none"
-version: 2.2.5+146
+version: 2.2.6+146
 
 environment:
+  flutter: 3.32.4
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
@@ -44,8 +45,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
-  integration_test:
-    sdk: flutter
+  # integration_test:
+  # sdk: flutter
   mocktail: ^1.0.1
   flutter_lints: ^1.0.0
 
