@@ -9,7 +9,6 @@ import './product_item.dart';
 import '../../models/product.dart';
 import '../../models/release.dart';
 import '../../providers/filter.dart';
-import '../../providers/auth.dart';
 import '../../providers/http_client.dart';
 import './pagination_indicators/first_page_error_indicator.dart';
 import './pagination_indicators/new_page_error_indicator.dart';
@@ -30,11 +29,11 @@ class _ProductListViewState extends State<ProductList> {
       PagingController(firstPageKey: 1, invisibleItemsThreshold: 5);
 
   Future<void> _fetchPage(
-      http.Client client, int pageKey, Filter filters, Auth auth) async {
+      http.Client client, int pageKey, Filter filters) async {
     try {
       final newItems = await retry(
         () => ApiHelper.getProductList(
-            client, pageKey, filters, auth, _pageSize, widget.release),
+            client, pageKey, filters, _pageSize, widget.release),
       );
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
@@ -59,10 +58,9 @@ class _ProductListViewState extends State<ProductList> {
     if (!_pagingController.hasListeners) {
       _pagingController.addPageRequestListener((pageKey) {
         final filters = Provider.of<Filter>(context, listen: false).filters;
-        final auth = Provider.of<Auth>(context, listen: false);
         final client =
             Provider.of<HttpClient>(context, listen: false).apiClient;
-        _fetchPage(client, pageKey, filters, auth);
+        _fetchPage(client, pageKey, filters);
       });
     }
 

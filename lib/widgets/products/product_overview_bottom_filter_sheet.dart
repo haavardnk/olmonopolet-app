@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../providers/filter.dart';
-import '../../providers/auth.dart';
 import '../../assets/constants.dart';
 
 class ProductOverviewBottomFilterSheet extends StatefulWidget {
@@ -18,7 +17,6 @@ class _ProductOverviewBottomFilterSheetState
     extends State<ProductOverviewBottomFilterSheet> {
   // filter provider
   late Filter filters = Provider.of<Filter>(context, listen: false);
-  late Auth authData = Provider.of<Auth>(context, listen: false);
 
   // price slider
   late RangeValues _priceRange;
@@ -36,11 +34,7 @@ class _ProductOverviewBottomFilterSheetState
     _priceRange = filters.priceRange;
     _pricePerVolumeRange = filters.pricePerVolumeRange;
     _alcoholRange = filters.alcoholRange;
-    if (authData.isAuth) {
-      _sortList = sortListAuth.keys.toList();
-    } else {
-      _sortList = sortList.keys.toList();
-    }
+    _sortList = sortList.keys.toList();
     super.initState();
   }
 
@@ -185,8 +179,8 @@ class _ProductOverviewBottomFilterSheetState
                                   ),
                                   itemBuilder: (context, item, isSelected) {
                                     return Container(
-                                      margin:
-                                          const EdgeInsets.symmetric(horizontal: 8),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 8),
                                       child: ListTile(
                                         title: Text(item),
                                         subtitle: Text(filters
@@ -471,8 +465,8 @@ class _ProductOverviewBottomFilterSheetState
                                     ),
                                     itemBuilder: (context, item, isSelected) {
                                       return Container(
-                                        margin:
-                                            const EdgeInsets.symmetric(horizontal: 8),
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 8),
                                         child: ListTile(
                                           title: Text(item),
                                         ),
@@ -484,8 +478,8 @@ class _ProductOverviewBottomFilterSheetState
                                           Wrap(
                                             children: [
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.only(top: 8),
+                                                padding: const EdgeInsets.only(
+                                                    top: 8),
                                                 child: ElevatedButton(
                                                   onPressed: () {
                                                     _multiKey.currentState!
@@ -497,80 +491,17 @@ class _ProductOverviewBottomFilterSheetState
                                                   },
                                                   style:
                                                       ElevatedButton.styleFrom(
-                                                    minimumSize: const Size(50, 30),
-                                                    textStyle:
-                                                        const TextStyle(fontSize: 13),
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            horizontal: 10),
+                                                    minimumSize:
+                                                        const Size(50, 30),
+                                                    textStyle: const TextStyle(
+                                                        fontSize: 13),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10),
                                                   ),
                                                   child: const Text('Alle'),
                                                 ),
                                               ),
-                                              if (authData.isAuth)
-                                                Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      left: 8,
-                                                      top: 8,
-                                                      right: 8),
-                                                  child: ElevatedButton(
-                                                      onPressed: () {
-                                                        _multiKey.currentState
-                                                            ?.popupDeselectItems(
-                                                                styleList);
-                                                        _multiKey.currentState
-                                                            ?.popupSelectItems(styleList
-                                                                .where((item) =>
-                                                                    authData
-                                                                        .checkedInStyles
-                                                                        .contains(
-                                                                            item))
-                                                                .toList());
-                                                      },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        minimumSize:
-                                                            const Size(50, 30),
-                                                        textStyle: const TextStyle(
-                                                            fontSize: 13),
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 10),
-                                                      ),
-                                                      child: const Text(
-                                                          'Innsjekket')),
-                                                ),
-                                              if (authData.isAuth)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(top: 8),
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      _multiKey.currentState
-                                                          ?.popupDeselectItems(
-                                                              styleList);
-                                                      _multiKey.currentState
-                                                          ?.popupSelectItems(styleList
-                                                              .where((item) =>
-                                                                  !authData
-                                                                      .checkedInStyles
-                                                                      .contains(
-                                                                          item))
-                                                              .toList());
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      minimumSize: const Size(50, 30),
-                                                      textStyle: const TextStyle(
-                                                          fontSize: 13),
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                              horizontal: 10),
-                                                    ),
-                                                    child: const Text(
-                                                        'Ikke Innsjekket'),
-                                                  ),
-                                                ),
                                             ],
                                           ),
                                           Expanded(child: popupWidget),
@@ -595,7 +526,8 @@ class _ProductOverviewBottomFilterSheetState
                                         borderRadius: BorderRadius.circular(24),
                                       ),
                                       isDense: true,
-                                      contentPadding: const EdgeInsets.symmetric(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
                                         vertical: 23,
                                         horizontal: 10,
                                       ),
@@ -913,54 +845,6 @@ class _ProductOverviewBottomFilterSheetState
                             );
                     },
                   ),
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-                  // Text(
-                  //     authData.isAuth
-                  //         ? 'Untappd Innsjekket'
-                  //         : 'Untappd Innsjekket - Innlogging kreves',
-                  //     style: const TextStyle(
-                  //         fontSize: 16, fontWeight: FontWeight.bold)),
-                  // Wrap(
-                  //   spacing: 8,
-                  //   children: List.generate(
-                  //     checkinList.length,
-                  //     (index) {
-                  //       return _radio(
-                  //         checkinList[index],
-                  //         index,
-                  //         filters.checkIn,
-                  //         filters.setCheckin,
-                  //         mystate,
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-                  // Text(
-                  //     authData.isAuth
-                  //         ? 'Untappd Ønskeliste'
-                  //         : 'Untappd Ønskeliste - Innlogging kreves',
-                  //     style: const TextStyle(
-                  //         fontSize: 16, fontWeight: FontWeight.bold)),
-                  // Wrap(
-                  //   spacing: 8,
-                  //   children: List.generate(
-                  //     wishlistList.length,
-                  //     (index) {
-                  //       return _radio(
-                  //         wishlistList[index],
-                  //         index,
-                  //         filters.wishlisted,
-                  //         filters.setWishlisted,
-                  //         mystate,
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -970,35 +854,13 @@ class _ProductOverviewBottomFilterSheetState
     );
   }
 
-  Widget _radio(
-      String value, int index, int selected, Function setSelected, mystate) {
-    return ChoiceChip(
-      label: Text(value),
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(24)),
-      elevation: 0,
-      pressElevation: 0,
-      selected:
-          (selected == 0) ? (index == 0 ? true : false) : selected == index,
-      onSelected: (bool selected) {
-        authData.isAuth
-            ? mystate(() {
-                setSelected(index);
-              })
-            : null;
-      },
-    );
-  }
-
   Widget _filter(
       var selectedData, String value, int index, Function setFilter, mystate) {
     return FilterChip(
       label: Text(value),
       shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 1), borderRadius: BorderRadius.circular(24)),
+          side: const BorderSide(width: 1),
+          borderRadius: BorderRadius.circular(24)),
       selected: selectedData[index],
       onSelected: (bool selected) {
         mystate(() {

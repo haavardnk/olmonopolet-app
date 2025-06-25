@@ -13,7 +13,6 @@ import './screens/product_detail_screen.dart';
 import 'screens/home_screen.dart';
 import './screens/about_screen.dart';
 import './providers/filter.dart';
-import './providers/auth.dart';
 import './providers/cart.dart';
 import './providers/http_client.dart';
 import './helpers/api_helper.dart';
@@ -91,10 +90,10 @@ class _MyAppState extends State<MyApp> {
     print('User granted permission: ${settings.authorizationStatus}');
   }
 
-  Future<void> sendFcmToken(client, String apiToken) async {
+  Future<void> sendFcmToken(client) async {
     var fcmToken = await FirebaseMessaging.instance.getToken();
     if (fcmToken!.isNotEmpty) {
-      ApiHelper.updateFcmToken(client, fcmToken, apiToken);
+      ApiHelper.updateFcmToken(client, fcmToken);
     }
   }
 
@@ -121,33 +120,19 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(
             create: (ctx) => HttpClient(),
           ),
-          ChangeNotifierProxyProvider<HttpClient, Auth>(
-            create: (ctx) => Auth(),
-            update: (ctx, client, previousAuth) =>
-                previousAuth!..update(client.apiClient),
-          ),
           ChangeNotifierProxyProvider<HttpClient, Filter>(
             create: (ctx) => Filter(),
             update: (ctx, client, previousFilter) =>
                 previousFilter!..update(client.apiClient),
           ),
-          ChangeNotifierProxyProvider2<Auth, HttpClient, Cart>(
+          ChangeNotifierProxyProvider<HttpClient, Cart>(
             create: (ctx) => Cart(),
-            update: (ctx, auth, client, previousCart) =>
-                previousCart!..update(auth.apiToken, client.apiClient),
+            update: (ctx, client, previousCart) =>
+                previousCart!..update(client.apiClient),
           ),
         ],
-        child: Consumer<Auth>(builder: (ctx, auth, _) {
-          final client = Provider.of<HttpClient>(ctx, listen: false).apiClient;
-
+        child: Builder(builder: (ctx) {
           Provider.of<Filter>(ctx, listen: false).loadFilters();
-          if (auth.isAuth) {
-            sendFcmToken(
-              client,
-              auth.apiToken,
-            );
-            auth.getCheckedInStyles();
-          }
 
           return MaterialApp(
             localizationsDelegates: const [
@@ -161,16 +146,6 @@ class _MyAppState extends State<MyApp> {
             darkTheme: darkTheme,
             home: RateMyAppBuilder(
               builder: (context) => const HomeScreen(),
-              // builder: (context) => auth.isAuthOrSkipLogin
-              //     ? const HomeScreen()
-              //     : FutureBuilder(
-              //         future: auth.tryAutoLogin(),
-              //         builder: (ctx, authResultSnapshot) =>
-              //             authResultSnapshot.connectionState ==
-              //                     ConnectionState.waiting
-              //                 ? const SplashScreen()
-              //                 : const AuthScreen(),
-              //       ),
               onInitialized: (context, rateMyApp) {
                 if (rateMyApp.shouldOpenDialog) {
                   rateMyApp.showStarRateDialog(

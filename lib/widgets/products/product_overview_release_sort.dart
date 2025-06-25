@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/release.dart';
 import '../../providers/filter.dart';
-import '../../providers/auth.dart';
 import '../../assets/constants.dart';
 
 class ProductOverviewReleaseSort extends StatefulWidget {
@@ -16,7 +15,6 @@ class ProductOverviewReleaseSort extends StatefulWidget {
 
 class _ReleaseSortState extends State<ProductOverviewReleaseSort> {
   late final filters = Provider.of<Filter>(context, listen: false).filters;
-  late final Auth authData = Provider.of<Auth>(context, listen: false);
 
   @override
   Widget build(BuildContext context) {

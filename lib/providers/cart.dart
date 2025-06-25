@@ -20,11 +20,9 @@ class CartItem {
 }
 
 class Cart with ChangeNotifier {
-  late String _apiToken;
   late http.Client _client;
 
-  void update(String token, http.Client client) {
-    _apiToken = token;
+  void update(http.Client client) {
     _client = client;
   }
 
@@ -194,7 +192,7 @@ class Cart with ChangeNotifier {
     if (_items.isNotEmpty) {
       final productIds = _items.keys.toList().join(',');
       final updatedProducts =
-          await ApiHelper.getProductsData(_client, productIds, _apiToken);
+          await ApiHelper.getProductsData(_client, productIds);
       for (var product in updatedProducts) {
         _items[product.id] = CartItem(
           product: Product(
@@ -283,131 +281,117 @@ class Cart with ChangeNotifier {
   void sortCart() {
     final sorted = _items.entries.toList();
     if (cartSortIndex == 'Alkohol - Høy til lav') {
-      sorted
-        .sort(
-          (a, b) {
-            int result;
-            if (a.value.product.abv == null) {
-              result = 1;
-            } else if (b.value.product.abv == null) {
-              result = -1;
-            } else {
-              result = b.value.product.abv!.compareTo(a.value.product.abv!);
-            }
-            return result;
-          },
-        );
+      sorted.sort(
+        (a, b) {
+          int result;
+          if (a.value.product.abv == null) {
+            result = 1;
+          } else if (b.value.product.abv == null) {
+            result = -1;
+          } else {
+            result = b.value.product.abv!.compareTo(a.value.product.abv!);
+          }
+          return result;
+        },
+      );
     } else if (cartSortIndex == 'Alkohol - Lav til høy') {
-      sorted
-        .sort(
-          (a, b) {
-            int result;
-            if (a.value.product.abv == null) {
-              result = 1;
-            } else if (b.value.product.abv == null) {
-              result = -1;
-            } else {
-              result = a.value.product.abv!.compareTo(b.value.product.abv!);
-            }
-            return result;
-          },
-        );
+      sorted.sort(
+        (a, b) {
+          int result;
+          if (a.value.product.abv == null) {
+            result = 1;
+          } else if (b.value.product.abv == null) {
+            result = -1;
+          } else {
+            result = a.value.product.abv!.compareTo(b.value.product.abv!);
+          }
+          return result;
+        },
+      );
     } else if (cartSortIndex == 'Din rating - Høy til lav') {
-      sorted
-        .sort(
-          (a, b) {
-            int result;
-            if (a.value.product.userRating == null) {
-              result = 1;
-            } else if (b.value.product.userRating == null) {
-              result = -1;
-            } else {
-              result = b.value.product.userRating!
-                  .compareTo(a.value.product.userRating!);
-            }
-            return result;
-          },
-        );
+      sorted.sort(
+        (a, b) {
+          int result;
+          if (a.value.product.userRating == null) {
+            result = 1;
+          } else if (b.value.product.userRating == null) {
+            result = -1;
+          } else {
+            result = b.value.product.userRating!
+                .compareTo(a.value.product.userRating!);
+          }
+          return result;
+        },
+      );
     } else if (cartSortIndex == 'Din rating - Lav til høy') {
-      sorted
-        .sort(
-          (a, b) {
-            int result;
-            if (a.value.product.userRating == null) {
-              result = 1;
-            } else if (b.value.product.userRating == null) {
-              result = -1;
-            } else {
-              result = a.value.product.userRating!
-                  .compareTo(b.value.product.userRating!);
-            }
-            return result;
-          },
-        );
+      sorted.sort(
+        (a, b) {
+          int result;
+          if (a.value.product.userRating == null) {
+            result = 1;
+          } else if (b.value.product.userRating == null) {
+            result = -1;
+          } else {
+            result = a.value.product.userRating!
+                .compareTo(b.value.product.userRating!);
+          }
+          return result;
+        },
+      );
     } else if (cartSortIndex == 'Global rating - Høy til lav') {
-      sorted
-        .sort(
-          (a, b) {
-            int result;
-            if (a.value.product.rating == null) {
-              result = 1;
-            } else if (b.value.product.rating == null) {
-              result = -1;
-            } else {
-              result =
-                  b.value.product.rating!.compareTo(a.value.product.rating!);
-            }
-            return result;
-          },
-        );
+      sorted.sort(
+        (a, b) {
+          int result;
+          if (a.value.product.rating == null) {
+            result = 1;
+          } else if (b.value.product.rating == null) {
+            result = -1;
+          } else {
+            result = b.value.product.rating!.compareTo(a.value.product.rating!);
+          }
+          return result;
+        },
+      );
     } else if (cartSortIndex == 'Global rating - Lav til høy') {
-      sorted
-        .sort(
-          (a, b) {
-            int result;
-            if (a.value.product.rating == null) {
-              result = 1;
-            } else if (b.value.product.rating == null) {
-              result = -1;
-            } else {
-              result =
-                  a.value.product.rating!.compareTo(b.value.product.rating!);
-            }
-            return result;
-          },
-        );
+      sorted.sort(
+        (a, b) {
+          int result;
+          if (a.value.product.rating == null) {
+            result = 1;
+          } else if (b.value.product.rating == null) {
+            result = -1;
+          } else {
+            result = a.value.product.rating!.compareTo(b.value.product.rating!);
+          }
+          return result;
+        },
+      );
     } else if (cartSortIndex == 'Navn - A til Å') {
-      sorted
-        .sort(
-          (a, b) => a.value.product.name.compareTo(b.value.product.name),
-        );
+      sorted.sort(
+        (a, b) => a.value.product.name.compareTo(b.value.product.name),
+      );
     } else if (cartSortIndex == 'Navn - Å til A') {
-      sorted
-        .sort(
-          (a, b) => b.value.product.name.compareTo(a.value.product.name),
-        );
+      sorted.sort(
+        (a, b) => b.value.product.name.compareTo(a.value.product.name),
+      );
     } else if (cartSortIndex == 'Pris - Høy til lav') {
-      sorted
-        .sort(
-          (a, b) => b.value.product.price.compareTo(a.value.product.price),
-        );
+      sorted.sort(
+        (a, b) => b.value.product.price.compareTo(a.value.product.price),
+      );
     } else if (cartSortIndex == 'Pris - Lav til høy') {
-      sorted
-        .sort(
-          (a, b) => a.value.product.price.compareTo(b.value.product.price),
-        );
+      sorted.sort(
+        (a, b) => a.value.product.price.compareTo(b.value.product.price),
+      );
     } else if (cartSortIndex == 'Pris per liter - Høy til lav') {
-      sorted
-        .sort(
-          (a, b) => b.value.product.pricePerVolume!
-              .compareTo(a.value.product.pricePerVolume!),
-        );
+      sorted.sort(
+        (a, b) => b.value.product.pricePerVolume!
+            .compareTo(a.value.product.pricePerVolume!),
+      );
     } else if (cartSortIndex == 'Pris per liter - Lav til høy') {
-      sorted
-        .sort(
-          (a, b) => a.value.product.pricePerVolume!
-              .compareTo(b.value.product.pricePerVolume!),
-        );
+      sorted.sort(
+        (a, b) => a.value.product.pricePerVolume!
+            .compareTo(b.value.product.pricePerVolume!),
+      );
     }
     _items = Map<int, CartItem>.fromEntries(sorted);
     saveCartSettings();

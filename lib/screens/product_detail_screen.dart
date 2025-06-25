@@ -8,12 +8,10 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flag/flag.dart';
 import 'package:http/http.dart' as http;
 
-import '../providers/auth.dart';
 import '../providers/cart.dart';
 import '../providers/filter.dart';
 import '../providers/http_client.dart';
 import '../helpers/api_helper.dart';
-import '../helpers/untappd_helper.dart';
 import '../helpers/app_launcher.dart';
 import '../models/product.dart';
 import '../widgets/common/rating_widget.dart';
@@ -37,7 +35,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   List<dynamic> _stockList = [];
   List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
     stockList = snapshot.data!['all_stock'];
-    Map<String, int> order = { for (var key in storeList.map((e) => e.name).toList()) key : storeList.map((e) => e.name).toList().indexOf(key) };
+    Map<String, int> order = {
+      for (var key in storeList.map((e) => e.name).toList())
+        key: storeList.map((e) => e.name).toList().indexOf(key)
+    };
     stockList.sort(
         (a, b) => order[a['store_name']]!.compareTo(order[b['store_name']]!));
     return stockList;
@@ -49,7 +50,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final product = args['product'] as Product;
     final herotag = args['herotag'] as String;
-    final auth = Provider.of<Auth>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
@@ -76,26 +76,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         actions: [
           PopupMenuButton(itemBuilder: (context) {
             return [
-              if (auth.isAuth)
-                PopupMenuItem<int>(
-                  value: 0,
-                  child: FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Row(
-                      children: [
-                        Icon(!wishlisted
-                            ? Icons.playlist_add
-                            : Icons.playlist_remove),
-                        const VerticalDivider(width: 5),
-                        Text(!wishlisted
-                            ? 'Legg i Untappd ønskeliste'
-                            : 'Fjern fra Untappd ønskeliste'),
-                      ],
-                    ),
-                  ),
-                ),
               PopupMenuItem<int>(
-                value: 1,
+                value: 0,
                 child: FittedBox(
                   fit: BoxFit.fitWidth,
                   child: Row(
@@ -113,7 +95,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               const PopupMenuItem<int>(
-                value: 2,
+                value: 1,
                 child: FittedBox(
                   fit: BoxFit.fitWidth,
                   child: Row(
@@ -126,7 +108,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               const PopupMenuItem<int>(
-                value: 3,
+                value: 2,
                 child: FittedBox(
                   fit: BoxFit.fitWidth,
                   child: Row(
@@ -141,12 +123,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ];
           }, onSelected: (value) {
             if (value == 0) {
-              toggleWishlist(client.untappdClient, auth, product, cart);
-            } else if (value == 1) {
               wrongUntappdMatch(client.apiClient, product);
-            } else if (value == 2) {
+            } else if (value == 1) {
               AppLauncher.launchUntappd(product);
-            } else if (value == 3) {
+            } else if (value == 2) {
               product.vmpUrl != null
                   ? launchUrl(Uri.parse(product.vmpUrl!))
                   : null;
@@ -207,7 +187,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       body: FutureBuilder(
         future: ApiHelper.getDetailedProductInfo(
-            client.apiClient, product.id, auth, fields),
+            client.apiClient, product.id, fields),
         builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
           if (snapshot.hasData &&
               snapshot.data!['all_stock'] != null &&
@@ -1209,11 +1189,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               height: 15,
                             ),
                             ExpansionTile(
-                              title: const Text("Vis butikker med varen på lager",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  )),
+                              title:
+                                  const Text("Vis butikker med varen på lager",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      )),
                               dense: true,
                               shape: const Border(),
                               children: [
@@ -1527,24 +1508,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       ),
     );
-  }
-
-  Future<void> toggleWishlist(
-      http.Client client, Auth auth, Product product, Cart cart) async {
-    bool success = !wishlisted
-        ? await UntappdHelper.addToWishlist(
-            client, auth.apiToken, auth.untappdToken, product)
-        : await UntappdHelper.removeFromWishlist(
-            client, auth.apiToken, auth.untappdToken, product);
-    setState(() {
-      if (!wishlisted && success) {
-        wishlisted = true;
-        cart.updateCartItemsData();
-      } else if (wishlisted && success) {
-        wishlisted = false;
-        cart.updateCartItemsData();
-      }
-    });
   }
 
   wrongUntappdMatch(http.Client client, Product product) {

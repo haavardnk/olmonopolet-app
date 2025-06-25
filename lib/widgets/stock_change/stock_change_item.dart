@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:provider/provider.dart';
 import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
 import 'package:flag/flag.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../models/stock_change.dart';
-import '../../providers/cart.dart';
-import '../../providers/auth.dart';
 import '../../screens/product_detail_screen.dart';
 import '../common/rating_widget.dart';
 import '../common/item_popup_menu.dart';
@@ -38,10 +35,8 @@ class _StockChangeItemState extends State<StockChangeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<Auth>(context, listen: false);
     final MediaQueryData _mediaQueryData = MediaQuery.of(context);
     final _tabletMode = _mediaQueryData.size.shortestSide >= 600 ? true : false;
-    final cart = Provider.of<Cart>(context, listen: false);
     const countries = countryList;
     final double _boxImageSize = _tabletMode
         ? 60 + _mediaQueryData.textScaleFactor * 10
@@ -112,22 +107,10 @@ class _StockChangeItemState extends State<StockChangeItem> {
                 onLongPress: () {
                   showPopupMenu(
                     context,
-                    auth,
                     wishlisted,
                     tapPosition,
                     overlay,
                     widget.stockChange.product,
-                  ).then(
-                    (value) => setState(() {
-                      if (value == 'wishlistAdded') {
-                        wishlisted = true;
-                        cart.updateCartItemsData();
-                      }
-                      if (value == 'wishlistRemoved') {
-                        wishlisted = false;
-                        cart.updateCartItemsData();
-                      }
-                    }),
                   );
                 },
                 child: Container(

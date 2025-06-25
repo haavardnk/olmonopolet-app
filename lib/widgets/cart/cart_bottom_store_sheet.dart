@@ -5,7 +5,6 @@ import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../providers/cart.dart';
 import '../../providers/filter.dart';
-import '../../providers/auth.dart';
 import '../../assets/constants.dart';
 
 class CartBottomStoreSheet extends StatefulWidget {
@@ -16,7 +15,6 @@ class CartBottomStoreSheet extends StatefulWidget {
 }
 
 class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
-  late Auth authData = Provider.of<Auth>(context, listen: false);
   late List<String?> _sortList;
 
   Future<void> initCartSettings() async {
@@ -33,11 +31,7 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
 
   @override
   void initState() {
-    if (authData.isAuth) {
-      _sortList = cartSortListAuth;
-    } else {
-      _sortList = cartSortList;
-    }
+    _sortList = cartSortList;
 
     super.initState();
   }
@@ -145,8 +139,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                     ),
                     SwitchListTile(
                       contentPadding: const EdgeInsets.only(left: 16, right: 4),
-                      title:
-                          const Text('Skjul dersom ingen på lager i valgte butikker'),
+                      title: const Text(
+                          'Skjul dersom ingen på lager i valgte butikker'),
                       value: cart.hideNoStock,
                       activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
@@ -201,7 +195,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                             searchFieldProps: TextFieldProps(
                                               decoration: InputDecoration(
                                                 labelText: 'Søk',
-                                                prefixIcon: const Icon(Icons.search),
+                                                prefixIcon:
+                                                    const Icon(Icons.search),
                                                 border: OutlineInputBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -213,8 +208,9 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                             itemBuilder:
                                                 (context, item, isSelected) {
                                               return Container(
-                                                margin: const EdgeInsets.symmetric(
-                                                    horizontal: 8),
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8),
                                                 child: ListTile(
                                                   title: Text(item),
                                                   subtitle: Text(filters
@@ -233,7 +229,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                                       .reduce((a, b) =>
                                                           a + ', ' + b)
                                                   : 'Velg butikker',
-                                              style: const TextStyle(fontSize: 16),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
                                             );
                                           },
                                           dropdownDecoratorProps:

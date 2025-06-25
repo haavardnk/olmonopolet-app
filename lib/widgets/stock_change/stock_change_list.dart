@@ -8,7 +8,6 @@ import './stock_change_item.dart';
 import '../../helpers/api_helper.dart';
 import '../../models/stock_change.dart';
 import '../../providers/filter.dart';
-import '../../providers/auth.dart';
 import '../../providers/http_client.dart';
 import '../products/pagination_indicators/first_page_error_indicator.dart';
 import '../products/pagination_indicators/new_page_error_indicator.dart';
@@ -28,11 +27,11 @@ class _StockChangeListViewState extends State<StockChangeList> {
       PagingController(firstPageKey: 1, invisibleItemsThreshold: 5);
 
   Future<void> _fetchPage(
-      http.Client client, int pageKey, Filter filters, Auth auth) async {
+      http.Client client, int pageKey, Filter filters) async {
     try {
       final newItems = await retry(
         () => ApiHelper.getStockChangeList(
-            client, pageKey, auth, _pageSize, filters.stockChangeStoreId),
+            client, pageKey, _pageSize, filters.stockChangeStoreId),
       );
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
@@ -57,10 +56,9 @@ class _StockChangeListViewState extends State<StockChangeList> {
     if (!_pagingController.hasListeners) {
       _pagingController.addPageRequestListener((pageKey) {
         final filters = Provider.of<Filter>(context, listen: false).filters;
-        final auth = Provider.of<Auth>(context, listen: false);
         final client =
             Provider.of<HttpClient>(context, listen: false).apiClient;
-        _fetchPage(client, pageKey, filters, auth);
+        _fetchPage(client, pageKey, filters);
       });
     }
 

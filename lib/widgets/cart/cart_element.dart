@@ -8,7 +8,6 @@ import 'package:flag/flag.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../providers/cart.dart';
-import '../../providers/auth.dart';
 import '../../providers/filter.dart';
 import '../../providers/http_client.dart';
 import '../../helpers/api_helper.dart';
@@ -56,7 +55,6 @@ class _CartElementState extends State<CartElement> {
   @override
   Widget build(BuildContext context) {
     const fields = "all_stock";
-    final auth = Provider.of<Auth>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false).apiClient;
     final heroTag = 'cart${widget.cartItem.product.id}';
@@ -122,24 +120,10 @@ class _CartElementState extends State<CartElement> {
                 onLongPress: () {
                   showPopupMenu(
                     context,
-                    auth,
                     wishlisted,
                     tapPosition,
                     overlay,
                     widget.cartItem.product,
-                  ).then(
-                    (value) => setState(
-                      () {
-                        if (value == 'wishlistAdded') {
-                          wishlisted = true;
-                          widget.cartData.updateCartItemsData();
-                        }
-                        if (value == 'wishlistRemoved') {
-                          wishlisted = false;
-                          widget.cartData.updateCartItemsData();
-                        }
-                      },
-                    ),
                   );
                 },
                 child: AnimatedContainer(
@@ -535,8 +519,8 @@ class _CartElementState extends State<CartElement> {
                           ),
                           if (_expanded == true)
                             FutureBuilder(
-                              future: ApiHelper.getDetailedProductInfo(client,
-                                  widget.cartItem.product.id, auth, fields),
+                              future: ApiHelper.getDetailedProductInfo(
+                                  client, widget.cartItem.product.id, fields),
                               builder: (context,
                                   AsyncSnapshot<Map<String, dynamic>>
                                       snapshot) {

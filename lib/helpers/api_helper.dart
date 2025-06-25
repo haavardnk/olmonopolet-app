@@ -8,31 +8,19 @@ import '../models/store.dart';
 import '../models/release.dart';
 import '../models/stock_change.dart';
 import '../providers/filter.dart';
-import '../providers/auth.dart';
 import '../utils/environment.dart';
 
 class ApiHelper {
   static Future<Map<String, dynamic>> getDetailedProductInfo(
-      http.Client http, int productId, Auth auth, String fields) async {
-    final Map<String, String> headers = auth.apiToken.isNotEmpty
-        ? {
-            'Authorization': 'Token ${auth.apiToken}',
-          }
-        : {};
+      http.Client http, int productId, String fields) async {
     final url = Uri.parse(
         '${Environment.apiBaseUrl}beers/?beers=$productId&fields=$fields&all_stock=true');
     try {
-      final response = await http.get(
-        url,
-        headers: headers,
-      );
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))['results'][0];
         return jsonResponse;
-      } else if (response.statusCode == 401) {
-        auth.logout();
-        return {};
       } else {
         throw GenericHttpException();
       }
@@ -60,16 +48,10 @@ class ApiHelper {
   }
 
   static Future<List<StockChange>> getStockChangeList(
-      http.Client http, int page, Auth auth, int pageSize, String store) async {
-    final Map<String, String> headers = auth.apiToken.isNotEmpty
-        ? {
-            'Authorization': 'Token ${auth.apiToken}',
-          }
-        : {};
+      http.Client http, int page, int pageSize, String store) async {
     try {
       final response = await http.get(
         _apiStockChangeUrlBuilder(page, pageSize, store),
-        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -81,9 +63,6 @@ class ApiHelper {
           ),
         );
         return stockChange;
-      } else if (response.statusCode == 401) {
-        auth.logout();
-        return [];
       } else {
         throw GenericHttpException();
       }
@@ -93,24 +72,18 @@ class ApiHelper {
   }
 
   static Future<List<Product>> getProductList(
-      http.Client http, int page, Filter filter, Auth auth, int pageSize,
+      http.Client http, int page, Filter filter, int pageSize,
       [Release? release]) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
-        'volume,price_per_volume,vmp_url,untpd_url,untpd_id,country,product_selection';
-    final Map<String, String> headers = auth.apiToken.isNotEmpty
-        ? {
-            'Authorization': 'Token ${auth.apiToken}',
-          }
-        : {};
+        'sub_category,style,stock,abv,volume,price_per_volume,vmp_url,'
+        'untpd_url,untpd_id,country,product_selection';
     try {
       final response = await http.get(
         release == null
             ? _apiProductUrlBuilder(fields, page, filter, pageSize)
             : _apiReleaseProductUrlBuilder(
                 fields, page, filter, release, pageSize),
-        headers: headers,
       );
       if (response.statusCode == 200) {
         final jsonResponse =
@@ -121,9 +94,6 @@ class ApiHelper {
           ),
         );
         return products;
-      } else if (response.statusCode == 401) {
-        auth.logout();
-        return [];
       } else {
         throw GenericHttpException();
       }
@@ -133,23 +103,15 @@ class ApiHelper {
   }
 
   static Future<List<Product>> getProductsData(
-      http.Client http, String productIds, String apiToken) async {
+      http.Client http, String productIds) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,user_checked_in,user_wishlisted,'
-        'volume,price_per_volume,vmp_url,untpd_url,untpd_id,country';
-    final Map<String, String> headers = apiToken.isNotEmpty
-        ? {
-            'Authorization': 'Token $apiToken',
-          }
-        : {};
+        'sub_category,style,stock,abv,volume,price_per_volume,'
+        'vmp_url,untpd_url,untpd_id,country';
     final url = Uri.parse(
         '${Environment.apiBaseUrl}beers/?beers=$productIds&fields=$fields');
     try {
-      final response = await http.get(
-        url,
-        headers: headers,
-      );
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         final jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))['results'];
@@ -212,29 +174,6 @@ class ApiHelper {
     }
   }
 
-  static Future<List<String>> getCheckedInStyles(
-      http.Client http, String apiToken) async {
-    final Map<String, String> headers = {
-      'Authorization': 'Token $apiToken',
-    };
-    try {
-      final response = await http.post(
-        Uri.parse('${Environment.apiBaseUrl}auth/checked_in_styles'),
-        headers: headers,
-      );
-      if (response.statusCode == 200) {
-        List<String> styles = [
-          ...json.decode(utf8.decode(response.bodyBytes))['checked_in_styles']
-        ];
-        return styles;
-      } else {
-        throw GenericHttpException();
-      }
-    } on SocketException {
-      throw NoConnectionException();
-    }
-  }
-
   static Future<List<Release>> getReleaseList(http.Client http) async {
     const fields = "name,release_date,beer_count,product_selections";
 
@@ -253,39 +192,11 @@ class ApiHelper {
     }
   }
 
-  static Future<void> updateFcmToken(
-      http.Client http, String fcmToken, String apiToken) async {
+  static Future<void> updateFcmToken(http.Client http, String fcmToken) async {
     try {
-      final response = await http.post(
-          Uri.parse(
-              '${Environment.apiBaseUrl}notifications/set_token/?token=$fcmToken'),
-          headers: {
-            'Authorization': 'Token $apiToken',
-          });
-      if (response.statusCode == 200) {
-        print(response.body);
-        return;
-      } else {
-        throw GenericHttpException();
-      }
-    } on SocketException {
-      throw NoConnectionException();
-    }
-  }
-
-  static Future<void> deleteUserAccount(http.Client http, Auth auth) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('${Environment.apiBaseUrl}auth/delete/'),
-        headers: {
-          'Authorization': 'Token ${auth.apiToken}',
-        },
-      );
-      if (response.statusCode == 200) {
-        return;
-      } else {
-        throw GenericHttpException();
-      }
+      // Since this endpoint usually requires authentication, we do nothing
+      // as authentication is being removed from the app
+      return;
     } on SocketException {
       throw NoConnectionException();
     }
