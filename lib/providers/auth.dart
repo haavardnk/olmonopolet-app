@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -53,7 +53,7 @@ class Auth with ChangeNotifier {
         'https://auth.example.com/   const callbackUrl = 'com.beermonopoly.olmonopolet';
     const apiUrl = 'https://api.example.com/   const profileUrl = 'https://api.example.com/v4/   try {
       // Get Untappd token
-      final untappdResponse = await FlutterWebAuth.authenticate(
+      final untappdResponse = await FlutterWebAuth2.authenticate(
           url: oauthUrl, callbackUrlScheme: callbackUrl);
       final untappdToken =
           Uri.parse(untappdResponse).queryParameters['access_token'];
