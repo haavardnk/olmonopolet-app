@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
 import './stock_change_item.dart';
@@ -21,113 +20,131 @@ class StockChangeList extends StatefulWidget {
 }
 
 class _StockChangeListViewState extends State<StockChangeList> {
-  late int _pageSize;
+  int _pageSize = 14;
   late DateTime lastDate;
-  bool _hasAddedListener = false;
-  final PagingController<int, StockChange> _pagingController =
-      PagingController(firstPageKey: 1, invisibleItemsThreshold: 5);
+  late PagingController<int, StockChange> _pagingController;
+  bool _listenerAdded = false;
 
-  Future<void> _fetchPage(
-      http.Client client, int pageKey, Filter filters) async {
-    try {
-      final newItems = await retry(
-        () => ApiHelper.getStockChangeList(
-            client, pageKey, _pageSize, filters.stockChangeStoreId),
-      );
-      final isLastPage = newItems.length < _pageSize;
-      if (isLastPage) {
-        _pagingController.appendLastPage(newItems);
-      } else {
-        final nextPageKey = pageKey + 1;
-        _pagingController.appendPage(newItems, nextPageKey);
-      }
-    } catch (error) {
-      _pagingController.error = error;
+  @override
+  void initState() {
+    super.initState();
+    _pagingController = PagingController<int, StockChange>(
+      getNextPageKey: (state) {
+        if (state.keys == null || state.keys!.isEmpty) return 1;
+        if (state.lastPageIsEmpty) return null;
+        return state.keys!.last + 1;
+      },
+      fetchPage: (pageKey) => _fetchPage(pageKey),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_listenerAdded) {
+      _listenerAdded = true;
+      Provider.of<Filter>(context, listen: false).addListener(_onFilterChanged);
     }
+  }
+
+  void _onFilterChanged() {
+    _pagingController.refresh();
+  }
+
+  Future<List<StockChange>> _fetchPage(int pageKey) async {
+    final filters = Provider.of<Filter>(context, listen: false).filters;
+    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
+    final newItems = await retry(
+      () => ApiHelper.getStockChangeList(
+          client, pageKey, _pageSize, filters.stockChangeStoreId),
+    );
+    return newItems;
   }
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQueryData = MediaQuery.of(context);
-    _pageSize = _mediaQueryData.size.width ~/
-                (350 + _mediaQueryData.textScaleFactor * 21) >=
+    final mediaQueryData = MediaQuery.of(context);
+    _pageSize = mediaQueryData.size.width ~/
+                (350 + mediaQueryData.textScaleFactor * 21) >=
             2
         ? 24
         : 14;
-    if (!_hasAddedListener) {
-      _hasAddedListener = true;
-      _pagingController.addPageRequestListener((pageKey) {
-        final filters = Provider.of<Filter>(context, listen: false).filters;
-        final client =
-            Provider.of<HttpClient>(context, listen: false).apiClient;
-        _fetchPage(client, pageKey, filters);
-      });
-    }
 
     return RefreshIndicator(
       onRefresh: () => Future.sync(
         () => _pagingController.refresh(),
       ),
       child: Consumer<Filter>(
-        builder: (context, value, _) {
-          _pagingController.refresh();
-          return _mediaQueryData.size.width < 600
-              ? PagedListView<int, StockChange>(
-                  pagingController: _pagingController,
-                  builderDelegate: PagedChildBuilderDelegate<StockChange>(
-                    animateTransitions: true,
-                    transitionDuration: const Duration(milliseconds: 300),
-                    itemBuilder: (context, item, index) {
-                      if (index == 0) {
-                        return StockChangeItem(stockChange: item);
-                      } else {
-                        return StockChangeItem(
-                          stockChange: item,
-                          lastDate: _pagingController
-                              .itemList![index - 1].stockUnstockAt,
-                        );
-                      }
-                    },
-                    firstPageErrorIndicatorBuilder: (_) =>
-                        FirstPageErrorIndicator(
-                      onTryAgain: () => _pagingController.refresh(),
+        builder: (context, filterProvider, child) {
+          return PagingListener(
+            controller: _pagingController,
+            builder: (context, state, fetchNextPage) => mediaQueryData
+                        .size.width <
+                    600
+                ? PagedListView<int, StockChange>(
+                    state: state,
+                    fetchNextPage: fetchNextPage,
+                    builderDelegate: PagedChildBuilderDelegate<StockChange>(
+                      animateTransitions: true,
+                      transitionDuration: const Duration(milliseconds: 300),
+                      invisibleItemsThreshold: 5,
+                      itemBuilder: (context, item, index) {
+                        final items = state.items;
+                        if (index == 0 || items == null) {
+                          return StockChangeItem(stockChange: item);
+                        } else {
+                          return StockChangeItem(
+                            stockChange: item,
+                            lastDate: items[index - 1].stockUnstockAt,
+                          );
+                        }
+                      },
+                      firstPageErrorIndicatorBuilder: (_) =>
+                          FirstPageErrorIndicator(
+                        onTryAgain: () => _pagingController.refresh(),
+                      ),
+                      newPageErrorIndicatorBuilder: (_) =>
+                          NewPageErrorIndicator(
+                        onTap: () => _pagingController.fetchNextPage(),
+                      ),
+                      noItemsFoundIndicatorBuilder: (_) =>
+                          const NoItemsFoundIndicator(),
                     ),
-                    newPageErrorIndicatorBuilder: (_) => NewPageErrorIndicator(
-                      onTap: () => _pagingController.retryLastFailedRequest(),
+                  )
+                : PagedGridView<int, StockChange>(
+                    state: state,
+                    fetchNextPage: fetchNextPage,
+                    showNewPageProgressIndicatorAsGridChild: false,
+                    showNewPageErrorIndicatorAsGridChild: false,
+                    showNoMoreItemsIndicatorAsGridChild: false,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisExtent: 100 + mediaQueryData.textScaleFactor * 48,
+                      crossAxisCount: mediaQueryData.size.width ~/
+                                  (350 + mediaQueryData.textScaleFactor * 21) <=
+                              4
+                          ? mediaQueryData.size.width ~/
+                              (350 + mediaQueryData.textScaleFactor * 21)
+                          : 4,
                     ),
-                    noItemsFoundIndicatorBuilder: (_) =>
-                        const NoItemsFoundIndicator(),
+                    builderDelegate: PagedChildBuilderDelegate<StockChange>(
+                      animateTransitions: true,
+                      transitionDuration: const Duration(milliseconds: 300),
+                      invisibleItemsThreshold: 5,
+                      itemBuilder: (context, item, index) =>
+                          StockChangeItem(stockChange: item),
+                      firstPageErrorIndicatorBuilder: (_) =>
+                          FirstPageErrorIndicator(
+                        onTryAgain: () => _pagingController.refresh(),
+                      ),
+                      newPageErrorIndicatorBuilder: (_) =>
+                          NewPageErrorIndicator(
+                        onTap: () => _pagingController.fetchNextPage(),
+                      ),
+                      noItemsFoundIndicatorBuilder: (_) =>
+                          const NoItemsFoundIndicator(),
+                    ),
                   ),
-                )
-              : PagedGridView<int, StockChange>(
-                  pagingController: _pagingController,
-                  showNewPageProgressIndicatorAsGridChild: false,
-                  showNewPageErrorIndicatorAsGridChild: false,
-                  showNoMoreItemsIndicatorAsGridChild: false,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    mainAxisExtent: 100 + _mediaQueryData.textScaleFactor * 48,
-                    crossAxisCount: _mediaQueryData.size.width ~/
-                                (350 + _mediaQueryData.textScaleFactor * 21) <=
-                            4
-                        ? _mediaQueryData.size.width ~/
-                            (350 + _mediaQueryData.textScaleFactor * 21)
-                        : 4,
-                  ),
-                  builderDelegate: PagedChildBuilderDelegate<StockChange>(
-                    animateTransitions: true,
-                    transitionDuration: const Duration(milliseconds: 300),
-                    itemBuilder: (context, item, index) =>
-                        StockChangeItem(stockChange: item),
-                    firstPageErrorIndicatorBuilder: (_) =>
-                        FirstPageErrorIndicator(
-                      onTryAgain: () => _pagingController.refresh(),
-                    ),
-                    newPageErrorIndicatorBuilder: (_) => NewPageErrorIndicator(
-                      onTap: () => _pagingController.retryLastFailedRequest(),
-                    ),
-                    noItemsFoundIndicatorBuilder: (_) =>
-                        const NoItemsFoundIndicator(),
-                  ));
+          );
         },
       ),
     );
@@ -135,6 +152,10 @@ class _StockChangeListViewState extends State<StockChangeList> {
 
   @override
   void dispose() {
+    try {
+      Provider.of<Filter>(context, listen: false)
+          .removeListener(_onFilterChanged);
+    } catch (_) {}
     _pagingController.dispose();
     super.dispose();
   }
