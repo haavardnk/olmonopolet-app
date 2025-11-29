@@ -195,6 +195,22 @@ class ApiHelper {
     }
   }
 
+  static Future<List<String>> getActiveStyles(http.Client http) async {
+    final url = Uri.parse('${Environment.apiBaseUrl}beers/styles/');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        List<String> styles = List<String>.from(jsonResponse);
+        return styles;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
+
   static Future<List<Release>> getReleaseList(http.Client http) async {
     const fields = "name,release_date,beer_count,product_selections";
 

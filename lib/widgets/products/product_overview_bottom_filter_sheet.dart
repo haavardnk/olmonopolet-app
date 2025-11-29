@@ -406,7 +406,7 @@ class ProductOverviewBottomFilterSheetState
                     builder: (context, _, __) {
                       List<String> styleList = (filters.styleChoice == 0)
                           ? beermonopolyStyleList.keys.toList()
-                          : untappdStyleList;
+                          : filters.untappdStyleList;
                       return AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         child: filters.styleChoice == 0
@@ -414,11 +414,7 @@ class ProductOverviewBottomFilterSheetState
                                 key: ValueKey(filters.styleChoice),
                                 spacing: 8,
                                 children: List.generate(
-                                  (filters.styleChoice == 0)
-                                      ? beermonopolyStyleList.keys
-                                          .toList()
-                                          .length
-                                      : untappdStyleList.length,
+                                  beermonopolyStyleList.keys.toList().length,
                                   (index) {
                                     return FilterChip(
                                       label: Text(styleList[index]),
@@ -536,11 +532,14 @@ class ProductOverviewBottomFilterSheetState
                                       ),
                                     ),
                                   ),
-                                  items: (filter, loadProps) => styleList,
+                                  items: (filter, loadProps) async {
+                                    return await filters.getStyles();
+                                  },
                                   onChanged: (List<String> x) {
                                     mystate(() {
                                       filters.selectedStyles = x;
-                                      filters.setStyle();
+                                      filters
+                                          .setStyle(filters.untappdStyleList);
                                     });
                                   },
                                   selectedItems: filters.selectedStyles,

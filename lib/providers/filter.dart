@@ -44,6 +44,7 @@ class Filter with ChangeNotifier {
   List<Store> storeList = [];
   List<Release> releaseList = [];
   List<Country> countryList = [];
+  List<String> untappdStyleList = [];
   String stockChangeSelectedStore = '';
 
   List<bool> productSelectionSelectedList = List<bool>.filled(5, false);
@@ -68,8 +69,6 @@ class Filter with ChangeNotifier {
     {'name': 'productSelection', 'text': 'Produktutvalg', 'save': false},
     {'name': 'excludeAllergens', 'text': 'Allergener', 'save': false},
     {'name': 'delivery', 'text': 'Bestilling', 'save': false},
-    // {'name': 'checkIn', 'text': 'Untappd Innsjekket', 'save': false},
-    // {'name': 'wishlisted', 'text': 'Untappd Ønskeliste', 'save': false},
     {'name': 'stockChangeStoreId', 'text': 'Lager inn/ut butikk', 'save': true},
     {'name': 'releaseSortBy', 'text': 'Lanseringer Sortering', 'save': true},
   ];
@@ -138,6 +137,25 @@ class Filter with ChangeNotifier {
     }
   }
 
+  bool stylesLoading = false;
+  Future<List<String>> getStyles() async {
+    if (untappdStyleList.isNotEmpty && !stylesLoading) {
+      return untappdStyleList;
+    }
+    try {
+      stylesLoading = true;
+      var styles = await ApiHelper.getActiveStyles(_client);
+      untappdStyleList = styles;
+      stylesLoading = false;
+      notifyListeners();
+      return untappdStyleList;
+    } catch (error) {
+      stylesLoading = false;
+      notifyListeners();
+      return untappdStyleList;
+    }
+  }
+
   void setPriceRange(RangeValues range) {
     priceRange = range;
     if (priceRange.end == 500) {
@@ -189,11 +207,12 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
-  void setStyle() {
+  void setStyle([List<String>? currentStyleList]) {
     if (selectedStyles.isEmpty) {
       style = '';
     } else if (styleChoice == 1 &&
-        selectedStyles.length == untappdStyleList.length) {
+        currentStyleList != null &&
+        selectedStyles.length == currentStyleList.length) {
       style = '';
     } else {
       String temporaryStyles = '';
