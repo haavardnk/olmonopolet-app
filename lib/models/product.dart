@@ -1,5 +1,20 @@
 import 'package:equatable/equatable.dart';
 
+class StockInfo {
+  const StockInfo({
+    required this.storeName,
+    required this.quantity,
+  });
+
+  factory StockInfo.fromJson(Map<String, dynamic> json) => StockInfo(
+        storeName: json['store_name'],
+        quantity: json['quantity'],
+      );
+
+  final String storeName;
+  final int quantity;
+}
+
 class Product extends Equatable {
   const Product({
     required this.id,
@@ -13,44 +28,83 @@ class Product extends Equatable {
     this.checkins,
     this.abv,
     this.imageUrl,
-    this.userRating,
-    this.userWishlisted,
     this.vmpUrl,
     this.untappdUrl,
     this.untappdId,
     this.country,
     this.countryCode,
     this.productSelection,
+    this.labelHdUrl,
+    this.ibu,
+    this.description,
+    this.brewery,
+    this.year,
+    this.color,
+    this.aroma,
+    this.taste,
+    this.storable,
+    this.foodPairing,
+    this.rawMaterials,
+    this.fullness,
+    this.sweetness,
+    this.freshness,
+    this.bitterness,
+    this.sugar,
+    this.acid,
+    this.method,
+    this.allergens,
+    this.alcoholUnits,
+    this.allStock,
   });
 
-  factory Product.fromJson(Map<String, dynamic> product) => Product(
-        id: product['vmp_id'],
-        name: product['vmp_name'],
-        style: product['style'] ??
-            product['sub_category'] ??
-            product['main_category'],
-        stock: product['stock'],
-        price: product['price'],
-        volume: product['volume'],
-        pricePerVolume: product['price_per_volume'],
-        rating: product['rating'],
-        checkins: product['checkins'],
-        abv: product['abv'],
-        imageUrl: product['label_sm_url'] != null &&
-                product['label_sm_url'].contains('badge-beer-default.png')
+  factory Product.fromJson(Map<String, dynamic> json) => Product(
+        id: json['vmp_id'],
+        name: json['vmp_name'],
+        style: json['style'] ?? json['sub_category'] ?? json['main_category'],
+        stock: json['stock'],
+        price: json['price'],
+        volume: json['volume'],
+        pricePerVolume: json['price_per_volume'],
+        rating: json['rating'],
+        checkins: json['checkins'],
+        abv: json['abv'],
+        imageUrl: json['label_sm_url'] != null &&
+                json['label_sm_url'].contains('badge-beer-default.png')
             ? null
-            : product['label_sm_url'],
-        userRating: product['user_checked_in'] != null &&
-                product['user_checked_in'].isNotEmpty
-            ? product['user_checked_in'][0]['rating']
+            : json['label_sm_url'],
+        vmpUrl: json['vmp_url'],
+        untappdUrl: json['untpd_url'],
+        untappdId: json['untpd_id'],
+        country: json['country'],
+        countryCode: json['country_code'],
+        productSelection: json['product_selection'],
+        labelHdUrl: json['label_hd_url'],
+        ibu: json['ibu'] != null ? (json['ibu'] as num).toDouble() : null,
+        description: json['description'],
+        brewery: json['brewery'],
+        year: json['year'],
+        color: json['color'],
+        aroma: json['aroma'],
+        taste: json['taste'],
+        storable: json['storable'],
+        foodPairing: json['food_pairing'],
+        rawMaterials: json['raw_materials'],
+        fullness: json['fullness'],
+        sweetness: json['sweetness'],
+        freshness: json['freshness'],
+        bitterness: json['bitterness'],
+        sugar: json['sugar'] != null ? (json['sugar'] as num).toDouble() : null,
+        acid: json['acid'] != null ? (json['acid'] as num).toDouble() : null,
+        method: json['method'],
+        allergens: json['allergens'],
+        alcoholUnits: json['alcohol_units'] != null
+            ? (json['alcohol_units'] as num).toDouble()
             : null,
-        userWishlisted: product['user_wishlisted'] ?? false,
-        vmpUrl: product['vmp_url'],
-        untappdUrl: product['untpd_url'],
-        untappdId: product['untpd_id'],
-        country: product['country'],
-        countryCode: product['country_code'],
-        productSelection: product['product_selection'],
+        allStock: json['all_stock'] != null
+            ? (json['all_stock'] as List)
+                .map((s) => StockInfo.fromJson(s))
+                .toList()
+            : null,
       );
 
   @override
@@ -66,8 +120,6 @@ class Product extends Equatable {
         checkins,
         abv,
         imageUrl,
-        userRating,
-        userWishlisted,
         vmpUrl,
         untappdUrl,
         untappdId,
@@ -87,12 +139,31 @@ class Product extends Equatable {
   final int? checkins;
   final double? abv;
   final String? imageUrl;
-  final double? userRating;
-  final bool? userWishlisted;
   final String? vmpUrl;
   final String? untappdUrl;
   final int? untappdId;
   final String? country;
   final String? countryCode;
   final String? productSelection;
+  final String? labelHdUrl;
+  final double? ibu;
+  final String? description;
+  final String? brewery;
+  final int? year;
+  final String? color;
+  final String? aroma;
+  final String? taste;
+  final String? storable;
+  final String? foodPairing;
+  final String? rawMaterials;
+  final int? fullness;
+  final int? sweetness;
+  final int? freshness;
+  final int? bitterness;
+  final double? sugar;
+  final double? acid;
+  final String? method;
+  final String? allergens;
+  final double? alcoholUnits;
+  final List<StockInfo>? allStock;
 }

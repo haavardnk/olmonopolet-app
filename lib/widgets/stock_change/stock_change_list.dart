@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:retry/retry.dart';
 
 import './stock_change_item.dart';
-import '../../helpers/api_helper.dart';
+import '../../services/api.dart';
 import '../../models/stock_change.dart';
 import '../../providers/filter.dart';
 import '../../providers/http_client.dart';

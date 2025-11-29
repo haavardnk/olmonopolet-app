@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import '../helpers/db_helper.dart';
-import '../helpers/api_helper.dart';
+import '../services/db.dart';
+import '../services/api.dart';
 import '../models/product.dart';
 import '../models/store.dart';
 
@@ -125,9 +125,6 @@ class Cart with ChangeNotifier {
           'checkins': _items[productId]!.product.checkins,
           'abv': _items[productId]!.product.abv,
           'imageUrl': _items[productId]!.product.imageUrl,
-          'userRating': _items[productId]!.product.userRating,
-          'userWishlisted':
-              (_items[productId]!.product.userWishlisted!) ? 1 : 0,
           'vmpUrl': _items[productId]!.product.vmpUrl,
           'untappdUrl': _items[productId]!.product.untappdUrl,
           'untappdId': _items[productId]!.product.untappdId,
@@ -160,8 +157,6 @@ class Cart with ChangeNotifier {
               checkins: item['checkins'],
               abv: item['abv'],
               imageUrl: item['imageUrl'],
-              userRating: item['userRating'],
-              userWishlisted: (item['userWishlisted'] == 1) ? true : false,
               vmpUrl: item['vmpUrl'],
               untappdUrl: item['untappdUrl'],
               untappdId: item['untappdId'],
@@ -209,8 +204,6 @@ class Cart with ChangeNotifier {
               checkins: product.checkins,
               abv: product.abv,
               imageUrl: product.imageUrl,
-              userRating: product.userRating,
-              userWishlisted: product.userWishlisted,
               vmpUrl: product.vmpUrl,
               untappdUrl: product.untappdUrl,
               untappdId: product.untappdId,
@@ -307,36 +300,6 @@ class Cart with ChangeNotifier {
             result = -1;
           } else {
             result = a.value.product.abv!.compareTo(b.value.product.abv!);
-          }
-          return result;
-        },
-      );
-    } else if (cartSortIndex == 'Din rating - Høy til lav') {
-      sorted.sort(
-        (a, b) {
-          int result;
-          if (a.value.product.userRating == null) {
-            result = 1;
-          } else if (b.value.product.userRating == null) {
-            result = -1;
-          } else {
-            result = b.value.product.userRating!
-                .compareTo(a.value.product.userRating!);
-          }
-          return result;
-        },
-      );
-    } else if (cartSortIndex == 'Din rating - Lav til høy') {
-      sorted.sort(
-        (a, b) {
-          int result;
-          if (a.value.product.userRating == null) {
-            result = 1;
-          } else if (b.value.product.userRating == null) {
-            result = -1;
-          } else {
-            result = a.value.product.userRating!
-                .compareTo(b.value.product.userRating!);
           }
           return result;
         },

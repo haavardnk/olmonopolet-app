@@ -5,8 +5,8 @@ import 'package:http/http.dart' as http;
 import '../models/store.dart';
 import '../models/release.dart';
 import '../models/country.dart';
-import '../helpers/api_helper.dart';
-import '../helpers/location_helper.dart';
+import '../services/api.dart';
+import '../services/location.dart';
 import '../assets/constants.dart';
 
 class Filter with ChangeNotifier {

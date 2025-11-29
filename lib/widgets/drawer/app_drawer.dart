@@ -3,7 +3,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
-import '../../helpers/app_launcher.dart';
+import '../../services/app_launcher.dart';
 import '../../screens/about_screen.dart';
 import '../../utils/environment.dart';
 

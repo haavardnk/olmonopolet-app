@@ -3,7 +3,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 import 'package:retry/retry.dart';
 
-import '../../helpers/api_helper.dart';
+import '../../services/api.dart';
 import './product_item.dart';
 import '../../models/product.dart';
 import '../../models/release.dart';

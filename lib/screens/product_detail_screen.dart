@@ -11,8 +11,8 @@ import 'package:http/http.dart' as http;
 import '../providers/cart.dart';
 import '../providers/filter.dart';
 import '../providers/http_client.dart';
-import '../helpers/api_helper.dart';
-import '../helpers/app_launcher.dart';
+import '../services/api.dart';
+import '../services/app_launcher.dart';
 import '../models/product.dart';
 import '../widgets/common/rating_widget.dart';
 
@@ -29,18 +29,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late bool wishlisted;
   late bool init = false;
 
-  int _numRatings = 0;
-  double _friendsRating = 0;
-  List<dynamic> _stockList = [];
-  List<dynamic> _sortStockList(var stockList, var snapshot, var storeList) {
-    stockList = snapshot.data!['all_stock'];
+  List<StockInfo> _stockList = [];
+  List<StockInfo> _sortStockList(List<StockInfo> stockList, List storeList) {
+    final storeNames = storeList.map((e) => e.name).toList();
     Map<String, int> order = {
-      for (var key in storeList.map((e) => e.name).toList())
-        key: storeList.map((e) => e.name).toList().indexOf(key)
+      for (var key in storeNames) key: storeNames.indexOf(key)
     };
-    stockList.sort(
-        (a, b) => order[a['store_name']]!.compareTo(order[b['store_name']]!));
-    return stockList;
+    final filteredList =
+        stockList.where((s) => order.containsKey(s.storeName)).toList();
+    filteredList
+        .sort((a, b) => order[a.storeName]!.compareTo(order[b.storeName]!));
+    return filteredList;
   }
 
   @override
@@ -56,14 +55,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final tabletMode = mediaQueryData.size.width >= 600 ? true : false;
     final boxImageSize =
         mediaQueryData.size.shortestSide * (tabletMode ? 0.4 : 0.75);
-    const fields =
-        'label_hd_url,ibu,description,brewery,product_selection,all_stock,'
-        'year,color,aroma,taste,storable,food_pairing,raw_materials,fullness,'
-        'sweetness,freshness,bitterness,sugar,acid,method,allergens,'
-        'user_checked_in,friends_checked_in,app_rating,alcohol_units';
 
     if (init == false) {
-      wishlisted = product.userWishlisted ?? false;
+      wishlisted = false;
       init = true;
     }
 
@@ -183,34 +177,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           },
         ),
       ),
-      body: FutureBuilder(
-        future: ApiHelper.getDetailedProductInfo(
-            client.apiClient, product.id, fields),
-        builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-          if (snapshot.hasData &&
-              snapshot.data!['all_stock'] != null &&
+      body: FutureBuilder<Product>(
+        future: ApiHelper.getProductDetails(client.apiClient, product),
+        builder: (context, snapshot) {
+          final details = snapshot.data;
+          if (details != null &&
+              details.allStock != null &&
               filters.storeList.isNotEmpty) {
-            _stockList =
-                _sortStockList(_stockList, snapshot, filters.storeList);
-          }
-          if (snapshot.hasData) {
-            _numRatings = 0;
-            _friendsRating = 0;
-            if (snapshot.data!['app_rating'] != null &&
-                snapshot.data!['app_rating']['rating'] != null) {
-              _numRatings += 1;
-            }
-            if (snapshot.data!['friends_checked_in'] != null &&
-                snapshot.data!['friends_checked_in'].isNotEmpty) {
-              _numRatings += 1;
-              snapshot.data!['friends_checked_in']
-                  .forEach((friend) => {_friendsRating += friend['rating']});
-              _friendsRating =
-                  _friendsRating / snapshot.data!['friends_checked_in'].length;
-            }
-            if (product.userRating != null) {
-              _numRatings += 1;
-            }
+            _stockList = _sortStockList(details.allStock!, filters.storeList);
           }
           return Column(
             children: [
@@ -231,24 +205,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               badgePosition: BadgePosition.topEnd,
                             )
                           : null,
-                      child: Container(
-                        foregroundDecoration: product.userRating != null
-                            ? const RotatedCornerDecoration.withColor(
-                                color: Color(0xFFFBC02D),
-                                textSpan: TextSpan(text: 'Smakt'),
-                                badgeSize: Size(60, 60),
-                                badgePosition: BadgePosition.topStart,
-                              )
-                            : null,
+                      child: SizedBox(
                         height: boxImageSize,
                         width: boxImageSize,
-                        child: snapshot.hasData &&
-                                snapshot.data!['label_hd_url'] != null &&
-                                snapshot.data!['label_hd_url'].isNotEmpty
+                        child: details != null &&
+                                details.labelHdUrl != null &&
+                                details.labelHdUrl!.isNotEmpty
                             ? FadeInImage(
                                 fit: BoxFit.contain,
                                 image: NetworkImage(
-                                  snapshot.data!['label_hd_url'],
+                                  details.labelHdUrl!,
                                 ),
                                 placeholder: product.imageUrl != null
                                     ? NetworkImage(product.imageUrl!)
@@ -318,7 +284,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                     ),
-                    if (!snapshot.hasData)
+                    if (snapshot.hasError)
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height / 8,
+                          ),
+                          Center(
+                            child: Column(
+                              children: [
+                                const Icon(Icons.error_outline, size: 48),
+                                const SizedBox(height: 16),
+                                Text(
+                                    'Kunne ikke laste detaljer: ${snapshot.error}'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (!snapshot.hasData && !snapshot.hasError)
                       Column(
                         children: [
                           SizedBox(
@@ -401,213 +385,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                         ],
                                                       ),
                                                     ),
-                                                    if ((_numRatings == 1) &&
-                                                        snapshot.hasData &&
-                                                        snapshot.data![
-                                                                'app_rating'] !=
-                                                            null &&
-                                                        snapshot.data![
-                                                                    'app_rating']
-                                                                ['rating'] !=
-                                                            null)
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            'Ølmonopolet - ${snapshot.data!['app_rating']['count']}',
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        14),
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                '${snapshot.data!['app_rating']['rating'].toStringAsFixed(2)} ',
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14,
-                                                                ),
-                                                              ),
-                                                              createRatingBar(
-                                                                  rating: snapshot
-                                                                              .data![
-                                                                          'app_rating']
-                                                                      [
-                                                                      'rating'],
-                                                                  size: 18,
-                                                                  color: const Color(
-                                                                      0xff01aed6)),
-                                                            ],
-                                                          )
-                                                        ],
-                                                      ),
-                                                    if (product.userRating !=
-                                                        null)
-                                                      Column(
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              const Text(
-                                                                'Din rating',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14),
-                                                              ),
-                                                              if (snapshot
-                                                                      .hasData &&
-                                                                  snapshot.data![
-                                                                          'user_checked_in'] !=
-                                                                      null)
-                                                                Text(
-                                                                  ' - ${snapshot.data!['user_checked_in'][0]['count']}',
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          14),
-                                                                )
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                product.userRating !=
-                                                                        null
-                                                                    ? '${product.userRating!.toStringAsFixed(2)} '
-                                                                    : '0 ',
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14,
-                                                                ),
-                                                              ),
-                                                              createRatingBar(
-                                                                  rating: product
-                                                                              .userRating !=
-                                                                          null
-                                                                      ? product
-                                                                          .userRating!
-                                                                      : 0,
-                                                                  size: 18,
-                                                                  color: Colors
-                                                                          .yellow[
-                                                                      700]!),
-                                                            ],
-                                                          )
-                                                        ],
-                                                      ),
                                                   ],
                                                 ),
-                                                if (_numRatings > 1)
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                if (_numRatings > 1)
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        tabletMode
-                                                            ? MainAxisAlignment
-                                                                .spaceEvenly
-                                                            : MainAxisAlignment
-                                                                .spaceBetween,
-                                                    children: [
-                                                      if (snapshot.data![
-                                                                  'app_rating'] !=
-                                                              null &&
-                                                          snapshot.data![
-                                                                      'app_rating']
-                                                                  ['rating'] !=
-                                                              null)
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              'Ølmonopolet - ${snapshot.data!['app_rating']['count']}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          14),
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  '${snapshot.data!['app_rating']['rating'].toStringAsFixed(2)} ',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        14,
-                                                                  ),
-                                                                ),
-                                                                createRatingBar(
-                                                                    rating: snapshot
-                                                                            .data!['app_rating']
-                                                                        [
-                                                                        'rating'],
-                                                                    size: 18,
-                                                                    color: const Color(
-                                                                        0xff01aed6)),
-                                                              ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                      if (snapshot.data![
-                                                                  'friends_checked_in'] !=
-                                                              null &&
-                                                          snapshot
-                                                              .data![
-                                                                  'friends_checked_in']
-                                                              .isNotEmpty)
-                                                        InkWell(
-                                                          onTap: () {
-                                                            friendsCheckins(
-                                                              snapshot.data![
-                                                                  'friends_checked_in'],
-                                                              mediaQueryData,
-                                                            );
-                                                          },
-                                                          child: Column(
-                                                            children: [
-                                                              Row(
-                                                                children: [
-                                                                  Text(
-                                                                    'Venner - ${snapshot.data!['friends_checked_in'].length}',
-                                                                    style: const TextStyle(
-                                                                        fontSize:
-                                                                            14),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              Row(
-                                                                children: [
-                                                                  Text(
-                                                                    '${_friendsRating.toStringAsFixed(2)} ',
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                    ),
-                                                                  ),
-                                                                  createRatingBar(
-                                                                      rating:
-                                                                          _friendsRating,
-                                                                      size: 18,
-                                                                      color: const Color(
-                                                                          0xff01aed6)),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
                                               ],
                                             ),
                                           ),
@@ -620,43 +399,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                             fontSize: 14,
                                           ),
                                         ),
-                                      if (snapshot.hasData &&
-                                          (snapshot.data!['freshness'] !=
-                                                  null ||
-                                              snapshot.data!['bitterness'] !=
-                                                  null ||
-                                              snapshot.data!['sweetness'] !=
-                                                  null ||
-                                              snapshot.data!['fullness'] !=
-                                                  null))
+                                      if (details != null &&
+                                          (details.freshness != null ||
+                                              details.bitterness != null ||
+                                              details.sweetness != null ||
+                                              details.fullness != null))
                                         const Divider(
                                           height: 20,
                                         ),
-                                      if (snapshot.hasData &&
-                                          (snapshot.data!['freshness'] !=
-                                                  null ||
-                                              snapshot.data!['bitterness'] !=
-                                                  null ||
-                                              snapshot.data!['sweetness'] !=
-                                                  null ||
-                                              snapshot.data!['fullness'] !=
-                                                  null))
+                                      if (details != null &&
+                                          (details.freshness != null ||
+                                              details.bitterness != null ||
+                                              details.sweetness != null ||
+                                              details.fullness != null))
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceEvenly,
                                           children: [
-                                            if (snapshot.data!['freshness'] !=
-                                                null)
+                                            if (details.freshness != null)
                                               CircularPercentIndicator(
                                                 radius: 25.0,
                                                 lineWidth: 5.0,
                                                 animation: true,
-                                                percent: snapshot
-                                                        .data!['freshness']
+                                                percent: details.freshness!
                                                         .toDouble() /
                                                     12,
-                                                center: Text((snapshot.data![
-                                                                'freshness'] /
+                                                center: Text((details
+                                                                .freshness! /
                                                             12 *
                                                             100)
                                                         .toStringAsFixed(0) +
@@ -674,18 +443,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                   "Friskhet",
                                                 ),
                                               ),
-                                            if (snapshot.data!['fullness'] !=
-                                                null)
+                                            if (details.fullness != null)
                                               CircularPercentIndicator(
                                                 radius: 25.0,
                                                 lineWidth: 5.0,
                                                 animation: true,
-                                                percent: snapshot
-                                                        .data!['fullness']
+                                                percent: details.fullness!
                                                         .toDouble() /
                                                     12,
-                                                center: Text((snapshot.data![
-                                                                'fullness'] /
+                                                center: Text((details
+                                                                .fullness! /
                                                             12 *
                                                             100)
                                                         .toStringAsFixed(0) +
@@ -703,18 +470,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                   "Fylde",
                                                 ),
                                               ),
-                                            if (snapshot.data!['bitterness'] !=
-                                                null)
+                                            if (details.bitterness != null)
                                               CircularPercentIndicator(
                                                 radius: 25.0,
                                                 lineWidth: 5.0,
                                                 animation: true,
-                                                percent: snapshot
-                                                        .data!['bitterness']
+                                                percent: details.bitterness!
                                                         .toDouble() /
                                                     12,
-                                                center: Text((snapshot.data![
-                                                                'bitterness'] /
+                                                center: Text((details
+                                                                .bitterness! /
                                                             12 *
                                                             100)
                                                         .toStringAsFixed(0) +
@@ -732,20 +497,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                   "Bitterhet",
                                                 ),
                                               ),
-                                            if (snapshot.data!['sweetness'] !=
-                                                    null &&
-                                                snapshot.data!['sweetness'] !=
-                                                    0)
+                                            if (details.sweetness != null &&
+                                                details.sweetness != 0)
                                               CircularPercentIndicator(
                                                 radius: 25.0,
                                                 lineWidth: 5.0,
                                                 animation: true,
-                                                percent: snapshot
-                                                        .data!['sweetness']
+                                                percent: details.sweetness!
                                                         .toDouble() /
                                                     12,
-                                                center: Text((snapshot.data![
-                                                                'sweetness'] /
+                                                center: Text((details
+                                                                .sweetness! /
                                                             12 *
                                                             100)
                                                         .toStringAsFixed(0) +
@@ -785,47 +547,42 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                               Text('${product.volume} l'),
                                             ],
                                           ),
-                                          if (snapshot.hasData &&
-                                              snapshot.data!['acid'] != null)
+                                          if (details != null &&
+                                              details.acid != null)
                                             FadeIn(
                                               child: Column(
                                                 children: [
                                                   const Text('Syre'),
-                                                  Text(
-                                                      '${snapshot.data!['acid']} g/l'),
+                                                  Text('${details.acid} g/l'),
                                                 ],
                                               ),
                                             ),
-                                          if (snapshot.hasData &&
-                                              snapshot.data!['sugar'] != null)
+                                          if (details != null &&
+                                              details.sugar != null)
                                             FadeIn(
                                               child: Column(
                                                 children: [
                                                   const Text('Sukker'),
-                                                  Text(
-                                                      '${snapshot.data!['sugar']} g/l'),
+                                                  Text('${details.sugar} g/l'),
                                                 ],
                                               ),
                                             ),
-                                          if (snapshot.hasData &&
-                                              snapshot.data!['ibu'] != null &&
-                                              snapshot.data!['ibu'] != 0)
+                                          if (details != null &&
+                                              details.ibu != null &&
+                                              details.ibu != 0)
                                             FadeIn(
                                               child: Column(
                                                 children: [
                                                   const Text('IBU'),
                                                   Text(
-                                                    snapshot.data!['ibu']
-                                                        .toString(),
+                                                    details.ibu.toString(),
                                                   ),
                                                 ],
                                               ),
                                             ),
-                                          if (snapshot.hasData &&
-                                              snapshot.data!['alcohol_units'] !=
-                                                  null &&
-                                              snapshot.data!['alcohol_units'] !=
-                                                  0)
+                                          if (details != null &&
+                                              details.alcoholUnits != null &&
+                                              details.alcoholUnits != 0)
                                             FadeIn(
                                               child: Column(
                                                 children: [
@@ -833,8 +590,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                   Row(
                                                     children: [
                                                       Text(
-                                                        snapshot.data![
-                                                                'alcohol_units']
+                                                        details.alcoholUnits!
                                                             .toStringAsFixed(1),
                                                       ),
                                                     ],
@@ -866,9 +622,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['year'] != null &&
-                                      snapshot.data!['year'] != 0)
+                                  if (details != null &&
+                                      details.year != null &&
+                                      details.year != 0)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -878,20 +634,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['year'].toString(),
+                                              details.year.toString(),
                                             ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['year'] != null &&
-                                      snapshot.data!['year'] != 0)
+                                  if (details != null &&
+                                      details.year != null &&
+                                      details.year != 0)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['taste'] != null)
+                                  if (details != null && details.taste != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -901,21 +656,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['taste']
-                                                  .toString()
+                                              details.taste!
                                                   .replaceAll(".", ""),
                                             ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['taste'] != null)
+                                  if (details != null && details.taste != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['aroma'] != null)
+                                  if (details != null && details.aroma != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -925,21 +677,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['aroma']
-                                                  .toString()
+                                              details.aroma!
                                                   .replaceAll(".", ""),
                                             ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['aroma'] != null)
+                                  if (details != null && details.aroma != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['color'] != null)
+                                  if (details != null && details.color != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -949,21 +698,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['color']
-                                                  .toString()
+                                              details.color!
                                                   .replaceAll(".", ""),
                                             ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['color'] != null)
+                                  if (details != null && details.color != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['food_pairing'] != null)
+                                  if (details != null &&
+                                      details.foodPairing != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -973,21 +720,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['food_pairing']
-                                                  .toString()
+                                              details.foodPairing!
                                                   .replaceAll(".", ""),
                                             ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['food_pairing'] != null)
+                                  if (details != null &&
+                                      details.foodPairing != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['storable'] != null)
+                                  if (details != null &&
+                                      details.storable != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -997,7 +743,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['storable']
+                                              details.storable!
                                                   .toString()
                                                   .replaceAll(".", ""),
                                             ),
@@ -1005,13 +751,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['storable'] != null)
+                                  if (details != null &&
+                                      details.storable != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['raw_materials'] != null)
+                                  if (details != null &&
+                                      details.rawMaterials != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -1021,7 +767,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['raw_materials']
+                                              details.rawMaterials!
                                                   .toString()
                                                   .replaceAll(".", ""),
                                             ),
@@ -1029,13 +775,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['raw_materials'] != null)
+                                  if (details != null &&
+                                      details.rawMaterials != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['method'] != null)
+                                  if (details != null && details.method != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -1045,20 +790,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['method']
-                                                  .toString(),
+                                              details.method!.toString(),
                                             ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['method'] != null)
+                                  if (details != null && details.method != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['allergens'] != null)
+                                  if (details != null &&
+                                      details.allergens != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -1068,20 +811,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['allergens']
-                                                  .toString(),
+                                              details.allergens!.toString(),
                                             ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['allergens'] != null)
+                                  if (details != null &&
+                                      details.allergens != null)
                                     const Divider(
                                       height: 8,
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['brewery'] != null)
+                                  if (details != null &&
+                                      details.brewery != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -1091,14 +833,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot.data!['brewery'],
+                                              details.brewery!,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['brewery'] != null)
+                                  if (details != null &&
+                                      details.brewery != null)
                                     const Divider(
                                       height: 8,
                                     ),
@@ -1158,9 +900,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   const Divider(
                                     height: 8,
                                   ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['product_selection'] !=
-                                          null)
+                                  if (details != null &&
+                                      details.productSelection != null)
                                     FadeIn(
                                       child: Row(
                                         children: [
@@ -1170,8 +911,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              snapshot
-                                                  .data!['product_selection'],
+                                              details.productSelection!,
                                             ),
                                           ),
                                         ],
@@ -1220,9 +960,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                             .spaceBetween,
                                                     children: [
                                                       Text(_stockList[index]
-                                                          ['store_name']),
+                                                          .storeName),
                                                       Text(
-                                                        'På lager: ${_stockList[index]['quantity']}',
+                                                        'På lager: ${_stockList[index].quantity}',
                                                         overflow: TextOverflow
                                                             .ellipsis,
                                                       ),
@@ -1262,11 +1002,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['description'] != null)
-                                    Text(snapshot.data!['description']),
-                                  if (snapshot.hasData &&
-                                      snapshot.data!['description'] == '')
+                                  if (details != null &&
+                                      details.description != null)
+                                    Text(details.description!),
+                                  if (details != null &&
+                                      details.description == '')
                                     const Center(
                                       child: Text(
                                         'Mangler beskrivelse',

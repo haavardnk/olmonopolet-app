@@ -11,7 +11,7 @@ class DBHelper {
         return db.execute(
             'CREATE TABLE cart(id INT PRIMARY KEY,name TEXT,style TEXT,'
             'price REAL,volume REAL,pricePerVolume REAL,stock INT,rating REAL,checkins INT,'
-            'abv REAL,imageUrl TEXT,userRating REAL,userWishlisted INT,quantity INT,'
+            'abv REAL,imageUrl TEXT,quantity INT,'
             'vmpUrl TEXT,untappdUrl TEXT,untappdId INT,country STRING,countryCode STRING)');
       },
       onUpgrade: (db, oldVersion, newVersion) {

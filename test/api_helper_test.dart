@@ -4,7 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:beermonopoly/helpers/api_helper.dart';
+import 'package:beermonopoly/services/api.dart';
+import 'package:beermonopoly/utils/exceptions.dart';
 import 'package:beermonopoly/providers/filter.dart';
 import 'package:beermonopoly/models/stock_change.dart';
 import 'package:beermonopoly/models/product.dart';
@@ -24,74 +25,10 @@ void main() {
   });
 
   group(
-    "getDetailedProductInfo",
-    () {
-      test(
-        "raises GenericHttpException when not receiving status code 200",
-        () async {
-          when(() => mockClient.get(any(), headers: {})).thenAnswer(((_) async {
-            return http.Response('', 400);
-          }));
-
-          expect(
-            () => ApiHelper.getDetailedProductInfo(mockClient, 1, ''),
-            throwsA(
-              isA<GenericHttpException>(),
-            ),
-          );
-        },
-      );
-
-      test(
-        "raises NoConnectionException on SocketException",
-        () async {
-          when(() => mockClient.get(any(), headers: {})).thenAnswer(((_) async {
-            throw const SocketException('No connection');
-          }));
-
-          expect(
-            () => ApiHelper.getDetailedProductInfo(mockClient, 1, ''),
-            throwsA(
-              isA<NoConnectionException>(),
-            ),
-          );
-        },
-      );
-
-      test(
-        "get detailed info of product when not signed in",
-        () async {
-          when(() => mockClient.get(
-                Uri.parse(
-                  'https://api.example.com/',
-                ),
-              )).thenAnswer(((_) async {
-            return http.Response(
-              '{"count":1,"next":null,"previous":null,"results":[{"vmp_name":"Graff Niflheim Barrel Aged Stout","rating":4.13861}]}',
-              200,
-            );
-          }));
-
-          final detailedProductInfo = await ApiHelper.getDetailedProductInfo(
-              mockClient, 123, 'vmp_name,rating');
-
-          expect(
-            detailedProductInfo,
-            {
-              'vmp_name': 'Graff Niflheim Barrel Aged Stout',
-              'rating': 4.13861,
-            },
-          );
-        },
-      );
-    },
-  );
-
-  group(
     'checkStock',
     () {
       test(
-        "raises GenericHttpException when not receiving status code 200",
+        "raises ApiException when not receiving status code 200",
         () async {
           when(() => mockClient.get(any())).thenAnswer(((_) async {
             return http.Response('', 400);
@@ -100,14 +37,14 @@ void main() {
           expect(
             () => ApiHelper.checkStock(mockClient, '1,2,3', '110'),
             throwsA(
-              isA<GenericHttpException>(),
+              isA<ApiException>(),
             ),
           );
         },
       );
 
       test(
-        "raises NoConnectionException on SocketException",
+        "raises NetworkException on SocketException",
         () async {
           when(() => mockClient.get(any())).thenAnswer(((_) async {
             throw const SocketException('No connection');
@@ -116,7 +53,7 @@ void main() {
           expect(
             () => ApiHelper.checkStock(mockClient, '1,2,3', '110'),
             throwsA(
-              isA<NoConnectionException>(),
+              isA<NetworkException>(),
             ),
           );
         },
@@ -149,7 +86,7 @@ void main() {
     'getStockChangeList',
     () {
       test(
-        "raises GenericHttpException when not receiving status code 200",
+        "raises ApiException when not receiving status code 200",
         () async {
           when(() => mockClient.get(
                 any(),
@@ -160,14 +97,14 @@ void main() {
           expect(
             () => ApiHelper.getStockChangeList(mockClient, 1, 25, '121'),
             throwsA(
-              isA<GenericHttpException>(),
+              isA<ApiException>(),
             ),
           );
         },
       );
 
       test(
-        "raises NoConnectionException on SocketException",
+        "raises NetworkException on SocketException",
         () async {
           when(() => mockClient.get(
                 any(),
@@ -178,7 +115,7 @@ void main() {
           expect(
             () => ApiHelper.getStockChangeList(mockClient, 1, 25, '121'),
             throwsA(
-              isA<NoConnectionException>(),
+              isA<NetworkException>(),
             ),
           );
         },
@@ -240,7 +177,6 @@ void main() {
                   style: "IPA - Imperial / Double New England / Hazy",
                   price: 174.9,
                   volume: 0.473,
-                  userWishlisted: false,
                 ),
               )
             ],
@@ -254,7 +190,7 @@ void main() {
     'getProductList',
     () {
       test(
-        "raises GenericHttpException when not receiving status code 200",
+        "raises ApiException when not receiving status code 200",
         () async {
           when(() => mockClient.get(
                 any(),
@@ -265,14 +201,14 @@ void main() {
           expect(
             () => ApiHelper.getProductList(mockClient, 1, filter, 25),
             throwsA(
-              isA<GenericHttpException>(),
+              isA<ApiException>(),
             ),
           );
         },
       );
 
       test(
-        "raises NoConnectionException on SocketException",
+        "raises NetworkException on SocketException",
         () async {
           when(() => mockClient.get(
                 any(),
@@ -283,7 +219,7 @@ void main() {
           expect(
             () => ApiHelper.getProductList(mockClient, 1, filter, 25),
             throwsA(
-              isA<NoConnectionException>(),
+              isA<NetworkException>(),
             ),
           );
         },
@@ -358,8 +294,6 @@ void main() {
                     "https://www.vinmonopolet.no/Land/Norge/Vestfold-og-Telemark/Holmestrand/Marlobobo-Wildberry-Vanilla-Trail-2022/p/16655602",
                 untappdUrl:
                     "https://untappd.com/b/marlobobo-wildberry-vanilla-trail-2022/5575146",
-                userRating: null,
-                userWishlisted: false,
                 stock: null,
               ),
             ],
@@ -373,7 +307,7 @@ void main() {
     'getProductsData',
     () {
       test(
-        "raises GenericHttpException when not receiving status code 200",
+        "raises ApiException when not receiving status code 200",
         () async {
           when(() => mockClient.get(
                 any(),
@@ -384,14 +318,14 @@ void main() {
           expect(
             () => ApiHelper.getProductsData(mockClient, '1,2,3'),
             throwsA(
-              isA<GenericHttpException>(),
+              isA<ApiException>(),
             ),
           );
         },
       );
 
       test(
-        "raises NoConnectionException on SocketException",
+        "raises NetworkException on SocketException",
         () async {
           when(() => mockClient.get(
                 any(),
@@ -402,7 +336,7 @@ void main() {
           expect(
             () => ApiHelper.getProductsData(mockClient, '1,2,3'),
             throwsA(
-              isA<NoConnectionException>(),
+              isA<NetworkException>(),
             ),
           );
         },

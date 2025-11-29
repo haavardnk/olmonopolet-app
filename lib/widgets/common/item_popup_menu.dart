@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../helpers/app_launcher.dart';
+import '../../services/app_launcher.dart';
 import '../../models/product.dart';
 
 Future<String?> showPopupMenu(BuildContext context, bool wishlisted,
