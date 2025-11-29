@@ -198,9 +198,9 @@ class Filter with ChangeNotifier {
   void setSortBy(String index, [bool release = false]) {
     sortIndex = index;
     if (release) {
-      releaseSortBy = sortListAuth[index]!;
+      releaseSortBy = sortList[index]!;
     } else {
-      sortBy = sortListAuth[index]!;
+      sortBy = sortList[index]!;
     }
 
     notifyListeners();

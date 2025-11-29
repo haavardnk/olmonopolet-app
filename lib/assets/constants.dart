@@ -46,41 +46,8 @@ const Map<String, String> sortList = {
   'Pris per liter - Lav til høy': 'price_per_volume',
 };
 
-const Map<String, String> sortListAuth = {
-  'Alkohol - Høy til lav': '-abv',
-  'Alkohol - Lav til høy': 'abv',
-  'Bryggeri - Stigende': 'brewery',
-  'Bryggeri - Synkende': '-brewery',
-  'Dato lagt til - Nyeste først': '-created_at',
-  'Dato lagt til - Eldste først': 'created_at',
-  'Din rating - Høy til lav': '-checkin__rating',
-  'Din rating - Lav til høy': 'checkin__rating',
-  'Global rating - Høy til lav': '-rating',
-  'Global rating - Lav til høy': 'rating',
-  'Navn - A til Å': 'vmp_name',
-  'Navn - Å til A': '-vmp_name',
-  'Pris - Høy til lav': '-price',
-  'Pris - Lav til høy': 'price',
-  'Pris per liter - Høy til lav': '-price_per_volume',
-  'Pris per liter - Lav til høy': 'price_per_volume',
-};
-
 const List<String> cartSortList = [
   'Ingen sortering',
-  'Global rating - Høy til lav',
-  'Global rating - Lav til høy',
-  'Navn - A til Å',
-  'Navn - Å til A',
-  'Pris - Høy til lav',
-  'Pris - Lav til høy',
-  'Pris per liter - Høy til lav',
-  'Pris per liter - Lav til høy',
-];
-
-const List<String> cartSortListAuth = [
-  'Ingen sortering',
-  'Din rating - Høy til lav',
-  'Din rating - Lav til høy',
   'Global rating - Høy til lav',
   'Global rating - Lav til høy',
   'Navn - A til Å',
