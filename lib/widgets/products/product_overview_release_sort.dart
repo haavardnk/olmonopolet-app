@@ -7,7 +7,7 @@ import '../../assets/constants.dart';
 
 class ProductOverviewReleaseSort extends StatefulWidget {
   final Release release;
-  const ProductOverviewReleaseSort(this.release, {Key? key}) : super(key: key);
+  const ProductOverviewReleaseSort(this.release, {super.key});
 
   @override
   State<ProductOverviewReleaseSort> createState() => _ReleaseSortState();

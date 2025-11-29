@@ -8,7 +8,7 @@ import '../widgets/stock_change/stock_change_store_select.dart';
 import '../providers/filter.dart';
 
 class StockChangeTab extends StatefulWidget {
-  const StockChangeTab({Key? key}) : super(key: key);
+  const StockChangeTab({super.key});
 
   @override
   State<StockChangeTab> createState() => _StockChangeTabState();
@@ -18,7 +18,7 @@ class _StockChangeTabState extends State<StockChangeTab> {
   @override
   Widget build(BuildContext context) {
     late Filter filters = Provider.of<Filter>(context, listen: false);
-    final _openDropDownProgKey = GlobalKey<DropdownSearchState<String>>();
+    final openDropDownProgKey = GlobalKey<DropdownSearchState<String>>();
 
     return Scaffold(
       appBar: AppBar(
@@ -34,12 +34,12 @@ class _StockChangeTabState extends State<StockChangeTab> {
         ),
         actions: [
           StockChangeStoreSelect(
-            openDropDownProgKey: _openDropDownProgKey,
+            openDropDownProgKey: openDropDownProgKey,
             filters: filters,
           ),
           IconButton(
             onPressed: () {
-              _openDropDownProgKey.currentState?.openDropDownSearch();
+              openDropDownProgKey.currentState?.openDropDownSearch();
             },
             icon: const Icon(
               Icons.store,
@@ -58,7 +58,7 @@ class _StockChangeTabState extends State<StockChangeTab> {
                     label: const Text('Velg butikk'),
                     icon: const Icon(Icons.store),
                     onPressed: () {
-                      _openDropDownProgKey.currentState?.openDropDownSearch();
+                      openDropDownProgKey.currentState?.openDropDownSearch();
                     },
                   ),
                 );

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/filter.dart';
 
 class ProductOverviewSearchBar extends StatefulWidget {
-  const ProductOverviewSearchBar({Key? key}) : super(key: key);
+  const ProductOverviewSearchBar({super.key});
 
   @override
   State<ProductOverviewSearchBar> createState() => _SearchBarState();

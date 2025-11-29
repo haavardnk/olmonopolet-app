@@ -16,13 +16,13 @@ import './pagination_indicators/no_items_found_indicator.dart';
 class ProductList extends StatefulWidget {
   final Release? release;
 
-  const ProductList({Key? key, this.release}) : super(key: key);
+  const ProductList({super.key, this.release});
 
   @override
-  _ProductListViewState createState() => _ProductListViewState();
+  ProductListViewState createState() => ProductListViewState();
 }
 
-class _ProductListViewState extends State<ProductList> {
+class ProductListViewState extends State<ProductList> {
   int _pageSize = 14;
   late PagingController<int, Product> _pagingController;
   bool _listenerAdded = false;

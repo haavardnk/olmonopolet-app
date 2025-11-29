@@ -23,14 +23,13 @@ class CartElement extends StatefulWidget {
   final Cart cartData;
 
   const CartElement(this.index, this.boxImageSize, this.cartItem, this.cartData,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   @override
-  _CartElementState createState() => _CartElementState();
+  CartElementState createState() => CartElementState();
 }
 
-class _CartElementState extends State<CartElement> {
+class CartElementState extends State<CartElement> {
   bool _expanded = false;
   late bool wishlisted;
 

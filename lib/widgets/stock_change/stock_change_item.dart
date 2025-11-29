@@ -13,8 +13,7 @@ import '../common/item_popup_menu.dart';
 import '../../assets/constants.dart';
 
 class StockChangeItem extends StatefulWidget {
-  const StockChangeItem({required this.stockChange, this.lastDate, Key? key})
-      : super(key: key);
+  const StockChangeItem({required this.stockChange, this.lastDate, super.key});
 
   final StockChange stockChange;
   final DateTime? lastDate;

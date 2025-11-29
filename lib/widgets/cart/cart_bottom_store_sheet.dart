@@ -8,13 +8,13 @@ import '../../providers/filter.dart';
 import '../../assets/constants.dart';
 
 class CartBottomStoreSheet extends StatefulWidget {
-  const CartBottomStoreSheet({Key? key}) : super(key: key);
+  const CartBottomStoreSheet({super.key});
 
   @override
-  _BottomStoreSheetState createState() => _BottomStoreSheetState();
+  BottomStoreSheetState createState() => BottomStoreSheetState();
 }
 
-class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
+class BottomStoreSheetState extends State<CartBottomStoreSheet> {
   late List<String?> _sortList;
 
   Future<void> initCartSettings() async {

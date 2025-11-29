@@ -8,9 +8,9 @@ Widget createRatingBar(
     rating = 5;
   }
 
-  bool _absolute = false;
-  int _fullStar = 0;
-  int _emptyStar = 0;
+  bool absolute = false;
+  int fullStar = 0;
+  int emptyStar = 0;
 
   if (rating == 0 ||
       rating == 1 ||
@@ -18,30 +18,30 @@ Widget createRatingBar(
       rating == 3 ||
       rating == 4 ||
       rating == 5) {
-    _absolute = true;
+    absolute = true;
   } else {
-    double _dec = (rating - int.parse(rating.toString().substring(0, 1)));
-    if (_dec > 0 && _dec < 1) {
-      if (_dec >= 0.25 && _dec <= 0.75) {
-        _absolute = false;
+    double dec = (rating - int.parse(rating.toString().substring(0, 1)));
+    if (dec > 0 && dec < 1) {
+      if (dec >= 0.25 && dec <= 0.75) {
+        absolute = false;
       } else {
-        _absolute = true;
-        if (_dec < 0.25) {
-          _emptyStar = 1;
-        } else if (_dec > 0.75) {
-          _fullStar = 1;
+        absolute = true;
+        if (dec < 0.25) {
+          emptyStar = 1;
+        } else if (dec > 0.75) {
+          fullStar = 1;
         }
       }
     }
   }
   return Row(
     children: [
-      for (int i = 1; i <= rating + _fullStar; i++)
+      for (int i = 1; i <= rating + fullStar; i++)
         Icon(Icons.star, color: color, size: size),
-      !_absolute
+      !absolute
           ? Icon(Icons.star_half, color: color, size: size)
           : const SizedBox.shrink(),
-      for (int i = 1; i <= (5 - rating + _emptyStar); i++)
+      for (int i = 1; i <= (5 - rating + emptyStar); i++)
         Icon(Icons.star_border, color: color, size: size),
     ],
   );

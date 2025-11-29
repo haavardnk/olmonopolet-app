@@ -191,16 +191,6 @@ class ApiHelper {
       throw GenericHttpException();
     }
   }
-
-  static Future<void> updateFcmToken(http.Client http, String fcmToken) async {
-    try {
-      // Since this endpoint usually requires authentication, we do nothing
-      // as authentication is being removed from the app
-      return;
-    } on SocketException {
-      throw NoConnectionException();
-    }
-  }
 }
 
 Uri _apiProductUrlBuilder(
@@ -225,23 +215,23 @@ Uri _apiProductUrlBuilder(
       '&page=$page'
       '&page_size=$pageSize');
   if (filter.storeId.isNotEmpty) {
-    string = string + '&store=${filter.storeId}';
+    string = '$string&store=${filter.storeId}';
   }
   if (filter.checkIn == 1 || filter.sortBy.contains('checkin__rating')) {
-    string = string + '&user_checkin=True';
+    string = '$string&user_checkin=True';
   } else if (filter.checkIn == 2) {
-    string = string + '&user_checkin=False';
+    string = '$string&user_checkin=False';
   }
   if (filter.wishlisted == 1) {
-    string = string + '&user_wishlisted=True';
+    string = '$string&user_wishlisted=True';
   } else if (filter.wishlisted == 2) {
-    string = string + '&user_wishlisted=False';
+    string = '$string&user_wishlisted=False';
   }
   if (filter.deliverySelectedList[0] == true) {
-    string = string + '&store_delivery=True';
+    string = '$string&store_delivery=True';
   }
   if (filter.deliverySelectedList[1] == true) {
-    string = string + '&post_delivery=True';
+    string = '$string&post_delivery=True';
   }
 
   final url = Uri.parse(string);

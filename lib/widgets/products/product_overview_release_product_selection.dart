@@ -7,9 +7,9 @@ import '../../providers/filter.dart';
 
 class ProductOverviewReleaseProductSelection extends StatelessWidget {
   const ProductOverviewReleaseProductSelection({
-    Key? key,
+    super.key,
     required this.release,
-  }) : super(key: key);
+  });
 
   final Release? release;
 

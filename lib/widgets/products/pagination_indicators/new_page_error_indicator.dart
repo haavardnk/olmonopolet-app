@@ -3,9 +3,9 @@ import './footer_tile.dart';
 
 class NewPageErrorIndicator extends StatelessWidget {
   const NewPageErrorIndicator({
-    Key? key,
+    super.key,
     this.onTap,
-  }) : super(key: key);
+  });
   final VoidCallback? onTap;
 
   @override

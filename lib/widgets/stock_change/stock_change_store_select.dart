@@ -6,11 +6,10 @@ import '../../providers/filter.dart';
 
 class StockChangeStoreSelect extends StatelessWidget {
   const StockChangeStoreSelect({
-    Key? key,
+    super.key,
     required GlobalKey<DropdownSearchState<String>> openDropDownProgKey,
     required this.filters,
-  })  : _openDropDownProgKey = openDropDownProgKey,
-        super(key: key);
+  }) : _openDropDownProgKey = openDropDownProgKey;
 
   final GlobalKey<DropdownSearchState<String>> _openDropDownProgKey;
   final Filter filters;

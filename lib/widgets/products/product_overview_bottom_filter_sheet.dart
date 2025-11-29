@@ -6,14 +6,14 @@ import '../../providers/filter.dart';
 import '../../assets/constants.dart';
 
 class ProductOverviewBottomFilterSheet extends StatefulWidget {
-  const ProductOverviewBottomFilterSheet({Key? key}) : super(key: key);
+  const ProductOverviewBottomFilterSheet({super.key});
 
   @override
-  _ProductOverviewBottomFilterSheetState createState() =>
-      _ProductOverviewBottomFilterSheetState();
+  ProductOverviewBottomFilterSheetState createState() =>
+      ProductOverviewBottomFilterSheetState();
 }
 
-class _ProductOverviewBottomFilterSheetState
+class ProductOverviewBottomFilterSheetState
     extends State<ProductOverviewBottomFilterSheet> {
   // filter provider
   late Filter filters = Provider.of<Filter>(context, listen: false);
@@ -67,9 +67,9 @@ class _ProductOverviewBottomFilterSheetState
   }
 
   Widget _showPopup() {
-    final _mediaQueryData = MediaQuery.of(context);
+    final mediaQueryData = MediaQuery.of(context);
     return SizedBox(
-      height: _mediaQueryData.size.height * 0.60,
+      height: mediaQueryData.size.height * 0.60,
       child:
           StatefulBuilder(builder: (BuildContext context, StateSetter mystate) {
         return Column(
@@ -120,11 +120,11 @@ class _ProductOverviewBottomFilterSheetState
             ),
             Flexible(
               child: ListView(
-                padding: _mediaQueryData.size.width > 600 &&
-                        _mediaQueryData.orientation == Orientation.landscape
+                padding: mediaQueryData.size.width > 600 &&
+                        mediaQueryData.orientation == Orientation.landscape
                     ? EdgeInsets.symmetric(
                         vertical: 16,
-                        horizontal: _mediaQueryData.size.width * 0.15,
+                        horizontal: mediaQueryData.size.width * 0.15,
                       )
                     : const EdgeInsets.fromLTRB(16, 5, 16, 16),
                 children: <Widget>[
@@ -202,7 +202,7 @@ class _ProductOverviewBottomFilterSheetState
                                   return Text(
                                     filters.selectedStores.isNotEmpty
                                         ? filters.selectedStores
-                                            .reduce((a, b) => a + ', ' + b)
+                                            .reduce((a, b) => '$a, $b')
                                         : 'Alle butikker',
                                     style: const TextStyle(fontSize: 16),
                                   );
@@ -260,7 +260,7 @@ class _ProductOverviewBottomFilterSheetState
                           labels: RangeLabels(
                             _priceRange.start.round().toString(),
                             _priceRange.end == 500
-                                ? _priceRange.end.round().toString() + ' +'
+                                ? '${_priceRange.end.round()} +'
                                 : _priceRange.end.round().toString(),
                           ),
                           onChanged: (RangeValues values) {
@@ -280,8 +280,7 @@ class _ProductOverviewBottomFilterSheetState
                           labels: RangeLabels(
                             _pricePerVolumeRange.start.round().toString(),
                             _pricePerVolumeRange.end == 1000
-                                ? _pricePerVolumeRange.end.round().toString() +
-                                    ' +'
+                                ? '${_pricePerVolumeRange.end.round()} +'
                                 : _pricePerVolumeRange.end.round().toString(),
                           ),
                           onChanged: (RangeValues values) {
@@ -595,9 +594,8 @@ class _ProductOverviewBottomFilterSheetState
                       ),
                       dropdownBuilder: (context, selectedItems) {
                         return Text(
-                          filters.selectedCountries.isNotEmpty
-                              ? filters.selectedCountries
-                                  .reduce((a, b) => a + ', ' + b)
+                          selectedItems.isNotEmpty
+                              ? selectedItems.map((c) => c.name).join(', ')
                               : 'Alle land',
                           style: const TextStyle(fontSize: 16),
                         );
@@ -638,7 +636,7 @@ class _ProductOverviewBottomFilterSheetState
                     labels: RangeLabels(
                       _alcoholRange.start.round().toString(),
                       _alcoholRange.end == 15
-                          ? _alcoholRange.end.round().toString() + ' +'
+                          ? '${_alcoholRange.end.round()} +'
                           : _alcoholRange.end.round().toString(),
                     ),
                     onChanged: (RangeValues values) {

@@ -11,7 +11,7 @@ import '../providers/filter.dart';
 import '../providers/cart.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
   static const routeName = '/tabs';
 
   @override
@@ -22,10 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final PersistentTabController _controller = PersistentTabController();
 
   Future<void> setupInteractedMessage(
-      PersistentTabController _controller) async {
-    void _handleMessage(RemoteMessage message) {
+      PersistentTabController controller) async {
+    void handleMessage(RemoteMessage message) {
       if (message.data['route'] == '/releases') {
-        _controller.jumpToTab(1);
+        controller.jumpToTab(1);
       }
     }
 
@@ -33,10 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
         await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
-      _handleMessage(initialMessage);
+      handleMessage(initialMessage);
     }
 
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
   }
 
   @override
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
       filters.getReleases();
     }
 
-    List<PersistentTabConfig> _tabs = [
+    List<PersistentTabConfig> tabs = [
       PersistentTabConfig(
         screen: const ProductOverviewTab(),
         item: ItemConfig(
@@ -97,8 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Consumer<Cart>(
             builder: (_, cart, __) => Badge(
               label: Text(cart.itemCount.toString()),
-              child: const Icon(Icons.receipt_long),
               isLabelVisible: cart.itemCount > 0,
+              child: const Icon(Icons.receipt_long),
             ),
           ),
           activeForegroundColor:
@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return PersistentTabView(
       controller: _controller,
-      tabs: _tabs,
+      tabs: tabs,
       resizeToAvoidBottomInset: true,
       avoidBottomPadding: true,
       navBarOverlap: const NavBarOverlap.none(),

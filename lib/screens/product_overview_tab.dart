@@ -15,11 +15,11 @@ import '../models/release.dart';
 class ProductOverviewTab extends StatelessWidget {
   final Release? release;
 
-  const ProductOverviewTab({Key? key, this.release}) : super(key: key);
+  const ProductOverviewTab({super.key, this.release});
 
   @override
   Widget build(BuildContext context) {
-    var _currentIndex = 0;
+    var currentIndex = 0;
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
@@ -29,30 +29,31 @@ class ProductOverviewTab extends StatelessWidget {
                 fit: BoxFit.contain,
                 child: Text(
                   release!.releaseDate != null
-                      ? toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO').format(release!.releaseDate!))
+                      ? toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO')
+                          .format(release!.releaseDate!))
                       : release!.name,
                 ),
               )
             : Consumer<Filter>(
                 builder: (context, filter, _) => FadeIn(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeIn,
                   child: FittedBox(
                     fit: BoxFit.contain,
                     child: Text(
-                      _currentIndex == 0
+                      currentIndex == 0
                           ? filter.selectedStores.isEmpty
                               ? 'Alle Butikker'
                               : filter.selectedStores.length == 1
                                   ? filter.selectedStores[0]
                                   : 'Valgte butikker: ${filter.selectedStores.length}'
-                          : _currentIndex == 1
+                          : currentIndex == 1
                               ? 'Nyhetslanseringer'
-                              : _currentIndex == 2
+                              : currentIndex == 2
                                   ? 'Velg Butikk'
                                   : 'Handleliste',
                     ),
                   ),
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeIn,
                 ),
               ),
         actions: [
@@ -62,14 +63,14 @@ class ProductOverviewTab extends StatelessWidget {
         ],
         bottom: release == null
             ? const PreferredSize(
-                child: ProductOverviewSearchBar(),
                 preferredSize: Size.fromHeight(kToolbarHeight),
+                child: ProductOverviewSearchBar(),
               )
             : (release != null && release!.productSelections.length > 1)
                 ? PreferredSize(
+                    preferredSize: const Size.fromHeight(kToolbarHeight),
                     child: ProductOverviewReleaseProductSelection(
                         release: release),
-                    preferredSize: const Size.fromHeight(kToolbarHeight),
                   )
                 : null,
       ),

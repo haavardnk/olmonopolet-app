@@ -4,8 +4,8 @@ import './first_page_exception_indicator.dart';
 
 class NoItemsFoundIndicator extends StatelessWidget {
   const NoItemsFoundIndicator({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => const FirstPageExceptionIndicator(

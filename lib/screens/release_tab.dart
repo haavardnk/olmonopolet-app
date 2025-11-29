@@ -10,7 +10,7 @@ import '../screens/product_overview_tab.dart';
 import '../models/release.dart';
 
 class ReleaseTab extends StatefulWidget {
-  const ReleaseTab({Key? key}) : super(key: key);
+  const ReleaseTab({super.key});
 
   @override
   State<ReleaseTab> createState() => _ReleaseTabState();
@@ -28,7 +28,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
     late Filter filters = Provider.of<Filter>(context, listen: false);
     List<int> years = [];
 
-    void _getReleaseYears() {
+    void getReleaseYears() {
       for (var release in filters.releaseList) {
         if (years.contains(release.releaseDate!.year)) {
           continue;
@@ -37,7 +37,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
       }
     }
 
-    String _createProductSelectionText(List<String> productSelections) {
+    String createProductSelectionText(List<String> productSelections) {
       String productSelectionText = "";
       productSelections
           .removeWhere((element) => element == "Spesialbestilling");
@@ -46,19 +46,19 @@ class _ReleaseTabState extends State<ReleaseTab> {
         productSelectionText = productSelections[0];
       } else {
         for (var element in productSelections) {
-            if (productSelections.indexOf(element) ==
-                productSelections.length - 1) {
-              productSelectionText += element;
+          if (productSelections.indexOf(element) ==
+              productSelections.length - 1) {
+            productSelectionText += element;
+          } else {
+            productSelectionText += "${element.split('utvalget')[0]}-";
+            if (productSelections.indexOf(element) <
+                productSelections.length - 2) {
+              productSelectionText += ", ";
             } else {
-              productSelectionText += "${element.split('utvalget')[0]}-";
-              if (productSelections.indexOf(element) <
-                  productSelections.length - 2) {
-                productSelectionText += ", ";
-              } else {
-                productSelectionText += " og ";
-              }
+              productSelectionText += " og ";
             }
           }
+        }
       }
       return productSelectionText;
     }
@@ -79,15 +79,15 @@ class _ReleaseTabState extends State<ReleaseTab> {
         onRefresh: filters.getReleases,
         child: Consumer<Filter>(
           builder: (context, _, __) {
-            _getReleaseYears();
+            getReleaseYears();
             return ListView(
               children: [
                 for (int year in years)
                   ExpansionTile(
                     title: Text(
                       year.toString(),
-                      style:
-                          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     initiallyExpanded: year == years[0] ? true : false,
                     shape: const Border(),
@@ -141,7 +141,9 @@ class _ReleaseTabState extends State<ReleaseTab> {
                                 },
                                 title: Text(
                                   release.releaseDate != null
-                                      ? toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO').format(release.releaseDate!))
+                                      ? toBeginningOfSentenceCase(
+                                          DateFormat.yMMMMEEEEd('nb_NO')
+                                              .format(release.releaseDate!))
                                       : release.name,
                                   style: const TextStyle(
                                     fontSize: 15,
@@ -156,7 +158,7 @@ class _ReleaseTabState extends State<ReleaseTab> {
                                       Padding(
                                         padding: const EdgeInsets.only(top: 5),
                                         child: Text(
-                                          _createProductSelectionText(
+                                          createProductSelectionText(
                                               release.productSelections),
                                           style: const TextStyle(
                                             fontSize: 14,

@@ -4,8 +4,8 @@ import './first_page_exception_indicator.dart';
 class FirstPageErrorIndicator extends StatelessWidget {
   const FirstPageErrorIndicator({
     this.onTryAgain,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final VoidCallback? onTryAgain;
 

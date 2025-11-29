@@ -7,16 +7,16 @@ import '../widgets/cart/cart_bottom_store_sheet.dart';
 import '../widgets/drawer/app_drawer.dart';
 
 class CartTab extends StatelessWidget {
-  const CartTab({Key? key}) : super(key: key);
+  const CartTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData _mediaQueryData = MediaQuery.of(context);
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
     final cartData = Provider.of<Cart>(context);
-    final _tabletMode = _mediaQueryData.size.width >= 600 ? true : false;
-    final double _boxImageSize = _tabletMode
-        ? 100 + _mediaQueryData.textScaleFactor * 10
-        : _mediaQueryData.size.shortestSide / 4;
+    final tabletMode = mediaQueryData.size.width >= 600 ? true : false;
+    final double boxImageSize = tabletMode
+        ? 100 + mediaQueryData.textScaleFactor * 10
+        : mediaQueryData.size.shortestSide / 4;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +54,7 @@ class CartTab extends StatelessWidget {
                                     ),
                                   CartElement(
                                     index,
-                                    _boxImageSize,
+                                    boxImageSize,
                                     cartData.items.values.elementAt(index),
                                     cartData,
                                   ),

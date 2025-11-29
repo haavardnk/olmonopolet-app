@@ -13,13 +13,13 @@ import '../products/pagination_indicators/new_page_error_indicator.dart';
 import '../products/pagination_indicators/no_items_found_indicator.dart';
 
 class StockChangeList extends StatefulWidget {
-  const StockChangeList({Key? key}) : super(key: key);
+  const StockChangeList({super.key});
 
   @override
-  _StockChangeListViewState createState() => _StockChangeListViewState();
+  StockChangeListViewState createState() => StockChangeListViewState();
 }
 
-class _StockChangeListViewState extends State<StockChangeList> {
+class StockChangeListViewState extends State<StockChangeList> {
   int _pageSize = 14;
   late DateTime lastDate;
   late PagingController<int, StockChange> _pagingController;

@@ -18,7 +18,7 @@ import '../widgets/common/rating_widget.dart';
 import '../../assets/constants.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({Key? key}) : super(key: key);
+  const ProductDetailScreen({super.key});
   static const routeName = '/product-detail';
   static final GlobalKey<FormState> _formKey = GlobalKey();
 
@@ -54,10 +54,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final client = Provider.of<HttpClient>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
     const countries = countryList;
-    final _mediaQueryData = MediaQuery.of(context);
-    final _tabletMode = _mediaQueryData.size.width >= 600 ? true : false;
-    final _boxImageSize =
-        _mediaQueryData.size.shortestSide * (_tabletMode ? 0.4 : 0.75);
+    final mediaQueryData = MediaQuery.of(context);
+    final tabletMode = mediaQueryData.size.width >= 600 ? true : false;
+    final boxImageSize =
+        mediaQueryData.size.shortestSide * (tabletMode ? 0.4 : 0.75);
     const fields =
         'label_hd_url,ibu,description,brewery,product_selection,all_stock,'
         'year,color,aroma,taste,storable,food_pairing,raw_materials,fullness,'
@@ -218,10 +218,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               Expanded(
                 child: ListView(
-                  padding: _tabletMode &&
-                          _mediaQueryData.orientation == Orientation.landscape
+                  padding: tabletMode &&
+                          mediaQueryData.orientation == Orientation.landscape
                       ? EdgeInsets.symmetric(
-                          horizontal: _mediaQueryData.size.width * 0.15)
+                          horizontal: mediaQueryData.size.width * 0.15)
                       : null,
                   children: [
                     Container(
@@ -242,8 +242,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 badgePosition: BadgePosition.topStart,
                               )
                             : null,
-                        height: _boxImageSize,
-                        width: _boxImageSize,
+                        height: boxImageSize,
+                        width: boxImageSize,
                         child: snapshot.hasData &&
                                 snapshot.data!['label_hd_url'] != null &&
                                 snapshot.data!['label_hd_url'].isNotEmpty
@@ -353,7 +353,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                             child: Column(
                                               children: [
                                                 Row(
-                                                  mainAxisAlignment: _tabletMode
+                                                  mainAxisAlignment: tabletMode
                                                       ? MainAxisAlignment
                                                           .spaceEvenly
                                                       : MainAxisAlignment
@@ -510,7 +510,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                 if (_numRatings > 1)
                                                   Row(
                                                     mainAxisAlignment:
-                                                        _tabletMode
+                                                        tabletMode
                                                             ? MainAxisAlignment
                                                                 .spaceEvenly
                                                             : MainAxisAlignment
@@ -569,7 +569,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                             friendsCheckins(
                                                               snapshot.data![
                                                                   'friends_checked_in'],
-                                                              _mediaQueryData,
+                                                              mediaQueryData,
                                                             );
                                                           },
                                                           child: Column(
@@ -875,8 +875,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Årgang'),
                                             width: 115,
+                                            child: Text('Årgang'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -898,8 +898,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Smak'),
                                             width: 115,
+                                            child: Text('Smak'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -922,8 +922,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Lukt'),
                                             width: 115,
+                                            child: Text('Lukt'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -946,8 +946,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Farge'),
                                             width: 115,
+                                            child: Text('Farge'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -970,8 +970,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Passer til'),
                                             width: 115,
+                                            child: Text('Passer til'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -994,8 +994,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Lagring'),
                                             width: 115,
+                                            child: Text('Lagring'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -1018,8 +1018,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Råstoff'),
                                             width: 115,
+                                            child: Text('Råstoff'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -1042,8 +1042,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Metode'),
                                             width: 115,
+                                            child: Text('Metode'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -1065,8 +1065,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Allergen'),
                                             width: 115,
+                                            child: Text('Allergen'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -1088,8 +1088,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Bryggeri'),
                                             width: 115,
+                                            child: Text('Bryggeri'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -1109,8 +1109,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Land'),
                                             width: 115,
+                                            child: Text('Land'),
                                           ),
                                           Flexible(
                                             child: Row(
@@ -1150,8 +1150,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   Row(
                                     children: [
                                       const SizedBox(
-                                        child: Text('Varenummer'),
                                         width: 115,
+                                        child: Text('Varenummer'),
                                       ),
                                       Flexible(
                                         child: Text(
@@ -1170,8 +1170,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       child: Row(
                                         children: [
                                           const SizedBox(
-                                            child: Text('Utvalg'),
                                             width: 115,
+                                            child: Text('Utvalg'),
                                           ),
                                           Flexible(
                                             child: Text(
@@ -1298,7 +1298,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _showWrongUntappdMatchPopup(
       BuildContext context, client, int productId) {
-    final _urlController = TextEditingController();
+    final urlController = TextEditingController();
 
     Future<void> showDialogMessage(String title, String message) async {
       Widget continueButton = FilledButton.tonal(
@@ -1337,14 +1337,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
     }
 
-    void _submit() async {
+    void submit() async {
       if (!ProductDetailScreen._formKey.currentState!.validate()) {
         return;
       }
-      if (_urlController.text.isEmpty) {
+      if (urlController.text.isEmpty) {
         return;
       }
-      final untappdUrl = _urlController.text;
+      final untappdUrl = urlController.text;
       try {
         await ApiHelper.submitUntappdMatch(client, productId, untappdUrl);
         await showDialogMessage('Takk for hjelpen!',
@@ -1389,7 +1389,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   TextFormField(
                     autocorrect: false,
                     autofocus: true,
-                    controller: _urlController,
+                    controller: urlController,
                     keyboardType: TextInputType.url,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -1413,7 +1413,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   FilledButton.tonalIcon(
                     onPressed: () {
-                      _submit();
+                      submit();
                     },
                     label: const Text('Send inn'),
                     icon: const Icon(Icons.send),
@@ -1428,7 +1428,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _showFriendsCheckinsPopup(BuildContext context, List<dynamic> checkins,
-      MediaQueryData _mediaQueryData) {
+      MediaQueryData mediaQueryData) {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.4,
       child: Column(
@@ -1446,8 +1446,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            height: _mediaQueryData.size.height * 0.4 - 28,
-            width: _mediaQueryData.size.width,
+            height: mediaQueryData.size.height * 0.4 - 28,
+            width: mediaQueryData.size.width,
             child: ListView.builder(
                 itemCount: checkins.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -1524,7 +1524,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  friendsCheckins(List<dynamic> checkins, MediaQueryData _mediaQueryData) {
+  friendsCheckins(List<dynamic> checkins, MediaQueryData mediaQueryData) {
     showModalBottomSheet<void>(
       isScrollControlled: true,
       context: context,
@@ -1533,7 +1533,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             topLeft: Radius.circular(24), topRight: Radius.circular(24)),
       ),
       builder: (BuildContext context) {
-        return _showFriendsCheckinsPopup(context, checkins, _mediaQueryData);
+        return _showFriendsCheckinsPopup(context, checkins, mediaQueryData);
       },
     );
   }

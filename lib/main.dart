@@ -15,7 +15,6 @@ import './screens/about_screen.dart';
 import './providers/filter.dart';
 import './providers/cart.dart';
 import './providers/http_client.dart';
-import './helpers/api_helper.dart';
 import './assets/color_schemes.g.dart';
 
 @pragma('vm:entry-point')
@@ -26,7 +25,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Load .env file - will throw an exception if not found
   await dotenv.load(fileName: '.env');
 
   await Firebase.initializeApp();
@@ -65,7 +63,7 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -88,13 +86,6 @@ class _MyAppState extends State<MyApp> {
       sound: true,
     );
     print('User granted permission: ${settings.authorizationStatus}');
-  }
-
-  Future<void> sendFcmToken(client) async {
-    var fcmToken = await FirebaseMessaging.instance.getToken();
-    if (fcmToken!.isNotEmpty) {
-      ApiHelper.updateFcmToken(client, fcmToken);
-    }
   }
 
   @override

@@ -443,18 +443,6 @@ const List<Map<String, String>> excludeAllergensList = [
   {'Sulfitt': 'sulfitt'},
 ];
 
-const List<String> checkinList = [
-  'Alle',
-  'Innsjekket',
-  'Ikke innsjekket',
-];
-
-const List<String> wishlistList = [
-  'Alle',
-  'I ønskeliste',
-  'Ikke i ønskeliste',
-];
-
 const List<String> styleChoiceList = [
   'Ølmonopolet',
   'Untappd',

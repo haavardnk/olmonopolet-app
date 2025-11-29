@@ -15,8 +15,7 @@ import '../common/item_popup_menu.dart';
 import '../../assets/constants.dart';
 
 class ProductItem extends StatefulWidget {
-  const ProductItem({required this.product, Key? key, this.release})
-      : super(key: key);
+  const ProductItem({required this.product, super.key, this.release});
 
   final Product product;
   final Release? release;
@@ -35,13 +34,13 @@ class _ProductItemState extends State<ProductItem> {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData _mediaQueryData = MediaQuery.of(context);
-    final _tabletMode = _mediaQueryData.size.shortestSide >= 600 ? true : false;
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
+    final tabletMode = mediaQueryData.size.shortestSide >= 600 ? true : false;
     final cart = Provider.of<Cart>(context, listen: false);
     const countries = countryList;
-    final double _boxImageSize = _tabletMode
-        ? 100 + _mediaQueryData.textScaleFactor * 10
-        : _mediaQueryData.size.shortestSide / 4;
+    final double boxImageSize = tabletMode
+        ? 100 + mediaQueryData.textScaleFactor * 10
+        : mediaQueryData.size.shortestSide / 4;
     final heroTag = widget.release != null
         ? 'release${widget.product.id}'
         : 'products${widget.product.id}';
@@ -119,18 +118,18 @@ class _ProductItemState extends State<ProductItem> {
                                         widget.product.imageUrl!.isNotEmpty
                                     ? FancyShimmerImage(
                                         imageUrl: widget.product.imageUrl!,
-                                        height: _boxImageSize,
-                                        width: _boxImageSize,
+                                        height: boxImageSize,
+                                        width: boxImageSize,
                                         errorWidget: Image.asset(
                                           'assets/images/placeholder.png',
-                                          height: _boxImageSize,
-                                          width: _boxImageSize,
+                                          height: boxImageSize,
+                                          width: boxImageSize,
                                         ),
                                       )
                                     : Image.asset(
                                         'assets/images/placeholder.png',
-                                        height: _boxImageSize,
-                                        width: _boxImageSize,
+                                        height: boxImageSize,
+                                        width: boxImageSize,
                                       ),
                               ),
                               if (widget.product.country != null &&
@@ -329,8 +328,8 @@ class _ProductItemState extends State<ProductItem> {
               ),
             ),
             Positioned(
-              bottom: _tabletMode ? null : 10,
-              top: !_tabletMode ? null : _boxImageSize + 11 - 35,
+              bottom: tabletMode ? null : 10,
+              top: !tabletMode ? null : boxImageSize + 11 - 35,
               right: 12,
               child: Semantics(
                 button: true,

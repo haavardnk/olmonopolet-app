@@ -23,11 +23,11 @@ class HttpClient with ChangeNotifier {
   final _apiClient = httpClient();
   final _untappdClient = httpClient();
 
-  get apiClient {
+  Client get apiClient {
     return _apiClient;
   }
 
-  get untappdClient {
+  Client get untappdClient {
     return _untappdClient;
   }
 
