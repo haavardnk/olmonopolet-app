@@ -48,7 +48,9 @@ class StockChangeListViewState extends State<StockChangeList> {
   }
 
   void _onFilterChanged() {
-    _pagingController.refresh();
+    if (mounted) {
+      _pagingController.refresh();
+    }
   }
 
   Future<List<StockChange>> _fetchPage(int pageKey) async {
