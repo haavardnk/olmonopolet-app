@@ -15,7 +15,6 @@ import '../helpers/api_helper.dart';
 import '../helpers/app_launcher.dart';
 import '../models/product.dart';
 import '../widgets/common/rating_widget.dart';
-import '../../assets/constants.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key});
@@ -53,7 +52,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
-    const countries = countryList;
     final mediaQueryData = MediaQuery.of(context);
     final tabletMode = mediaQueryData.size.width >= 600 ? true : false;
     final boxImageSize =
@@ -1118,11 +1116,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                 Text(
                                                   product.country!,
                                                 ),
-                                                if (product.country != null &&
-                                                    countries[
-                                                            product.country] !=
+                                                if (product.countryCode !=
                                                         null &&
-                                                    countries[product.country]!
+                                                    product.countryCode!
                                                         .isNotEmpty)
                                                   Row(
                                                     children: [
@@ -1130,8 +1126,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                         width: 3,
                                                       ),
                                                       Flag.fromString(
-                                                        countries[
-                                                            product.country!]!,
+                                                        product.countryCode!,
                                                         height: 12,
                                                         width: 12 * 4 / 3,
                                                       ),

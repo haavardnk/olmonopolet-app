@@ -7,6 +7,7 @@ import '../models/product.dart';
 import '../models/store.dart';
 import '../models/release.dart';
 import '../models/stock_change.dart';
+import '../models/country.dart';
 import '../providers/filter.dart';
 import '../utils/environment.dart';
 
@@ -77,7 +78,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,vmp_url,'
-        'untpd_url,untpd_id,country,product_selection';
+        'untpd_url,untpd_id,country,country_code,product_selection';
     try {
       final response = await http.get(
         release == null
@@ -107,7 +108,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,'
-        'vmp_url,untpd_url,untpd_id,country';
+        'vmp_url,untpd_url,untpd_id,country,country_code';
     final url = Uri.parse(
         '${Environment.apiBaseUrl}beers/?beers=$productIds&fields=$fields');
     try {
@@ -166,6 +167,26 @@ class ApiHelper {
           ),
         );
         return stores;
+      } else {
+        throw GenericHttpException();
+      }
+    } on SocketException {
+      throw NoConnectionException();
+    }
+  }
+
+  static Future<List<Country>> getActiveCountries(http.Client http) async {
+    final url = Uri.parse('${Environment.apiBaseUrl}countries/active/');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        List<Country> countries = List<Country>.from(
+          jsonResponse.map(
+            (country) => Country.fromJson(country),
+          ),
+        );
+        return countries;
       } else {
         throw GenericHttpException();
       }

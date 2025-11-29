@@ -10,7 +10,6 @@ import '../../models/stock_change.dart';
 import '../../screens/product_detail_screen.dart';
 import '../common/rating_widget.dart';
 import '../common/item_popup_menu.dart';
-import '../../assets/constants.dart';
 
 class StockChangeItem extends StatefulWidget {
   const StockChangeItem({required this.stockChange, this.lastDate, super.key});
@@ -36,7 +35,6 @@ class _StockChangeItemState extends State<StockChangeItem> {
   Widget build(BuildContext context) {
     final MediaQueryData _mediaQueryData = MediaQuery.of(context);
     final _tabletMode = _mediaQueryData.size.shortestSide >= 600 ? true : false;
-    const countries = countryList;
     final double _boxImageSize = _tabletMode
         ? 60 + _mediaQueryData.textScaleFactor * 10
         : _mediaQueryData.size.shortestSide / 5.9;
@@ -148,18 +146,15 @@ class _StockChangeItemState extends State<StockChangeItem> {
                                         width: _boxImageSize,
                                       ),
                               ),
-                              if (widget.stockChange.product.country != null &&
-                                  countries[
-                                          widget.stockChange.product.country] !=
+                              if (widget.stockChange.product.countryCode !=
                                       null &&
-                                  countries[widget.stockChange.product.country]!
+                                  widget.stockChange.product.countryCode!
                                       .isNotEmpty)
                                 ClipRRect(
                                   borderRadius: const BorderRadius.only(
                                       bottomRight: Radius.circular(6)),
                                   child: Flag.fromString(
-                                    countries[
-                                        widget.stockChange.product.country!]!,
+                                    widget.stockChange.product.countryCode!,
                                     height: 20,
                                     width: 20 * 4 / 3,
                                   ),

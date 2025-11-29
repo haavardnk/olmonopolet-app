@@ -12,7 +12,7 @@ class DBHelper {
             'CREATE TABLE cart(id INT PRIMARY KEY,name TEXT,style TEXT,'
             'price REAL,volume REAL,pricePerVolume REAL,stock INT,rating REAL,checkins INT,'
             'abv REAL,imageUrl TEXT,userRating REAL,userWishlisted INT,quantity INT,'
-            'vmpUrl TEXT,untappdUrl TEXT,untappdId INT, country STRING)');
+            'vmpUrl TEXT,untappdUrl TEXT,untappdId INT,country STRING,countryCode STRING)');
       },
       onUpgrade: (db, oldVersion, newVersion) {
         if (oldVersion == 1) {
@@ -23,8 +23,11 @@ class DBHelper {
         if (oldVersion == 2) {
           db.execute("ALTER TABLE cart ADD COLUMN country STRING;");
         }
+        if (oldVersion == 3) {
+          db.execute("ALTER TABLE cart ADD COLUMN countryCode STRING;");
+        }
       },
-      version: 3,
+      version: 4,
     );
   }
 

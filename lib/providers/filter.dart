@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/store.dart';
 import '../models/release.dart';
+import '../models/country.dart';
 import '../helpers/api_helper.dart';
 import '../helpers/location_helper.dart';
 import '../assets/constants.dart';
@@ -42,6 +43,7 @@ class Filter with ChangeNotifier {
   List<String> selectedStores = [];
   List<Store> storeList = [];
   List<Release> releaseList = [];
+  List<Country> countryList = [];
   String stockChangeSelectedStore = '';
 
   List<bool> productSelectionSelectedList = List<bool>.filled(5, false);
@@ -114,6 +116,25 @@ class Filter with ChangeNotifier {
       releasesLoading = false;
       notifyListeners();
       return releaseList;
+    }
+  }
+
+  bool countriesLoading = false;
+  Future<List<Country>> getCountries() async {
+    if (countryList.isNotEmpty && !countriesLoading) {
+      return countryList;
+    }
+    try {
+      countriesLoading = true;
+      var countries = await ApiHelper.getActiveCountries(_client);
+      countryList = countries;
+      countriesLoading = false;
+      notifyListeners();
+      return countryList;
+    } catch (error) {
+      countriesLoading = false;
+      notifyListeners();
+      return countryList;
     }
   }
 

@@ -132,6 +132,7 @@ class Cart with ChangeNotifier {
           'untappdUrl': _items[productId]!.product.untappdUrl,
           'untappdId': _items[productId]!.product.untappdId,
           'country': _items[productId]!.product.country,
+          'countryCode': _items[productId]!.product.countryCode,
           'quantity': _items[productId]!.quantity,
         },
       );
@@ -165,6 +166,7 @@ class Cart with ChangeNotifier {
               untappdUrl: item['untappdUrl'],
               untappdId: item['untappdId'],
               country: item['country'],
+              countryCode: item['countryCode'],
             ),
             quantity: item['quantity'],
           ),
@@ -212,7 +214,8 @@ class Cart with ChangeNotifier {
               vmpUrl: product.vmpUrl,
               untappdUrl: product.untappdUrl,
               untappdId: product.untappdId,
-              country: product.country),
+              country: product.country,
+              countryCode: product.countryCode),
           quantity: _items[product.id]!.quantity,
           inStock: _items[product.id]!.inStock,
         );

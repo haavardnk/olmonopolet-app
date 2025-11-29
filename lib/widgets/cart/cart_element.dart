@@ -13,7 +13,6 @@ import '../../providers/http_client.dart';
 import '../../helpers/api_helper.dart';
 import '../common/rating_widget.dart';
 import '../common/item_popup_menu.dart';
-import '../../assets/constants.dart';
 import '../../screens/product_detail_screen.dart';
 
 class CartElement extends StatefulWidget {
@@ -196,22 +195,18 @@ class CartElementState extends State<CartElement> {
                                                   ),
                                           ),
                                           if (widget.cartItem.product
-                                                      .country !=
+                                                      .countryCode !=
                                                   null &&
-                                              countryList[widget.cartItem
-                                                      .product.country] !=
-                                                  null &&
-                                              countryList[widget.cartItem
-                                                      .product.country]!
-                                                  .isNotEmpty)
+                                              widget.cartItem.product
+                                                  .countryCode!.isNotEmpty)
                                             ClipRRect(
                                               borderRadius:
                                                   const BorderRadius.only(
                                                       bottomRight:
                                                           Radius.circular(6)),
                                               child: Flag.fromString(
-                                                countryList[widget.cartItem
-                                                    .product.country!]!,
+                                                widget.cartItem.product
+                                                    .countryCode!,
                                                 height: 20,
                                                 width: 20 * 4 / 3,
                                               ),

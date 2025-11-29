@@ -19,6 +19,7 @@ class Product extends Equatable {
     this.untappdUrl,
     this.untappdId,
     this.country,
+    this.countryCode,
     this.productSelection,
   });
 
@@ -48,6 +49,7 @@ class Product extends Equatable {
         untappdUrl: product['untpd_url'],
         untappdId: product['untpd_id'],
         country: product['country'],
+        countryCode: product['country_code'],
         productSelection: product['product_selection'],
       );
 
@@ -70,6 +72,7 @@ class Product extends Equatable {
         untappdUrl,
         untappdId,
         country,
+        countryCode,
         productSelection,
       ];
 
@@ -90,5 +93,6 @@ class Product extends Equatable {
   final String? untappdUrl;
   final int? untappdId;
   final String? country;
+  final String? countryCode;
   final String? productSelection;
 }

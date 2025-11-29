@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flag/flag.dart';
 
+import '../../models/country.dart';
 import '../../providers/filter.dart';
 import '../../assets/constants.dart';
 
@@ -578,7 +580,7 @@ class ProductOverviewBottomFilterSheetState
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                    child: DropdownSearch<String>.multiSelection(
+                    child: DropdownSearch<Country>.multiSelection(
                       popupProps: PopupPropsMultiSelection.dialog(
                         showSelectedItems: true,
                         showSearchBox: true,
@@ -591,6 +593,22 @@ class ProductOverviewBottomFilterSheetState
                             ),
                           ),
                         ),
+                        itemBuilder: (context, item, isDisabled, isSelected) {
+                          return ListTile(
+                            leading:
+                                item.isoCode != null && item.isoCode!.isNotEmpty
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(2),
+                                        child: Flag.fromString(
+                                          item.isoCode!,
+                                          height: 20,
+                                          width: 20 * 4 / 3,
+                                        ),
+                                      )
+                                    : const SizedBox(width: 20 * 4 / 3),
+                            title: Text(item.name),
+                          );
+                        },
                       ),
                       dropdownBuilder: (context, selectedItems) {
                         return Text(
@@ -612,14 +630,20 @@ class ProductOverviewBottomFilterSheetState
                           ),
                         ),
                       ),
-                      items: (filter, loadProps) => countryList.keys.toList(),
-                      onChanged: (List<String> x) {
+                      compareFn: (item1, item2) => item1.name == item2.name,
+                      items: (filter, loadProps) async {
+                        return await filters.getCountries();
+                      },
+                      onChanged: (List<Country> x) {
                         mystate(() {
-                          filters.selectedCountries = x;
+                          filters.selectedCountries =
+                              x.map((c) => c.name).toList();
                           filters.setCountry();
                         });
                       },
-                      selectedItems: filters.selectedCountries,
+                      selectedItems: filters.selectedCountries
+                          .map((name) => Country(name: name))
+                          .toList(),
                     ),
                   ),
                   const SizedBox(

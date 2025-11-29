@@ -37,7 +37,6 @@ class _ProductItemState extends State<ProductItem> {
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
     final tabletMode = mediaQueryData.size.shortestSide >= 600 ? true : false;
     final cart = Provider.of<Cart>(context, listen: false);
-    const countries = countryList;
     final double boxImageSize = tabletMode
         ? 100 + mediaQueryData.textScaleFactor * 10
         : mediaQueryData.size.shortestSide / 4;
@@ -132,14 +131,13 @@ class _ProductItemState extends State<ProductItem> {
                                         width: boxImageSize,
                                       ),
                               ),
-                              if (widget.product.country != null &&
-                                  countries[widget.product.country] != null &&
-                                  countries[widget.product.country]!.isNotEmpty)
+                              if (widget.product.countryCode != null &&
+                                  widget.product.countryCode!.isNotEmpty)
                                 ClipRRect(
                                   borderRadius: const BorderRadius.only(
                                       bottomRight: Radius.circular(6)),
                                   child: Flag.fromString(
-                                    countries[widget.product.country!]!,
+                                    widget.product.countryCode!,
                                     height: 20,
                                     width: 20 * 4 / 3,
                                   ),
