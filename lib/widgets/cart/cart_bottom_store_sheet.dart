@@ -89,8 +89,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                       child: DropdownSearch<String>(
                         popupProps: const PopupProps.dialog(),
-                        dropdownDecoratorProps: DropDownDecoratorProps(
-                          dropdownSearchDecoration: InputDecoration(
+                        decoratorProps: DropDownDecoratorProps(
+                          decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
@@ -107,7 +107,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                             style: const TextStyle(fontSize: 16),
                           );
                         },
-                        items: _sortList.map((value) => value!).toList(),
+                        items: (filter, loadProps) =>
+                            _sortList.map((value) => value!).toList(),
                         selectedItem: cart.cartSortIndex,
                         onChanged: (String? x) {
                           mystate(() {
@@ -205,8 +206,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                                 ),
                                               ),
                                             ),
-                                            itemBuilder:
-                                                (context, item, isSelected) {
+                                            itemBuilder: (context, item,
+                                                isDisabled, isSelected) {
                                               return Container(
                                                 margin:
                                                     const EdgeInsets.symmetric(
@@ -233,10 +234,9 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                                   const TextStyle(fontSize: 16),
                                             );
                                           },
-                                          dropdownDecoratorProps:
+                                          decoratorProps:
                                               DropDownDecoratorProps(
-                                            dropdownSearchDecoration:
-                                                InputDecoration(
+                                            decoration: InputDecoration(
                                               border: OutlineInputBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
@@ -251,7 +251,8 @@ class _BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                               ),
                                             ),
                                           ),
-                                          items: filters.storeList
+                                          items: (filter, loadProps) => filters
+                                              .storeList
                                               .map((e) => e.name)
                                               .toList(),
                                           onChanged: (List<String> x) {

@@ -25,6 +25,7 @@ class ProductList extends StatefulWidget {
 
 class _ProductListViewState extends State<ProductList> {
   late int _pageSize;
+  bool _hasAddedListener = false;
   final PagingController<int, Product> _pagingController =
       PagingController(firstPageKey: 1, invisibleItemsThreshold: 5);
 
@@ -55,7 +56,8 @@ class _ProductListViewState extends State<ProductList> {
             2
         ? 24
         : 14;
-    if (!_pagingController.hasListeners) {
+    if (!_hasAddedListener) {
+      _hasAddedListener = true;
       _pagingController.addPageRequestListener((pageKey) {
         final filters = Provider.of<Filter>(context, listen: false).filters;
         final client =

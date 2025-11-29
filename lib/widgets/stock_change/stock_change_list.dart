@@ -23,6 +23,7 @@ class StockChangeList extends StatefulWidget {
 class _StockChangeListViewState extends State<StockChangeList> {
   late int _pageSize;
   late DateTime lastDate;
+  bool _hasAddedListener = false;
   final PagingController<int, StockChange> _pagingController =
       PagingController(firstPageKey: 1, invisibleItemsThreshold: 5);
 
@@ -53,7 +54,8 @@ class _StockChangeListViewState extends State<StockChangeList> {
             2
         ? 24
         : 14;
-    if (!_pagingController.hasListeners) {
+    if (!_hasAddedListener) {
+      _hasAddedListener = true;
       _pagingController.addPageRequestListener((pageKey) {
         final filters = Provider.of<Filter>(context, listen: false).filters;
         final client =

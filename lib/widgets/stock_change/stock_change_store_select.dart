@@ -38,7 +38,7 @@ class StockChangeStoreSelect extends StatelessWidget {
                 ),
               ),
             ),
-            itemBuilder: (context, item, isSelected) {
+            itemBuilder: (context, item, isDisabled, isSelected) {
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 child: ListTile(
@@ -59,7 +59,8 @@ class StockChangeStoreSelect extends StatelessWidget {
                   Consumer<Filter>(
                     builder: (context, _, __) {
                       return SwitchListTile(
-                        contentPadding: const EdgeInsets.only(left: 12, right: 4),
+                        contentPadding:
+                            const EdgeInsets.only(left: 12, right: 4),
                         title: const Text(
                           'Husk valgt butikk',
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -77,7 +78,8 @@ class StockChangeStoreSelect extends StatelessWidget {
               );
             },
           ),
-          items: filters.storeList.map((e) => e.name).toList(),
+          items: (filter, loadProps) =>
+              filters.storeList.map((e) => e.name).toList(),
           onChanged: (String? x) {
             filters.stockChangeSelectedStore = x!;
             filters.setStore(stock: true);

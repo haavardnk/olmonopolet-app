@@ -177,7 +177,8 @@ class _ProductOverviewBottomFilterSheetState
                                       ),
                                     ),
                                   ),
-                                  itemBuilder: (context, item, isSelected) {
+                                  itemBuilder:
+                                      (context, item, isDisabled, isSelected) {
                                     return Container(
                                       margin: const EdgeInsets.symmetric(
                                           horizontal: 8),
@@ -206,8 +207,8 @@ class _ProductOverviewBottomFilterSheetState
                                     style: const TextStyle(fontSize: 16),
                                   );
                                 },
-                                dropdownDecoratorProps: DropDownDecoratorProps(
-                                  dropdownSearchDecoration: InputDecoration(
+                                decoratorProps: DropDownDecoratorProps(
+                                  decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(24),
                                     ),
@@ -218,7 +219,7 @@ class _ProductOverviewBottomFilterSheetState
                                     ),
                                   ),
                                 ),
-                                items: filters.storeList
+                                items: (filter, loadProps) => filters.storeList
                                     .map((e) => e.name)
                                     .toList(),
                                 onChanged: (List<String> x) {
@@ -305,8 +306,8 @@ class _ProductOverviewBottomFilterSheetState
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                     child: DropdownSearch<String>(
                       popupProps: const PopupProps.dialog(),
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                        dropdownSearchDecoration: InputDecoration(
+                      decoratorProps: DropDownDecoratorProps(
+                        decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
                           ),
@@ -323,7 +324,8 @@ class _ProductOverviewBottomFilterSheetState
                           style: const TextStyle(fontSize: 16),
                         );
                       },
-                      items: _sortList.map((value) => value!).toList(),
+                      items: (filter, loadProps) =>
+                          _sortList.map((value) => value!).toList(),
                       selectedItem: filters.sortIndex,
                       onChanged: (String? x) {
                         mystate(() {
@@ -463,7 +465,8 @@ class _ProductOverviewBottomFilterSheetState
                                         ),
                                       ),
                                     ),
-                                    itemBuilder: (context, item, isSelected) {
+                                    itemBuilder: (context, item, isDisabled,
+                                        isSelected) {
                                       return Container(
                                         margin: const EdgeInsets.symmetric(
                                             horizontal: 8),
@@ -519,9 +522,8 @@ class _ProductOverviewBottomFilterSheetState
                                       overflow: TextOverflow.ellipsis,
                                     );
                                   },
-                                  dropdownDecoratorProps:
-                                      DropDownDecoratorProps(
-                                    dropdownSearchDecoration: InputDecoration(
+                                  decoratorProps: DropDownDecoratorProps(
+                                    decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(24),
                                       ),
@@ -533,7 +535,7 @@ class _ProductOverviewBottomFilterSheetState
                                       ),
                                     ),
                                   ),
-                                  items: styleList,
+                                  items: (filter, loadProps) => styleList,
                                   onChanged: (List<String> x) {
                                     mystate(() {
                                       filters.selectedStyles = x;
@@ -600,8 +602,8 @@ class _ProductOverviewBottomFilterSheetState
                           style: const TextStyle(fontSize: 16),
                         );
                       },
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                        dropdownSearchDecoration: InputDecoration(
+                      decoratorProps: DropDownDecoratorProps(
+                        decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
                           ),
@@ -612,7 +614,7 @@ class _ProductOverviewBottomFilterSheetState
                           ),
                         ),
                       ),
-                      items: countryList.keys.toList(),
+                      items: (filter, loadProps) => countryList.keys.toList(),
                       onChanged: (List<String> x) {
                         mystate(() {
                           filters.selectedCountries = x;
