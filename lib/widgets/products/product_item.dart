@@ -23,6 +23,14 @@ class ProductItem extends StatefulWidget {
 }
 
 class _ProductItemState extends State<ProductItem> {
+  late Product _product;
+
+  @override
+  void initState() {
+    super.initState();
+    _product = widget.product;
+  }
+
   @override
   Widget build(BuildContext context) {
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
@@ -32,11 +40,12 @@ class _ProductItemState extends State<ProductItem> {
         ? 100 + mediaQueryData.textScaleFactor * 10
         : mediaQueryData.size.shortestSide / 4;
     final heroTag = widget.release != null
-        ? 'release${widget.product.id}'
-        : 'products${widget.product.id}';
+        ? 'release${_product.id}'
+        : 'products${_product.id}';
+    final displayImageUrl = _product.labelHdUrl ?? _product.imageUrl;
 
     return Semantics(
-      label: widget.product.name,
+      label: _product.name,
       button: true,
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -46,13 +55,19 @@ class _ProductItemState extends State<ProductItem> {
             settings: RouteSettings(
                 name: ProductDetailScreen.routeName,
                 arguments: <String, dynamic>{
-                  'product': widget.product,
+                  'product': _product,
                   'herotag': heroTag
                 }),
             screen: const ProductDetailScreen(),
             pageTransitionAnimation: PageTransitionAnimation.cupertino,
             withNavBar: true,
-          );
+          ).then((result) {
+            if (result != null && result is Product) {
+              setState(() {
+                _product = result;
+              });
+            }
+          });
         },
         child: Stack(
           children: [
@@ -70,10 +85,10 @@ class _ProductItemState extends State<ProductItem> {
                         children: [
                           Hero(
                             tag: heroTag,
-                            child: widget.product.imageUrl != null &&
-                                    widget.product.imageUrl!.isNotEmpty
+                            child: displayImageUrl != null &&
+                                    displayImageUrl.isNotEmpty
                                 ? FancyShimmerImage(
-                                    imageUrl: widget.product.imageUrl!,
+                                    imageUrl: displayImageUrl,
                                     height: boxImageSize,
                                     width: boxImageSize,
                                     errorWidget: Image.asset(
@@ -88,13 +103,13 @@ class _ProductItemState extends State<ProductItem> {
                                     width: boxImageSize,
                                   ),
                           ),
-                          if (widget.product.countryCode != null &&
-                              widget.product.countryCode!.isNotEmpty)
+                          if (_product.countryCode != null &&
+                              _product.countryCode!.isNotEmpty)
                             ClipRRect(
                               borderRadius: const BorderRadius.only(
                                   bottomRight: Radius.circular(6)),
                               child: Flag.fromString(
-                                widget.product.countryCode!,
+                                _product.countryCode!,
                                 height: 20,
                                 width: 20 * 4 / 3,
                               ),
@@ -111,7 +126,7 @@ class _ProductItemState extends State<ProductItem> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.product.name,
+                          _product.name,
                           style: const TextStyle(
                             fontSize: 14,
                           ),
@@ -121,14 +136,14 @@ class _ProductItemState extends State<ProductItem> {
                         Row(
                           children: [
                             Text(
-                              'Kr ${widget.product.price.toStringAsFixed(2)}',
+                              'Kr ${_product.price.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              ' - Kr ${widget.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                              ' - Kr ${_product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
                               style: const TextStyle(
                                 fontSize: 11,
                               ),
@@ -136,7 +151,7 @@ class _ProductItemState extends State<ProductItem> {
                           ],
                         ),
                         Text(
-                          widget.product.style,
+                          _product.style,
                           style: const TextStyle(
                             fontSize: 12,
                           ),
@@ -144,22 +159,22 @@ class _ProductItemState extends State<ProductItem> {
                         Row(
                           children: [
                             Text(
-                              widget.product.rating != null
-                                  ? '${widget.product.rating!.toStringAsFixed(2)} '
+                              _product.rating != null
+                                  ? '${_product.rating!.toStringAsFixed(2)} '
                                   : '0 ',
                               style: const TextStyle(
                                 fontSize: 12,
                               ),
                             ),
                             createRatingBar(
-                                rating: widget.product.rating != null
-                                    ? widget.product.rating!
+                                rating: _product.rating != null
+                                    ? _product.rating!
                                     : 0,
                                 size: 18,
                                 color: Colors.yellow[700]!),
                             Text(
-                              widget.product.checkins != null
-                                  ? ' ${NumberFormat.compact().format(widget.product.checkins)}'
+                              _product.checkins != null
+                                  ? ' ${NumberFormat.compact().format(_product.checkins)}'
                                   : '',
                               style: const TextStyle(
                                 fontSize: 12,
@@ -172,12 +187,11 @@ class _ProductItemState extends State<ProductItem> {
                           margin: const EdgeInsets.only(top: 2),
                           child: Row(
                             children: [
-                              if (widget.product.stock != null &&
-                                  widget.product.stock != 0)
+                              if (_product.stock != null && _product.stock != 0)
                                 Row(
                                   children: [
                                     Text(
-                                      'På lager: ${widget.product.stock}',
+                                      'På lager: ${_product.stock}',
                                       style: const TextStyle(
                                         fontSize: 11,
                                         height: 0.9,
@@ -193,22 +207,22 @@ class _ProductItemState extends State<ProductItem> {
                               Row(
                                 children: [
                                   Text(
-                                    widget.product.abv != null
-                                        ? '${widget.product.abv!.toStringAsFixed(1)}%'
+                                    _product.abv != null
+                                        ? '${_product.abv!.toStringAsFixed(1)}%'
                                         : '',
                                     style: const TextStyle(
                                       fontSize: 11,
                                       height: 0.9,
                                     ),
                                   ),
-                                  if (widget.product.abv != null)
+                                  if (_product.abv != null)
                                     VerticalDivider(
                                       width: 15,
                                       thickness: 1,
                                       color: Colors.grey[300],
                                     ),
                                   Text(
-                                    '${widget.product.volume}l',
+                                    '${_product.volume}l',
                                     style: const TextStyle(
                                       fontSize: 11,
                                       height: 0.9,
@@ -226,7 +240,7 @@ class _ProductItemState extends State<ProductItem> {
                                       widget.release!.productSelections.length >
                                           1)
                                     Text(
-                                      '${productSelectionAbrevationList[widget.product.productSelection]}',
+                                      '${productSelectionAbrevationList[_product.productSelection]}',
                                       style: const TextStyle(
                                         fontSize: 11,
                                         height: 0.9,
@@ -252,7 +266,7 @@ class _ProductItemState extends State<ProductItem> {
                 label: 'Legg i handleliste',
                 child: InkWell(
                   onTap: () {
-                    cart.addItem(widget.product.id, widget.product);
+                    cart.addItem(_product.id, _product);
                     cart.updateCartItemsData();
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -266,14 +280,14 @@ class _ProductItemState extends State<ProductItem> {
                     );
                   },
                   onLongPress: () {
-                    if (cart.items.keys.contains(widget.product.id)) {
-                      cart.removeSingleItem(widget.product.id);
+                    if (cart.items.keys.contains(_product.id)) {
+                      cart.removeSingleItem(_product.id);
                       cart.updateCartItemsData();
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            cart.items.keys.contains(widget.product.id)
+                            cart.items.keys.contains(_product.id)
                                 ? 'Fjernet en fra handlelisten!'
                                 : 'Fjernet helt fra handlelisten!',
                             textAlign: TextAlign.center,
@@ -298,13 +312,10 @@ class _ProductItemState extends State<ProductItem> {
                     child: Consumer<Cart>(
                       builder: (_, cart, __) => Center(
                         child: Badge(
-                          isLabelVisible:
-                              cart.items.keys.contains(widget.product.id),
-                          label: Text(
-                              cart.items.keys.contains(widget.product.id)
-                                  ? cart.items[widget.product.id]!.quantity
-                                      .toString()
-                                  : ''),
+                          isLabelVisible: cart.items.keys.contains(_product.id),
+                          label: Text(cart.items.keys.contains(_product.id)
+                              ? cart.items[_product.id]!.quantity.toString()
+                              : ''),
                           child: Icon(
                             Icons.shopping_cart_outlined,
                             size: 20,
