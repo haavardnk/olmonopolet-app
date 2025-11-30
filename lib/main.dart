@@ -12,7 +12,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import './screens/product_detail_screen.dart';
 import 'screens/home_screen.dart';
-import './screens/about_screen.dart';
 import './providers/filter.dart';
 import './providers/cart.dart';
 import './providers/http_client.dart';
@@ -180,7 +179,6 @@ class _MyAppState extends State<MyApp> {
               routes: {
                 ProductDetailScreen.routeName: (ctx) =>
                     const ProductDetailScreen(),
-                AboutScreen.routeName: (ctx) => const AboutScreen(),
               },
             );
           },
