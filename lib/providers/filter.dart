@@ -99,13 +99,14 @@ class Filter with ChangeNotifier {
   }
 
   bool releasesLoading = false;
+
   Future<List<Release>> getReleases() async {
-    if (releasesLoading) {
+    if (releaseList.isNotEmpty || releasesLoading) {
       return releaseList;
     }
     try {
       releasesLoading = true;
-      var releases = await ApiHelper.getReleaseList(_client);
+      var releases = await ApiHelper.getReleaseList(_client, page: 1, pageSize: 100);
       releaseList = releases;
       releaseSelectedList = List<bool>.filled(releaseList.length, false);
       releasesLoading = false;

@@ -68,7 +68,12 @@ class ProductListViewState extends State<ProductList> {
     final client = Provider.of<HttpClient>(context, listen: false).apiClient;
     final newItems = await retry(
       () => ApiHelper.getProductList(
-          client, pageKey, filters, _pageSize, widget.release),
+        client,
+        filter: filters,
+        page: pageKey,
+        pageSize: _pageSize,
+        release: widget.release,
+      ),
     );
     if (newItems.isNotEmpty && newItems.length < _pageSize) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

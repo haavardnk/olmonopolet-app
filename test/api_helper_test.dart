@@ -95,7 +95,7 @@ void main() {
           }));
 
           expect(
-            () => ApiHelper.getStockChangeList(mockClient, 1, 25, '121'),
+            () => ApiHelper.getStockChangeList(mockClient, store: '121', page: 1, pageSize: 25),
             throwsA(
               isA<ApiException>(),
             ),
@@ -113,7 +113,7 @@ void main() {
           }));
 
           expect(
-            () => ApiHelper.getStockChangeList(mockClient, 1, 25, '121'),
+            () => ApiHelper.getStockChangeList(mockClient, store: '121', page: 1, pageSize: 25),
             throwsA(
               isA<NetworkException>(),
             ),
@@ -158,7 +158,7 @@ void main() {
           }));
 
           final stockChangeList =
-              await ApiHelper.getStockChangeList(mockClient, 1, 1, '472');
+              await ApiHelper.getStockChangeList(mockClient, store: '472', page: 1, pageSize: 1);
 
           expect(
             stockChangeList,
@@ -199,7 +199,7 @@ void main() {
           }));
 
           expect(
-            () => ApiHelper.getProductList(mockClient, 1, filter, 25),
+            () => ApiHelper.getProductList(mockClient, filter: filter, page: 1, pageSize: 25),
             throwsA(
               isA<ApiException>(),
             ),
@@ -217,7 +217,7 @@ void main() {
           }));
 
           expect(
-            () => ApiHelper.getProductList(mockClient, 1, filter, 25),
+            () => ApiHelper.getProductList(mockClient, filter: filter, page: 1, pageSize: 25),
             throwsA(
               isA<NetworkException>(),
             ),
@@ -270,7 +270,7 @@ void main() {
           }));
 
           final productList =
-              await ApiHelper.getProductList(mockClient, 1, filter, 1);
+              await ApiHelper.getProductList(mockClient, filter: filter, page: 1, pageSize: 1);
 
           expect(
             productList,

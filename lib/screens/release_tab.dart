@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:retry/retry.dart';
 
-import '../providers/filter.dart';
+import '../providers/http_client.dart';
 import '../widgets/drawer/app_drawer.dart';
-import '../screens/product_overview_tab.dart';
+import '../widgets/release/release_item.dart';
+import '../widgets/products/pagination_indicators/first_page_error_indicator.dart';
+import '../widgets/products/pagination_indicators/new_page_error_indicator.dart';
 import '../models/release.dart';
+import '../services/api.dart';
 
 class ReleaseTab extends StatefulWidget {
   const ReleaseTab({super.key});
@@ -17,185 +21,106 @@ class ReleaseTab extends StatefulWidget {
 }
 
 class _ReleaseTabState extends State<ReleaseTab> {
+  static const int _pageSize = 15;
+  late PagingController<int, Release> _pagingController;
+
   @override
   void initState() {
     initializeDateFormatting('nb_NO', null);
     super.initState();
+    _pagingController = PagingController<int, Release>(
+      getNextPageKey: (state) {
+        if (state.keys == null || state.keys!.isEmpty) return 1;
+        if (state.lastPageIsEmpty) return null;
+        return state.keys!.last + 1;
+      },
+      fetchPage: (pageKey) => _fetchPage(pageKey),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _pagingController.fetchNextPage();
+      }
+    });
+  }
+
+  Future<List<Release>> _fetchPage(int pageKey) async {
+    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
+    final releases = await retry(
+      () =>
+          ApiHelper.getReleaseList(client, page: pageKey, pageSize: _pageSize),
+    );
+    if (releases.isNotEmpty && releases.length < _pageSize) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _pagingController.value = _pagingController.value.copyWith(
+            hasNextPage: false,
+          );
+        }
+      });
+    }
+    return releases;
   }
 
   @override
   Widget build(BuildContext context) {
-    late Filter filters = Provider.of<Filter>(context, listen: false);
-    List<int> years = [];
-
-    void getReleaseYears() {
-      for (var release in filters.releaseList) {
-        if (years.contains(release.releaseDate!.year)) {
-          continue;
-        }
-        years.add(release.releaseDate!.year);
-      }
-    }
-
-    String createProductSelectionText(List<String> productSelections) {
-      String productSelectionText = "";
-      productSelections
-          .removeWhere((element) => element == "Spesialbestilling");
-
-      if (productSelections.length == 1) {
-        productSelectionText = productSelections[0];
-      } else {
-        for (var element in productSelections) {
-          if (productSelections.indexOf(element) ==
-              productSelections.length - 1) {
-            productSelectionText += element;
-          } else {
-            productSelectionText += "${element.split('utvalget')[0]}-";
-            if (productSelections.indexOf(element) <
-                productSelections.length - 2) {
-              productSelectionText += ", ";
-            } else {
-              productSelectionText += " og ";
-            }
-          }
-        }
-      }
-      return productSelectionText;
-    }
-
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: const FittedBox(
           fit: BoxFit.contain,
-          child: Text(
-            'Nyhetslanseringer',
-          ),
+          child: Text('Nyhetslanseringer'),
         ),
       ),
       drawer: const AppDrawer(),
       body: RefreshIndicator(
-        onRefresh: filters.getReleases,
-        child: Consumer<Filter>(
-          builder: (context, _, __) {
-            getReleaseYears();
-            return ListView(
-              children: [
-                for (int year in years)
-                  ExpansionTile(
-                    title: Text(
-                      year.toString(),
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+        onRefresh: () => Future.sync(() {
+          _pagingController.refresh();
+          _pagingController.fetchNextPage();
+        }),
+        child: PagingListener(
+          controller: _pagingController,
+          builder: (context, state, fetchNextPage) =>
+              PagedListView<int, Release>.separated(
+            state: state,
+            fetchNextPage: fetchNextPage,
+            builderDelegate: PagedChildBuilderDelegate<Release>(
+              animateTransitions: true,
+              transitionDuration: const Duration(milliseconds: 300),
+              invisibleItemsThreshold: 5,
+              itemBuilder: (context, item, index) => ReleaseItem(release: item),
+              firstPageErrorIndicatorBuilder: (_) => FirstPageErrorIndicator(
+                onTryAgain: () {
+                  _pagingController.refresh();
+                  _pagingController.fetchNextPage();
+                },
+              ),
+              newPageErrorIndicatorBuilder: (_) => NewPageErrorIndicator(
+                onTap: () => _pagingController.fetchNextPage(),
+              ),
+              noItemsFoundIndicatorBuilder: (_) => Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 100.h),
+                  child: Text(
+                    'Ingen lanseringer funnet',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    initiallyExpanded: year == years[0] ? true : false,
-                    shape: const Border(),
-                    children: [
-                      for (Release release in filters.releaseList)
-                        if (release.releaseDate!.year == year)
-                          Column(
-                            children: [
-                              ListTile(
-                                isThreeLine: true,
-                                leading: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      release.releaseDate != null &&
-                                              DateTime.now()
-                                                      .difference(
-                                                          release.releaseDate!)
-                                                      .inDays <=
-                                                  14
-                                          ? Icons.new_releases
-                                          : Icons.new_releases_outlined,
-                                    ),
-                                  ],
-                                ),
-                                trailing: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.arrow_forward),
-                                  ],
-                                ),
-                                iconColor:
-                                    Theme.of(context).colorScheme.onSurface,
-                                textColor:
-                                    Theme.of(context).colorScheme.onSurface,
-                                onTap: () {
-                                  if (filters.filterSaveSettings[12]['save'] ==
-                                      false) {
-                                    filters.releaseSortBy = '-rating';
-                                    filters.releaseSortIndex =
-                                        'Global rating - Høy til lav';
-                                  }
-                                  filters.releaseProductSelectionChoice = '';
-                                  pushScreen(
-                                    context,
-                                    screen: ProductOverviewTab(
-                                      release: release,
-                                    ),
-                                    withNavBar: true,
-                                  );
-                                },
-                                title: Text(
-                                  release.releaseDate != null
-                                      ? toBeginningOfSentenceCase(
-                                          DateFormat.yMMMMEEEEd('nb_NO')
-                                              .format(release.releaseDate!))
-                                      : release.name,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (release.productSelections.isNotEmpty)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Text(
-                                          createProductSelectionText(
-                                              release.productSelections),
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: Text(
-                                        'Antall produkter: ${release.beerCount}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (release.name !=
-                                      filters.releaseList.last.name &&
-                                  release.releaseDate!.year ==
-                                      filters
-                                          .releaseList[filters.releaseList
-                                                  .indexOf(release) +
-                                              1]
-                                          .releaseDate!
-                                          .year)
-                                const Divider()
-                            ],
-                          ),
-                    ],
                   ),
-              ],
-            );
-          },
+                ),
+              ),
+            ),
+            separatorBuilder: (context, index) => const SizedBox.shrink(),
+          ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 }

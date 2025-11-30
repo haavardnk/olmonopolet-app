@@ -127,11 +127,11 @@ class ApiHelper {
   }
 
   static Future<List<StockChange>> getStockChangeList(
-    http.Client client,
-    int page,
-    int pageSize,
-    String store,
-  ) async {
+    http.Client client, {
+    required String store,
+    required int page,
+    required int pageSize,
+  }) async {
     final endpoint = 'stockchange/?store=$store&page=$page&page_size=$pageSize';
     return _handleRequest(
       request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
@@ -142,12 +142,12 @@ class ApiHelper {
   }
 
   static Future<List<Product>> getProductList(
-    http.Client client,
-    int page,
-    Filter filter,
-    int pageSize, [
+    http.Client client, {
+    required Filter filter,
+    required int page,
+    required int pageSize,
     Release? release,
-  ]) async {
+  }) async {
     final url = release == null
         ? _buildProductUrl(page, filter, pageSize)
         : _buildReleaseProductUrl(page, filter, release, pageSize);
@@ -240,9 +240,13 @@ class ApiHelper {
     );
   }
 
-  static Future<List<Release>> getReleaseList(http.Client client) async {
-    const endpoint =
-        'release/?fields=name,release_date,beer_count,product_selections';
+  static Future<List<Release>> getReleaseList(
+    http.Client client, {
+    required int page,
+    required int pageSize,
+  }) async {
+    final endpoint =
+        'release/?fields=name,release_date,product_selections,product_stats&page=$page&page_size=$pageSize';
     return _handleRequest(
       request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
       parser: (json) =>

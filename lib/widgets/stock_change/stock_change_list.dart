@@ -59,7 +59,11 @@ class StockChangeListViewState extends State<StockChangeList> {
     final client = Provider.of<HttpClient>(context, listen: false).apiClient;
     final newItems = await retry(
       () => ApiHelper.getStockChangeList(
-          client, pageKey, _pageSize, filters.stockChangeStoreId),
+        client,
+        store: filters.stockChangeStoreId,
+        page: pageKey,
+        pageSize: _pageSize,
+      ),
     );
     return newItems;
   }
