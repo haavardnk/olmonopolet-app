@@ -55,6 +55,7 @@ class Product extends Equatable {
     this.allergens,
     this.alcoholUnits,
     this.allStock,
+    this.valueScore,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
@@ -101,6 +102,9 @@ class Product extends Equatable {
             ? (json['all_stock'] as List)
                 .map((s) => StockInfo.fromJson(s))
                 .toList()
+            : null,
+        valueScore: json['value_score'] != null
+            ? (json['value_score'] as num).toDouble()
             : null,
       );
 
@@ -163,4 +167,5 @@ class Product extends Equatable {
   final String? allergens;
   final double? alcoholUnits;
   final List<StockInfo>? allStock;
+  final double? valueScore;
 }

@@ -83,7 +83,7 @@ class ApiHelper {
         'untpd_id,country,country_code,product_selection,label_hd_url,ibu,'
         'description,brewery,year,color,aroma,taste,storable,food_pairing,'
         'raw_materials,fullness,sweetness,freshness,bitterness,sugar,acid,'
-        'method,allergens,alcohol_units,all_stock';
+        'method,allergens,alcohol_units,all_stock,value_score';
     final endpoint = 'beers/?beers=${product.id}&fields=$fields&all_stock=true';
     return _handleRequest(
       request: () => client.get(Uri.parse('$_baseUrl$endpoint')),

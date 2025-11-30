@@ -30,7 +30,6 @@ dependencies:
   http: ^1.1.0
   infinite_scroll_pagination: ^5.1.1
   intl: ^0.20.0
-  percent_indicator: ^4.2.3
   persistent_bottom_nav_bar_v2: ^6.2.0
   provider: ^6.0.2
   rate_my_app: ^2.0.0

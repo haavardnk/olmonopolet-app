@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flag/flag.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +15,7 @@ import '../services/api.dart';
 import '../services/app_launcher.dart';
 import '../models/product.dart';
 import '../widgets/common/rating_widget.dart';
+import '../widgets/common/stock_popup.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key});
@@ -27,22 +27,8 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  late bool wishlisted;
-  late bool init = false;
   Product? _loadedProduct;
-
   List<StockInfo> _stockList = [];
-  List<StockInfo> _sortStockList(List<StockInfo> stockList, List storeList) {
-    final storeNames = storeList.map((e) => e.name).toList();
-    Map<String, int> order = {
-      for (var key in storeNames) key: storeNames.indexOf(key)
-    };
-    final filteredList =
-        stockList.where((s) => order.containsKey(s.storeName)).toList();
-    filteredList
-        .sort((a, b) => order[a.storeName]!.compareTo(order[b.storeName]!));
-    return filteredList;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,144 +39,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
-    final orientation = MediaQuery.of(context).orientation;
-    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
+    final colors = Theme.of(context).colorScheme;
     final tabletMode = 1.sw >= 600;
-    final boxImageSize = shortestSide * (tabletMode ? 0.4 : 0.75);
-
-    if (init == false) {
-      wishlisted = false;
-      init = true;
-    }
+    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
+    final imageSize = shortestSide * (tabletMode ? 0.45 : 0.6);
 
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          Navigator.of(context).pop(_loadedProduct ?? product);
-        }
+        if (!didPop) Navigator.of(context).pop(_loadedProduct ?? product);
       },
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () =>
-                Navigator.of(context).pop(_loadedProduct ?? product),
-          ),
-          title: const Text('Detaljer'),
-          surfaceTintColor: Colors.transparent,
-          actions: [
-            PopupMenuButton(itemBuilder: (context) {
-              return [
-                PopupMenuItem<int>(
-                  value: 0,
-                  child: FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.report),
-                        const VerticalDivider(width: 5),
-                        Text(
-                          product.rating != null
-                              ? 'Rapporter feil Untappd match'
-                              : 'Foreslå untappd match',
-                          overflow: TextOverflow.fade,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const PopupMenuItem<int>(
-                  value: 1,
-                  child: FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Row(
-                      children: [
-                        Icon(Icons.open_in_browser),
-                        VerticalDivider(width: 5),
-                        Text("Åpne i Untappd"),
-                      ],
-                    ),
-                  ),
-                ),
-                const PopupMenuItem<int>(
-                  value: 2,
-                  child: FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Row(
-                      children: [
-                        Icon(Icons.open_in_browser),
-                        VerticalDivider(width: 5),
-                        Text("Åpne i Vinmonopolet"),
-                      ],
-                    ),
-                  ),
-                ),
-              ];
-            }, onSelected: (value) {
-              if (value == 0) {
-                wrongUntappdMatch(client.apiClient, product);
-              } else if (value == 1) {
-                AppLauncher.launchUntappd(product);
-              } else if (value == 2) {
-                product.vmpUrl != null
-                    ? launchUrl(Uri.parse(product.vmpUrl!))
-                    : null;
-              }
-            }),
-          ],
-        ),
-        floatingActionButton: InkWell(
-          onLongPress: () {
-            if (cart.items.keys.contains(product.id)) {
-              cart.removeSingleItem(product.id);
-              cart.updateCartItemsData();
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    cart.items.keys.contains(product.id)
-                        ? 'Fjernet en fra handlelisten!'
-                        : 'Fjernet helt fra handlelisten!',
-                    textAlign: TextAlign.center,
-                  ),
-                  duration: const Duration(seconds: 1),
-                ),
-              );
-            }
-          },
-          child: FloatingActionButton(
-            child: Consumer<Cart>(
-              builder: (context, _, __) => Badge(
-                isLabelVisible: cart.items.keys.contains(product.id),
-                label: Text(cart.items.keys.contains(product.id)
-                    ? cart.items[product.id]!.quantity.toString()
-                    : ''),
-                child: const Icon(Icons.add_shopping_cart),
-              ),
-            ),
-            onPressed: () {
-              cart.addItem(product.id, product);
-              cart.updateCartItemsData();
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text(
-                    'Lagt til i handlelisten!',
-                    textAlign: TextAlign.center,
-                  ),
-                  duration: const Duration(seconds: 1),
-                  action: SnackBarAction(
-                    label: 'ANGRE',
-                    onPressed: () {
-                      cart.removeSingleItem(product.id);
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+        appBar: _buildAppBar(context, client.apiClient, product),
+        floatingActionButton: _buildFab(context, cart, product),
         body: FutureBuilder<Product>(
           future: ApiHelper.getProductDetails(client.apiClient, product),
           builder: (context, snapshot) {
@@ -199,836 +60,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               _loadedProduct = details;
               if (details.allStock != null && filters.storeList.isNotEmpty) {
                 _stockList =
-                    _sortStockList(details.allStock!, filters.storeList);
+                    sortStockListByStores(details.allStock!, filters.storeList);
               }
             }
             final displayImageUrl =
                 details?.labelHdUrl ?? product.labelHdUrl ?? product.imageUrl;
-            return Column(
-              children: [
-                Expanded(
-                  child: ListView(
-                    padding: tabletMode && orientation == Orientation.landscape
-                        ? EdgeInsets.symmetric(horizontal: 0.15.sw)
-                        : null,
-                    children: [
-                      Container(
-                        foregroundDecoration: wishlisted == true
-                            ? const RotatedCornerDecoration.withColor(
-                                color: Color(0xff01aed6),
-                                textSpan: TextSpan(text: 'Ønsket'),
-                                badgeSize: Size(60, 60),
-                                badgePosition: BadgePosition.topEnd,
-                              )
-                            : null,
-                        child: SizedBox(
-                          height: boxImageSize,
-                          width: boxImageSize,
-                          child: Hero(
-                            tag: herotag,
-                            child: displayImageUrl != null &&
-                                    displayImageUrl.isNotEmpty
-                                ? Image.network(
-                                    displayImageUrl,
-                                    fit: BoxFit.contain,
-                                  )
-                                : Image.asset(
-                                    'assets/images/placeholder.png',
-                                    fit: BoxFit.contain,
-                                  ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    product.name,
-                                    style: TextStyle(fontSize: 18.sp),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  'Kr ${product.price.toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                      fontSize: 20.sp,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                if (product.pricePerVolume != null)
-                                  Text(
-                                    ' - Kr ${product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                    ),
-                                  )
-                              ],
-                            ),
-                            Text(
-                              product.style,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                            Divider(
-                              height: 15.h,
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (snapshot.hasError)
-                        Column(
-                          children: [
-                            SizedBox(
-                              height: 0.125.sh,
-                            ),
-                            Center(
-                              child: Column(
-                                children: [
-                                  Icon(Icons.error_outline, size: 48.r),
-                                  SizedBox(height: 16.h),
-                                  Text(
-                                      'Kunne ikke laste detaljer: ${snapshot.error}'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      if (!snapshot.hasData && !snapshot.hasError)
-                        Column(
-                          children: [
-                            SizedBox(
-                              height: 0.125.sh,
-                            ),
-                            const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ],
-                        ),
-                      if (snapshot.hasData)
-                        FadeIn(
-                          duration: const Duration(milliseconds: 500),
-                          child: Column(
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (product.rating != null)
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                20, 0, 20, 0),
-                                            child: IntrinsicHeight(
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        tabletMode
-                                                            ? MainAxisAlignment
-                                                                .spaceEvenly
-                                                            : MainAxisAlignment
-                                                                .spaceBetween,
-                                                    children: [
-                                                      InkWell(
-                                                        onTap: () => AppLauncher
-                                                            .launchUntappd(
-                                                                product),
-                                                        child: Column(
-                                                          children: [
-                                                            Text(
-                                                              'Global rating - ${NumberFormat.compact().format(product.checkins)}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          14),
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  product.rating !=
-                                                                          null
-                                                                      ? '${product.rating!.toStringAsFixed(2)} '
-                                                                      : '0 ',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        14,
-                                                                  ),
-                                                                ),
-                                                                createRatingBar(
-                                                                    rating: product.rating !=
-                                                                            null
-                                                                        ? product
-                                                                            .rating!
-                                                                        : 0,
-                                                                    size: 18,
-                                                                    color: Colors
-                                                                            .yellow[
-                                                                        700]!),
-                                                              ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        if (product.rating == null)
-                                          const Text(
-                                            'Ingen Untappd Match',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        if (details != null &&
-                                            (details.freshness != null ||
-                                                details.bitterness != null ||
-                                                details.sweetness != null ||
-                                                details.fullness != null))
-                                          const Divider(
-                                            height: 20,
-                                          ),
-                                        if (details != null &&
-                                            (details.freshness != null ||
-                                                details.bitterness != null ||
-                                                details.sweetness != null ||
-                                                details.fullness != null))
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              if (details.freshness != null)
-                                                CircularPercentIndicator(
-                                                  radius: 25.0,
-                                                  lineWidth: 5.0,
-                                                  animation: true,
-                                                  percent: details.freshness!
-                                                          .toDouble() /
-                                                      12,
-                                                  center: Text(
-                                                      '${(details.freshness! / 12 * 100).toStringAsFixed(0)}%'),
-                                                  backgroundColor: Theme.of(
-                                                          context)
-                                                      .colorScheme
-                                                      .surfaceContainerHighest,
-                                                  progressColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .primary,
-                                                  circularStrokeCap:
-                                                      CircularStrokeCap.round,
-                                                  footer: const Text(
-                                                    "Friskhet",
-                                                  ),
-                                                ),
-                                              if (details.fullness != null)
-                                                CircularPercentIndicator(
-                                                  radius: 25.0,
-                                                  lineWidth: 5.0,
-                                                  animation: true,
-                                                  percent: details.fullness!
-                                                          .toDouble() /
-                                                      12,
-                                                  center: Text(
-                                                      '${(details.fullness! / 12 * 100).toStringAsFixed(0)}%'),
-                                                  backgroundColor: Theme.of(
-                                                          context)
-                                                      .colorScheme
-                                                      .surfaceContainerHighest,
-                                                  progressColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .primary,
-                                                  circularStrokeCap:
-                                                      CircularStrokeCap.round,
-                                                  footer: const Text(
-                                                    "Fylde",
-                                                  ),
-                                                ),
-                                              if (details.bitterness != null)
-                                                CircularPercentIndicator(
-                                                  radius: 25.0,
-                                                  lineWidth: 5.0,
-                                                  animation: true,
-                                                  percent: details.bitterness!
-                                                          .toDouble() /
-                                                      12,
-                                                  center: Text(
-                                                      '${(details.bitterness! / 12 * 100).toStringAsFixed(0)}%'),
-                                                  backgroundColor: Theme.of(
-                                                          context)
-                                                      .colorScheme
-                                                      .surfaceContainerHighest,
-                                                  progressColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .primary,
-                                                  circularStrokeCap:
-                                                      CircularStrokeCap.round,
-                                                  footer: const Text(
-                                                    "Bitterhet",
-                                                  ),
-                                                ),
-                                              if (details.sweetness != null &&
-                                                  details.sweetness != 0)
-                                                CircularPercentIndicator(
-                                                  radius: 25.0,
-                                                  lineWidth: 5.0,
-                                                  animation: true,
-                                                  percent: details.sweetness!
-                                                          .toDouble() /
-                                                      12,
-                                                  center: Text(
-                                                      '${(details.sweetness! / 12 * 100).toStringAsFixed(0)}%'),
-                                                  backgroundColor: Theme.of(
-                                                          context)
-                                                      .colorScheme
-                                                      .surfaceContainerHighest,
-                                                  progressColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .primary,
-                                                  circularStrokeCap:
-                                                      CircularStrokeCap.round,
-                                                  footer: const Text(
-                                                    "Sødme",
-                                                  ),
-                                                )
-                                            ],
-                                          ),
-                                        const Divider(
-                                          height: 15,
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            if (product.abv != null)
-                                              Column(
-                                                children: [
-                                                  const Text('Styrke'),
-                                                  Text('${product.abv} %'),
-                                                ],
-                                              ),
-                                            Column(
-                                              children: [
-                                                const Text('Størrelse'),
-                                                Text('${product.volume} l'),
-                                              ],
-                                            ),
-                                            if (details != null &&
-                                                details.acid != null)
-                                              FadeIn(
-                                                child: Column(
-                                                  children: [
-                                                    const Text('Syre'),
-                                                    Text('${details.acid} g/l'),
-                                                  ],
-                                                ),
-                                              ),
-                                            if (details != null &&
-                                                details.sugar != null)
-                                              FadeIn(
-                                                child: Column(
-                                                  children: [
-                                                    const Text('Sukker'),
-                                                    Text(
-                                                        '${details.sugar} g/l'),
-                                                  ],
-                                                ),
-                                              ),
-                                            if (details != null &&
-                                                details.ibu != null &&
-                                                details.ibu != 0)
-                                              FadeIn(
-                                                child: Column(
-                                                  children: [
-                                                    const Text('IBU'),
-                                                    Text(
-                                                      details.ibu.toString(),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            if (details != null &&
-                                                details.alcoholUnits != null &&
-                                                details.alcoholUnits != 0)
-                                              FadeIn(
-                                                child: Column(
-                                                  children: [
-                                                    const Text(
-                                                        'Alkoholenheter'),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          details.alcoholUnits!
-                                                              .toStringAsFixed(
-                                                                  1),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const Divider(
-                                height: 15,
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Informasjon',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (details != null &&
-                                        details.year != null &&
-                                        details.year != 0)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Årgang'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.year.toString(),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.year != null &&
-                                        details.year != 0)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.taste != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Smak'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.taste!
-                                                    .replaceAll(".", ""),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.taste != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.aroma != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Lukt'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.aroma!
-                                                    .replaceAll(".", ""),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.aroma != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.color != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Farge'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.color!
-                                                    .replaceAll(".", ""),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.color != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.foodPairing != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Passer til'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.foodPairing!
-                                                    .replaceAll(".", ""),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.foodPairing != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.storable != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Lagring'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.storable!
-                                                    .toString()
-                                                    .replaceAll(".", ""),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.storable != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.rawMaterials != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Råstoff'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.rawMaterials!
-                                                    .toString()
-                                                    .replaceAll(".", ""),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.rawMaterials != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.method != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Metode'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.method!.toString(),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.method != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.allergens != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Allergen'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.allergens!.toString(),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.allergens != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (details != null &&
-                                        details.brewery != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Bryggeri'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.brewery!,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    if (details != null &&
-                                        details.brewery != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    if (product.country != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Land'),
-                                            ),
-                                            Flexible(
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    product.country!,
-                                                  ),
-                                                  if (product.countryCode !=
-                                                          null &&
-                                                      product.countryCode!
-                                                          .isNotEmpty)
-                                                    Row(
-                                                      children: [
-                                                        const SizedBox(
-                                                          width: 3,
-                                                        ),
-                                                        Flag.fromString(
-                                                          product.countryCode!,
-                                                          height: 12,
-                                                          width: 12 * 4 / 3,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    if (product.country != null)
-                                      const Divider(
-                                        height: 8,
-                                      ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          width: 115,
-                                          child: Text('Varenummer'),
-                                        ),
-                                        Flexible(
-                                          child: Text(
-                                            product.id.toString(),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const Divider(
-                                      height: 8,
-                                    ),
-                                    if (details != null &&
-                                        details.productSelection != null)
-                                      FadeIn(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 115,
-                                              child: Text('Utvalg'),
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                details.productSelection!,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              const Divider(
-                                height: 15,
-                              ),
-                              ExpansionTile(
-                                title: const Text(
-                                    "Vis butikker med varen på lager",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    )),
-                                dense: true,
-                                shape: const Border(),
-                                children: [
-                                  Container(
-                                    height: _stockList.length < 6
-                                        ? _stockList.length * 15 + 65
-                                        : 165,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        if (_stockList.isNotEmpty)
-                                          Expanded(
-                                            child: ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: _stockList.length,
-                                              itemBuilder: (context, index) {
-                                                return Column(
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(_stockList[index]
-                                                            .storeName),
-                                                        Text(
-                                                          'På lager: ${_stockList[index].quantity}',
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    if (index <
-                                                        _stockList.length - 1)
-                                                      const Divider(
-                                                        height: 5,
-                                                      ),
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        if (_stockList.isEmpty)
-                                          const Text(
-                                            'Ingen butikker har denne varen på lager',
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const Divider(
-                                height: 20,
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Beskrivelse',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (details != null &&
-                                        details.description != null)
-                                      Text(details.description!),
-                                    if (details != null &&
-                                        details.description == '')
-                                      const Center(
-                                        child: Text(
-                                          'Mangler beskrivelse',
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 60,
-                              )
-                            ],
-                          ),
-                        )
-                    ],
-                  ),
+
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _buildHeader(context, product, details, herotag,
+                      displayImageUrl, imageSize, colors),
                 ),
+                if (snapshot.hasError)
+                  SliverFillRemaining(child: _buildError()),
+                if (!snapshot.hasData && !snapshot.hasError)
+                  const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                if (snapshot.hasData)
+                  SliverToBoxAdapter(
+                    child: FadeIn(
+                      duration: const Duration(milliseconds: 400),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: tabletMode ? 0.15.sw : 0),
+                        child: Column(
+                          children: [
+                            _buildRatingSection(context, product, colors),
+                            _buildQuickStats(context, product, details, colors),
+                            if (_hasFlavorProfile(details) ||
+                                details?.valueScore != null)
+                              _buildBarsSection(
+                                  context, product, details!, colors),
+                            _buildInfoSection(
+                                context, product, details, colors),
+                            _buildStockSection(context, product, colors),
+                            if (details?.description != null &&
+                                details!.description!.isNotEmpty)
+                              _buildDescriptionSection(
+                                  context, details.description!, colors),
+                            SizedBox(height: 80.h),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             );
           },
@@ -1037,244 +114,723 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _showWrongUntappdMatchPopup(
-      BuildContext context, client, int productId) {
-    final urlController = TextEditingController();
-
-    Future<void> showDialogMessage(String title, String message) async {
-      Widget continueButton = FilledButton.tonal(
-        onPressed: () {
-          Navigator.of(context, rootNavigator: true).pop();
-        },
-        child: const Text(
-          'OK',
-        ),
-      );
-
-      AlertDialog alert = AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 18),
-        ),
-        content: Text(
-          message,
-          style: const TextStyle(
-            fontSize: 13,
-          ),
-        ),
-        actions: [
-          continueButton,
-        ],
-      );
-
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
-      );
-    }
-
-    void submit() async {
-      if (!ProductDetailScreen._formKey.currentState!.validate()) {
-        return;
-      }
-      if (urlController.text.isEmpty) {
-        return;
-      }
-      final untappdUrl = urlController.text;
-      try {
-        await ApiHelper.submitUntappdMatch(client, productId, untappdUrl);
-        await showDialogMessage('Takk for hjelpen!',
-            'Ditt forslag er nå sendt inn og vil bli behandlet innen kort tid.');
-      } catch (error) {
-        await showDialogMessage(
-            'Det oppsto en feil',
-            'Det oppsto en feil når vi forsøkte å sende forslaget ditt. '
-                'Sjekk at linken er en korrekt untappd link eller prøv igjen senere.');
-      }
-      Navigator.of(context).pop();
-    }
-
-    return SizedBox(
-      height: 0.27.sh + MediaQuery.of(context).viewInsets.bottom,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-          Flexible(
-            child: Form(
-              key: ProductDetailScreen._formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: <Widget>[
-                  const Text('Untappd link',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextFormField(
-                    autocorrect: false,
-                    autofocus: true,
-                    controller: urlController,
-                    keyboardType: TextInputType.url,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vennligst skriv inn riktig Untappd link.';
-                      }
-                      if (!value.contains('https://untappd.com/b/') &&
-                          !value.contains('https://untp.beer/')) {
-                        return 'Ugyldig untappd link.';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText:
-                            'https://untappd.com/b/nogne-o-imperial-stout/42871',
-                        floatingLabelBehavior: FloatingLabelBehavior.never),
-                    onEditingComplete: () => FocusScope.of(context).unfocus(),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  FilledButton.tonalIcon(
-                    onPressed: () {
-                      submit();
-                    },
-                    label: const Text('Send inn'),
-                    icon: const Icon(Icons.send),
+  AppBar _buildAppBar(
+      BuildContext context, http.Client client, Product product) {
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => Navigator.of(context).pop(_loadedProduct ?? product),
+      ),
+      title: const Text('Detaljer'),
+      actions: [
+        PopupMenuButton(
+          itemBuilder: (_) => [
+            PopupMenuItem(
+              value: 0,
+              child: Row(
+                children: [
+                  const Icon(Icons.report_outlined),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      product.rating != null
+                          ? 'Rapporter feil Untappd match'
+                          : 'Foreslå untappd match',
+                    ),
                   ),
                 ],
               ),
             ),
+            PopupMenuItem(
+              value: 1,
+              child: Row(
+                children: [
+                  const Icon(Icons.sports_bar_outlined),
+                  SizedBox(width: 12.w),
+                  const Text('Åpne i Untappd'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 2,
+              child: Row(
+                children: [
+                  const Icon(Icons.open_in_browser),
+                  SizedBox(width: 12.w),
+                  const Text('Åpne i Vinmonopolet'),
+                ],
+              ),
+            ),
+          ],
+          onSelected: (value) {
+            if (value == 0) {
+              _showWrongUntappdMatchSheet(context, client, product.id);
+            } else if (value == 1) {
+              AppLauncher.launchUntappd(product);
+            } else if (value == 2 && product.vmpUrl != null) {
+              launchUrl(Uri.parse(product.vmpUrl!));
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFab(BuildContext context, Cart cart, Product product) {
+    return Consumer<Cart>(
+      builder: (context, _, __) {
+        final inCart = cart.items.keys.contains(product.id);
+        final quantity = inCart ? cart.items[product.id]!.quantity : 0;
+
+        return GestureDetector(
+          onLongPress: () {
+            if (inCart) {
+              HapticFeedback.mediumImpact();
+              cart.removeSingleItem(product.id);
+              cart.updateCartItemsData();
+            }
+          },
+          child: FloatingActionButton.small(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              cart.addItem(product.id, product);
+              cart.updateCartItemsData();
+            },
+            child: Badge(
+              isLabelVisible: inCart,
+              label: Text('$quantity'),
+              child: const Icon(Icons.add_shopping_cart),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(
+      BuildContext context,
+      Product product,
+      Product? details,
+      String herotag,
+      String? displayImageUrl,
+      double imageSize,
+      ColorScheme colors) {
+    // Calculate price per unit if alcohol units available
+    double? pricePerUnit;
+    if (details?.alcoholUnits != null && details!.alcoholUnits! > 0) {
+      pricePerUnit = product.price / details.alcoholUnits!;
+    }
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(0, 8.h, 0, 4.h),
+      child: Column(
+        children: [
+          SizedBox(
+            height: imageSize,
+            width: double.infinity,
+            child: Hero(
+              tag: herotag,
+              child: displayImageUrl != null && displayImageUrl.isNotEmpty
+                  ? Image.network(displayImageUrl, fit: BoxFit.contain)
+                  : Image.asset('assets/images/placeholder.png',
+                      fit: BoxFit.contain),
+            ),
+          ),
+          SizedBox(height: 16.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Column(
+              children: [
+                Text(
+                  product.name,
+                  style:
+                      TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 6.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Kr ${product.price.toStringAsFixed(2)}',
+                      style: TextStyle(
+                          fontSize: 18.sp, fontWeight: FontWeight.bold),
+                    ),
+                    if (product.pricePerVolume != null) ...[
+                      SizedBox(width: 6.w),
+                      Text('·',
+                          style: TextStyle(
+                              fontSize: 14.sp, color: colors.onSurfaceVariant)),
+                      SizedBox(width: 6.w),
+                      Text(
+                        '${product.pricePerVolume!.toStringAsFixed(0)} kr/l',
+                        style: TextStyle(
+                            fontSize: 13.sp, color: colors.onSurfaceVariant),
+                      ),
+                    ],
+                    if (pricePerUnit != null) ...[
+                      SizedBox(width: 6.w),
+                      Text('·',
+                          style: TextStyle(
+                              fontSize: 14.sp, color: colors.onSurfaceVariant)),
+                      SizedBox(width: 6.w),
+                      Text(
+                        '${pricePerUnit.toStringAsFixed(0)} kr/enhet',
+                        style: TextStyle(
+                            fontSize: 13.sp, color: colors.onSurfaceVariant),
+                      ),
+                    ],
+                  ],
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  product.style,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                    color: colors.primary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _showFriendsCheckinsPopup(
-      BuildContext context, List<dynamic> checkins) {
-    return SizedBox(
-      height: 0.4.sh,
+  Widget _buildRatingSection(
+      BuildContext context, Product product, ColorScheme colors) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: GestureDetector(
+        onTap: () => AppLauncher.launchUntappd(product),
+        child: product.rating != null
+            ? Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        product.rating!.toStringAsFixed(2),
+                        style: TextStyle(
+                            fontSize: 24.sp, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 8.w),
+                      createRatingBar(
+                          rating: product.rating!,
+                          size: 20.r,
+                          color: Colors.amber),
+                    ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    '${NumberFormat.compact().format(product.checkins)} check-ins på Untappd',
+                    style: TextStyle(
+                        fontSize: 12.sp, color: colors.onSurfaceVariant),
+                  ),
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 16.r, color: colors.onSurfaceVariant),
+                  SizedBox(width: 6.w),
+                  Text(
+                    'Ingen Untappd-match',
+                    style: TextStyle(
+                        fontSize: 13.sp, color: colors.onSurfaceVariant),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  bool _hasFlavorProfile(Product? details) {
+    if (details == null) return false;
+    return details.freshness != null ||
+        details.bitterness != null ||
+        details.sweetness != null ||
+        details.fullness != null;
+  }
+
+  Widget _buildBarsSection(BuildContext context, Product product,
+      Product details, ColorScheme colors) {
+    final bars = <Widget>[];
+
+    // Flavor profile bars
+    if (details.freshness != null) {
+      bars.add(_buildBar(
+          'Friskhet', details.freshness! / 12, colors.primary, colors));
+    }
+    if (details.fullness != null) {
+      bars.add(
+          _buildBar('Fylde', details.fullness! / 12, colors.primary, colors));
+    }
+    if (details.bitterness != null) {
+      bars.add(_buildBar(
+          'Bitterhet', details.bitterness! / 12, colors.primary, colors));
+    }
+    if (details.sweetness != null && details.sweetness! > 0) {
+      bars.add(
+          _buildBar('Sødme', details.sweetness! / 12, colors.primary, colors));
+    }
+
+    // Value score bar
+    if (details.valueScore != null) {
+      Color valueColor;
+      if (details.valueScore! >= 15) {
+        valueColor = Colors.green;
+      } else if (details.valueScore! >= 10) {
+        valueColor = Colors.blue;
+      } else if (details.valueScore! >= 5) {
+        valueColor = Colors.orange;
+      } else {
+        valueColor = Colors.red;
+      }
+      bars.add(
+          _buildBar('Verdi', details.valueScore! / 20, valueColor, colors));
+    }
+
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        children: bars,
+      ),
+    );
+  }
+
+  Widget _buildBar(
+      String label, double value, Color barColor, ColorScheme colors) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 70.w,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(3.r),
+              child: LinearProgressIndicator(
+                value: value,
+                minHeight: 6.h,
+                backgroundColor: colors.outlineVariant.withValues(alpha: 0.2),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    barColor.withValues(alpha: 0.7)),
+              ),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          SizedBox(
+            width: 35.w,
+            child: Text(
+              '${(value * 100).toStringAsFixed(0)}%',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: colors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStats(BuildContext context, Product product,
+      Product? details, ColorScheme colors) {
+    final stats = <Widget>[];
+    if (product.abv != null) {
+      stats.add(_buildStat('Styrke', '${product.abv}%', colors));
+    }
+    stats.add(_buildStat('Størrelse', '${product.volume}L', colors));
+    if (details?.acid != null) {
+      stats.add(_buildStat('Syre', '${details!.acid} g/l', colors));
+    }
+    if (details?.sugar != null) {
+      stats.add(_buildStat('Sukker', '${details!.sugar} g/l', colors));
+    }
+    if (details?.ibu != null && details!.ibu! > 0) {
+      stats.add(_buildStat('IBU', details.ibu!.toStringAsFixed(0), colors));
+    }
+    if (details?.alcoholUnits != null && details!.alcoholUnits! > 0) {
+      stats.add(_buildStat(
+          'Enheter', details.alcoholUnits!.toStringAsFixed(1), colors));
+    }
+
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Wrap(
+        spacing: 16.w,
+        runSpacing: 8.h,
+        alignment: WrapAlignment.center,
+        children: stats,
+      ),
+    );
+  }
+
+  Widget _buildStat(String label, String value, ColorScheme colors) {
+    return Column(
+      children: [
+        Text(value,
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600)),
+        Text(label,
+            style: TextStyle(fontSize: 13.sp, color: colors.onSurfaceVariant)),
+      ],
+    );
+  }
+
+  Widget _buildInfoSection(BuildContext context, Product product,
+      Product? details, ColorScheme colors) {
+    final infoItems = <_InfoRow>[];
+
+    // Primary info - what users care about most
+    if (details?.taste != null) {
+      infoItems.add(_InfoRow('Smak', _cleanText(details!.taste!)));
+    }
+    if (details?.aroma != null) {
+      infoItems.add(_InfoRow('Lukt', _cleanText(details!.aroma!)));
+    }
+    if (details?.foodPairing != null) {
+      infoItems.add(_InfoRow('Passer til', _cleanText(details!.foodPairing!)));
+    }
+    if (details?.brewery != null) {
+      infoItems.add(_InfoRow('Bryggeri', details!.brewery!));
+    }
+    if (product.country != null) {
+      infoItems.add(
+          _InfoRow('Land', product.country!, countryCode: product.countryCode));
+    }
+
+    // Secondary info
+    if (details?.year != null && details!.year! > 0) {
+      infoItems.add(_InfoRow('Årgang', details.year.toString()));
+    }
+    if (details?.color != null) {
+      infoItems.add(_InfoRow('Farge', _cleanText(details!.color!)));
+    }
+    if (details?.storable != null) {
+      infoItems.add(_InfoRow('Lagring', _cleanText(details!.storable!)));
+    }
+    if (details?.rawMaterials != null) {
+      infoItems.add(_InfoRow('Råstoff', _cleanText(details!.rawMaterials!)));
+    }
+    if (details?.method != null) {
+      infoItems.add(_InfoRow('Metode', details!.method!));
+    }
+
+    // Technical info
+    if (details?.allergens != null) {
+      infoItems.add(_InfoRow('Allergen', details!.allergens!));
+    }
+    if (details?.productSelection != null) {
+      infoItems.add(_InfoRow('Utvalg', details!.productSelection!));
+    }
+    infoItems.add(_InfoRow('Varenummer', product.id.toString()));
+
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                  color: Colors.grey[500],
-                  borderRadius: BorderRadius.circular(10)),
-            ),
+          Text(
+            'Informasjon',
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
           ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            height: 0.4.sh - 28,
-            width: 1.sw,
-            child: ListView.builder(
-                itemCount: checkins.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 16,
-                                foregroundImage:
-                                    NetworkImage(checkins[index]['avatar']),
-                                backgroundImage: const AssetImage(
-                                    'assets/images/default_avatar.png'),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                checkins[index]['username'],
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                '${checkins[index]['rating'].toStringAsFixed(2)} ',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              createRatingBar(
-                                  rating: checkins[index]['rating'],
-                                  size: 18,
-                                  color: Colors.yellow[700]!),
-                              Text(
-                                ' (${checkins[index]['count']})',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      const Divider(
-                        height: 10,
-                      )
-                    ],
-                  );
-                }),
-          )
+          SizedBox(height: 8.h),
+          ...infoItems.asMap().entries.map((entry) {
+            final isLast = entry.key == infoItems.length - 1;
+            return _buildInfoRow(entry.value, isLast, colors);
+          }),
         ],
       ),
     );
   }
 
-  void wrongUntappdMatch(http.Client client, Product product) {
-    showModalBottomSheet<void>(
-      isScrollControlled: true,
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-      ),
-      builder: (BuildContext context) {
-        return _showWrongUntappdMatchPopup(context, client, product.id);
-      },
+  Widget _buildInfoRow(_InfoRow row, bool isLast, ColorScheme colors) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 100.w,
+                child: Text(
+                  row.label,
+                  style: TextStyle(
+                      fontSize: 13.sp, color: colors.onSurfaceVariant),
+                ),
+              ),
+              Expanded(
+                child: row.countryCode != null
+                    ? Row(
+                        children: [
+                          if (row.countryCode!.isNotEmpty) ...[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(2.r),
+                              child: Flag.fromString(
+                                row.countryCode!,
+                                height: 12.r,
+                                width: 16.r,
+                              ),
+                            ),
+                            SizedBox(width: 6.w),
+                          ],
+                          Text(row.value, style: TextStyle(fontSize: 13.sp)),
+                        ],
+                      )
+                    : Text(row.value, style: TextStyle(fontSize: 13.sp)),
+              ),
+            ],
+          ),
+        ),
+        if (!isLast) Divider(height: 1, color: colors.outlineVariant),
+      ],
     );
   }
 
-  void friendsCheckins(List<dynamic> checkins) {
-    showModalBottomSheet<void>(
-      isScrollControlled: true,
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+  Widget _buildStockSection(
+      BuildContext context, Product product, ColorScheme colors) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12.r),
       ),
-      builder: (BuildContext context) {
-        return _showFriendsCheckinsPopup(context, checkins);
-      },
+      child: GestureDetector(
+        onTap: () => showStockPopup(
+          context: context,
+          productId: product.id,
+          preloadedStock: _loadedProduct?.allStock,
+        ),
+        behavior: HitTestBehavior.opaque,
+        child: Row(
+          children: [
+            Icon(Icons.store_outlined, size: 20.r, color: colors.primary),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Lagerstatus',
+                    style:
+                        TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    _stockList.isEmpty
+                        ? 'Se tilgjengelighet i dine butikker'
+                        : '${_stockList.length} ${_stockList.length == 1 ? 'butikk' : 'butikker'} har på lager',
+                    style: TextStyle(
+                        fontSize: 12.sp, color: colors.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right,
+                size: 24.r, color: colors.onSurfaceVariant),
+          ],
+        ),
+      ),
     );
   }
+
+  Widget _buildDescriptionSection(
+      BuildContext context, String description, ColorScheme colors) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Beskrivelse',
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 8.h),
+          Text(description, style: TextStyle(fontSize: 13.sp, height: 1.5)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildError() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 48.r),
+          SizedBox(height: 16.h),
+          const Text('Kunne ikke laste detaljer'),
+        ],
+      ),
+    );
+  }
+
+  String _cleanText(String text) => text.replaceAll('.', '').trim();
+
+  void _showWrongUntappdMatchSheet(
+      BuildContext context, http.Client client, int productId) {
+    final urlController = TextEditingController();
+
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 12.h, bottom: 8.h),
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16.r),
+              child: Form(
+                key: ProductDetailScreen._formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Untappd link',
+                      style: TextStyle(
+                          fontSize: 16.sp, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12.h),
+                    TextFormField(
+                      autocorrect: false,
+                      autofocus: true,
+                      controller: urlController,
+                      keyboardType: TextInputType.url,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vennligst skriv inn Untappd link';
+                        }
+                        if (!value.contains('https://untappd.com/b/') &&
+                            !value.contains('https://untp.beer/')) {
+                          return 'Ugyldig Untappd link';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText:
+                            'https://untappd.com/b/nogne-o-imperial-stout/42871',
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () => _submitUntappdMatch(
+                            context, client, productId, urlController.text),
+                        icon: const Icon(Icons.send),
+                        label: const Text('Send inn'),
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submitUntappdMatch(BuildContext context, http.Client client,
+      int productId, String untappdUrl) async {
+    if (!ProductDetailScreen._formKey.currentState!.validate()) return;
+    if (untappdUrl.isEmpty) return;
+
+    try {
+      await ApiHelper.submitUntappdMatch(client, productId, untappdUrl);
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Takk! Forslaget ditt er sendt inn.',
+                textAlign: TextAlign.center),
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kunne ikke sende forslag. Prøv igjen senere.',
+                textAlign: TextAlign.center),
+          ),
+        );
+      }
+    }
+  }
+}
+
+class _InfoRow {
+  final String label;
+  final String value;
+  final String? countryCode;
+
+  _InfoRow(this.label, this.value, {this.countryCode});
 }
