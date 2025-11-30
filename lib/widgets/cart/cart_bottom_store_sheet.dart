@@ -114,7 +114,7 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       title: const Text(
                           'Grå ut dersom ingen på lager i valgte butikker'),
                       value: cart.greyNoStock,
-                      activeThumbColor: Theme.of(context).colorScheme.primary,
+                      activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
                         mystate(() {
                           cart.greyNoStock = value;
@@ -128,7 +128,7 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       title: const Text(
                           'Skjul dersom ingen på lager i valgte butikker'),
                       value: cart.hideNoStock,
-                      activeThumbColor: Theme.of(context).colorScheme.primary,
+                      activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
                         mystate(() {
                           cart.hideNoStock = value;
@@ -141,7 +141,7 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       contentPadding: const EdgeInsets.only(left: 16, right: 4),
                       title: const Text('Bruk butikkvalg fra oversikt'),
                       value: cart.useOverviewStoreSelection,
-                      activeThumbColor: Theme.of(context).colorScheme.primary,
+                      activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
                         mystate(() {
                           cart.useOverviewStoreSelection = value;
