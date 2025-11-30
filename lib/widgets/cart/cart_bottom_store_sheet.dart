@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../providers/cart.dart';
 import '../../providers/filter.dart';
 import '../../assets/constants.dart';
+import '../filters/multi_select_dropdown.dart';
 
 class CartBottomStoreSheet extends StatefulWidget {
   const CartBottomStoreSheet({super.key});
@@ -88,34 +88,18 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                      child: DropdownSearch<String>(
-                        popupProps: const PopupProps.dialog(),
-                        decoratorProps: DropDownDecoratorProps(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 23,
-                              horizontal: 10,
-                            ),
-                          ),
-                        ),
-                        dropdownBuilder: (context, selectedItem) {
-                          return Text(
-                            selectedItem!,
-                            style: const TextStyle(fontSize: 16),
-                          );
-                        },
-                        items: (filter, loadProps) =>
-                            _sortList.map((value) => value!).toList(),
+                      child: SingleSelectDropdown<String>(
+                        items: _sortList.whereType<String>().toList(),
                         selectedItem: cart.cartSortIndex,
+                        itemLabel: (item) => item,
+                        hintText: 'Velg sortering',
                         onChanged: (String? x) {
-                          mystate(() {
-                            cart.cartSortIndex = x!;
-                            cart.sortCart();
-                          });
+                          if (x != null) {
+                            mystate(() {
+                              cart.cartSortIndex = x;
+                              cart.sortCart();
+                            });
+                          }
                         },
                       ),
                     ),
@@ -180,97 +164,50 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                             Consumer<Filter>(
                               builder: (context, filters, _) {
-                                if (!filters.storesLoading &&
-                                    filters.storeList.isEmpty) {
-                                  filters.getStores();
-                                }
-                                return filters.storeList.isNotEmpty
-                                    ? Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 8, 0, 8),
-                                        child: DropdownSearch<
-                                            String>.multiSelection(
-                                          popupProps:
-                                              PopupPropsMultiSelection.dialog(
-                                            showSelectedItems: true,
-                                            showSearchBox: true,
-                                            searchFieldProps: TextFieldProps(
-                                              decoration: InputDecoration(
-                                                labelText: 'Søk',
-                                                prefixIcon:
-                                                    const Icon(Icons.search),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                    20,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            itemBuilder: (context, item,
-                                                isDisabled, isSelected) {
-                                              return Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8),
-                                                child: ListTile(
-                                                  title: Text(item),
-                                                  subtitle: Text(filters
-                                                          .storeList.isNotEmpty
-                                                      ? '${filters.storeList.firstWhere((element) => element.name == item).distance!.toStringAsFixed(0)}km'
-                                                      : ''),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                          dropdownBuilder:
-                                              (context, selectedItems) {
-                                            return Text(
-                                              cart.cartSelectedStores.isNotEmpty
-                                                  ? cart.cartSelectedStores
-                                                      .reduce(
-                                                          (a, b) => '$a, $b')
-                                                  : 'Velg butikker',
-                                              style:
-                                                  const TextStyle(fontSize: 16),
-                                            );
-                                          },
-                                          decoratorProps:
-                                              DropDownDecoratorProps(
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  24,
-                                                ),
-                                              ),
-                                              isDense: true,
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 23,
-                                                horizontal: 10,
-                                              ),
-                                            ),
-                                          ),
-                                          items: (filter, loadProps) => filters
-                                              .storeList
-                                              .map((e) => e.name)
-                                              .toList(),
-                                          onChanged: (List<String> x) {
-                                            mystate(() {
-                                              cart.cartSelectedStores = x;
-                                              cart.setCartStore(
-                                                  filters.storeList);
-                                              initCartSettings();
-                                            });
-                                          },
-                                          selectedItems:
-                                              cart.cartSelectedStores,
-                                        ),
-                                      )
-                                    : const Center(
-                                        child: CircularProgressIndicator(),
-                                      );
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                                  child: MultiSelectDropdown<String>(
+                                    items: filters.storeList
+                                        .map((e) => e.name)
+                                        .toList(),
+                                    selectedItems: cart.cartSelectedStores,
+                                    itemLabel: (item) => item,
+                                    itemSubtitle: (item) {
+                                      final store = filters.storeList
+                                          .where((s) => s.name == item)
+                                          .firstOrNull;
+                                      if (store?.distance != null) {
+                                        return '${store!.distance!.toStringAsFixed(0)} km';
+                                      }
+                                      return null;
+                                    },
+                                    hintText: 'Velg butikker',
+                                    searchHint: 'Søk etter butikk...',
+                                    selectedLabel: (selected) => selected
+                                            .isEmpty
+                                        ? 'Velg butikker'
+                                        : selected.length == 1
+                                            ? selected.first
+                                            : '${selected.length} butikker valgt',
+                                    asyncItems: () async {
+                                      if (filters.storeList.isEmpty &&
+                                          !filters.storesLoading) {
+                                        await filters.getStores();
+                                      }
+                                      return filters.storeList
+                                          .map((e) => e.name)
+                                          .toList();
+                                    },
+                                    onChanged: (List<String> selected) {
+                                      mystate(() {
+                                        cart.cartSelectedStores = selected;
+                                        cart.setCartStore(filters.storeList);
+                                        initCartSettings();
+                                      });
+                                    },
+                                  ),
+                                );
                               },
                             ),
                           ],

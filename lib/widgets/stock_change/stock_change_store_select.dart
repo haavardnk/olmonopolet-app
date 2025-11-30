@@ -1,91 +1,153 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 
-class StockChangeStoreSelect extends StatelessWidget {
-  const StockChangeStoreSelect({
-    super.key,
-    required GlobalKey<DropdownSearchState<String>> openDropDownProgKey,
-    required this.filters,
-  }) : _openDropDownProgKey = openDropDownProgKey;
+Future<void> showStockChangeStoreDialog(
+    BuildContext context, Filter filters) async {
+  TextEditingController? searchController;
+  String searchQuery = '';
 
-  final GlobalKey<DropdownSearchState<String>> _openDropDownProgKey;
-  final Filter filters;
+  // Load stores if needed
+  if (filters.storeList.isEmpty && !filters.storesLoading) {
+    await filters.getStores();
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Visibility(
-      maintainState: true,
-      visible: false,
-      child: SizedBox(
-        width: 10,
-        child: DropdownSearch<String>(
-          key: _openDropDownProgKey,
-          popupProps: PopupPropsMultiSelection.dialog(
-            showSelectedItems: true,
-            showSearchBox: true,
-            searchFieldProps: TextFieldProps(
-              decoration: InputDecoration(
-                labelText: 'Søk',
-                prefixIcon: const Icon(
-                  Icons.search,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
+  if (!context.mounted) return;
+
+  await showDialog(
+    context: context,
+    builder: (dialogContext) {
+      return StatefulBuilder(
+        builder: (context, setDialogState) {
+          searchController ??= TextEditingController();
+
+          final filteredStores = searchQuery.isEmpty
+              ? filters.storeList
+              : filters.storeList
+                  .where(
+                      (s) => s.name.toLowerCase().contains(searchQuery))
+                  .toList();
+
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: 400,
+                maxHeight: 550,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                    child: Column(
+                      children: [
+                        Consumer<Filter>(
+                          builder: (context, _, __) {
+                            return SwitchListTile(
+                              contentPadding:
+                                  const EdgeInsets.only(left: 4, right: 0),
+                              title: const Text(
+                                'Husk valgt butikk',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              value: filters.filterSaveSettings[11]['save'],
+                              onChanged: (bool newValue) {
+                                setDialogState(() {
+                                  filters.filterSaveSettings[11]['save'] =
+                                      newValue;
+                                  filters.saveFilterSettings();
+                                });
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Søk etter butikk...',
+                            prefixIcon: const Icon(Icons.search, size: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                          onChanged: (value) {
+                            searchQuery = value.toLowerCase();
+                            setDialogState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  // List
+                  Flexible(
+                    child: filteredStores.isEmpty
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Text(
+                                'Ingen butikker funnet',
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            itemCount: filteredStores.length,
+                            itemBuilder: (context, index) {
+                              final store = filteredStores[index];
+                              final isSelected = filters
+                                      .stockChangeSelectedStore ==
+                                  store.name;
+                              return ListTile(
+                                dense: true,
+                                title: Text(store.name),
+                                subtitle: store.distance != null
+                                    ? Text(
+                                        '${store.distance!.toStringAsFixed(0)} km')
+                                    : null,
+                                trailing: isSelected
+                                    ? Icon(
+                                        Icons.check_circle,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      )
+                                    : null,
+                                onTap: () {
+                                  filters.stockChangeSelectedStore = store.name;
+                                  filters.setStore(stock: true);
+                                  Navigator.pop(dialogContext);
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
-            itemBuilder: (context, item, isDisabled, isSelected) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                child: ListTile(
-                  title: Text(item),
-                  subtitle: Text(filters.storeList.isNotEmpty &&
-                          filters.storeList
-                                  .firstWhere((element) => element.name == item)
-                                  .distance !=
-                              null
-                      ? '${filters.storeList.firstWhere((element) => element.name == item).distance!.toStringAsFixed(0)}km'
-                      : ''),
-                ),
-              );
-            },
-            containerBuilder: (context, popupWidget) {
-              return Column(
-                children: [
-                  Consumer<Filter>(
-                    builder: (context, _, __) {
-                      return SwitchListTile(
-                        contentPadding:
-                            const EdgeInsets.only(left: 12, right: 4),
-                        title: const Text(
-                          'Husk valgt butikk',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        value: filters.filterSaveSettings[11]['save'],
-                        onChanged: (bool newValue) {
-                          filters.filterSaveSettings[11]['save'] = newValue;
-                          filters.saveFilterSettings();
-                        },
-                      );
-                    },
-                  ),
-                  Expanded(child: popupWidget),
-                ],
-              );
-            },
-          ),
-          items: (filter, loadProps) =>
-              filters.storeList.map((e) => e.name).toList(),
-          onChanged: (String? x) {
-            filters.stockChangeSelectedStore = x!;
-            filters.setStore(stock: true);
-          },
-          selectedItem: filters.stockChangeSelectedStore,
-        ),
-      ),
-    );
-  }
+          );
+        },
+      );
+    },
+  );
+  searchController?.dispose();
 }

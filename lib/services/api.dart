@@ -255,6 +255,16 @@ class ApiHelper {
     );
   }
 
+  static Future<List<String>> getReleaseNames(http.Client client) async {
+    const endpoint = 'release/?fields=name';
+    return _handleRequest(
+      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      parser: (json) =>
+          (json as List).map((item) => item['name'] as String).toList(),
+      endpoint: endpoint,
+    );
+  }
+
   static Uri _buildProductUrl(int page, Filter filter, int pageSize) {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'

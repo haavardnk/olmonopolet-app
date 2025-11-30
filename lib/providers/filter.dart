@@ -43,6 +43,7 @@ class Filter with ChangeNotifier {
   List<String> selectedStores = [];
   List<Store> storeList = [];
   List<Release> releaseList = [];
+  List<String> releaseNameList = [];
   List<Country> countryList = [];
   List<String> untappdStyleList = [];
   String stockChangeSelectedStore = '';
@@ -100,6 +101,25 @@ class Filter with ChangeNotifier {
 
   bool releasesLoading = false;
 
+  Future<List<String>> getReleaseNames() async {
+    if (releaseNameList.isNotEmpty || releasesLoading) {
+      return releaseNameList;
+    }
+    try {
+      releasesLoading = true;
+      var releases = await ApiHelper.getReleaseNames(_client);
+      releaseNameList = releases;
+      releaseSelectedList = List<bool>.filled(releaseNameList.length, false);
+      releasesLoading = false;
+      notifyListeners();
+      return releaseNameList;
+    } catch (error) {
+      releasesLoading = false;
+      notifyListeners();
+      return releaseNameList;
+    }
+  }
+
   Future<List<Release>> getReleases() async {
     if (releaseList.isNotEmpty || releasesLoading) {
       return releaseList;
@@ -107,9 +127,8 @@ class Filter with ChangeNotifier {
     try {
       releasesLoading = true;
       var releases =
-          await ApiHelper.getReleaseList(_client, page: 1, pageSize: 100);
+          await ApiHelper.getReleaseList(_client, page: 1, pageSize: 10);
       releaseList = releases;
-      releaseSelectedList = List<bool>.filled(releaseList.length, false);
       releasesLoading = false;
       notifyListeners();
       return releaseList;
@@ -281,11 +300,11 @@ class Filter with ChangeNotifier {
     var temporaryRelease = '';
     releaseSelectedList.asMap().forEach(
       (index, value) {
-        if (value) {
+        if (value && index < releaseNameList.length) {
           if (temporaryRelease.isNotEmpty) {
             temporaryRelease += ',';
           }
-          temporaryRelease += releaseList[index].name;
+          temporaryRelease += releaseNameList[index];
         }
       },
     );

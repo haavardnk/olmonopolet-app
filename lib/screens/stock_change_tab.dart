@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/drawer/app_drawer.dart';
@@ -18,7 +17,6 @@ class _StockChangeTabState extends State<StockChangeTab> {
   @override
   Widget build(BuildContext context) {
     late Filter filters = Provider.of<Filter>(context, listen: false);
-    final openDropDownProgKey = GlobalKey<DropdownSearchState<String>>();
 
     return Scaffold(
       appBar: AppBar(
@@ -33,13 +31,9 @@ class _StockChangeTabState extends State<StockChangeTab> {
           ),
         ),
         actions: [
-          StockChangeStoreSelect(
-            openDropDownProgKey: openDropDownProgKey,
-            filters: filters,
-          ),
           IconButton(
             onPressed: () {
-              openDropDownProgKey.currentState?.openDropDownSearch();
+              showStockChangeStoreDialog(context, filters);
             },
             icon: const Icon(
               Icons.store,
@@ -58,7 +52,7 @@ class _StockChangeTabState extends State<StockChangeTab> {
                     label: const Text('Velg butikk'),
                     icon: const Icon(Icons.store),
                     onPressed: () {
-                      openDropDownProgKey.currentState?.openDropDownSearch();
+                      showStockChangeStoreDialog(context, filters);
                     },
                   ),
                 );

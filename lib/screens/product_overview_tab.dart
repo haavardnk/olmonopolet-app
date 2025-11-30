@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../widgets/products/product_list.dart';
 import '../widgets/drawer/app_drawer.dart';
-import '../widgets/products/product_overview_bottom_filter_sheet.dart';
+import '../widgets/filters/product_filter_sheet.dart';
 import '../widgets/products/product_overview_search_bar.dart';
 import '../widgets/products/product_overview_release_sort.dart';
 import '../widgets/products/product_overview_release_product_selection.dart';
@@ -33,7 +33,7 @@ class ProductOverviewTab extends StatelessWidget {
             : const ProductOverviewSearchBar(),
         actions: [
           release == null
-              ? const ProductOverviewBottomFilterSheet()
+              ? const ProductFilterSheet()
               : ProductOverviewReleaseSort(release!),
         ],
         bottom: (release != null && release!.productSelections.length > 1)
