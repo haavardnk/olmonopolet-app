@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flag/flag.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
@@ -12,6 +11,7 @@ import '../../models/release.dart';
 import '../../providers/cart.dart';
 import '../../screens/product_detail_screen.dart';
 import '../common/rating_widget.dart';
+import '../common/info_chips.dart';
 import '../../assets/constants.dart';
 
 class ProductItem extends StatefulWidget {
@@ -202,24 +202,27 @@ class _ProductItemState extends State<ProductItem> {
                           runSpacing: 4.h,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            _buildInfoChip('${_product.volume}L', context),
+                            buildInfoChip('${_product.volume}L', context,
+                                icon: Icons.water_drop_outlined),
                             if (_product.abv != null)
-                              _buildInfoChip(
+                              buildInfoChip(
                                   '${_product.abv!.toStringAsFixed(1)}%',
-                                  context),
+                                  context,
+                                  icon: Icons.percent),
                             if (_product.country != null &&
                                 _product.country!.isNotEmpty)
-                              _buildInfoChipWithFlag(
+                              buildInfoChipWithFlag(
                                 _product.country!,
                                 _product.countryCode,
                                 context,
                               ),
                             if (_product.stock != null && _product.stock! > 0)
-                              _buildInfoChip('${_product.stock} stk', context,
-                                  highlight: true),
+                              buildInfoChip('${_product.stock} stk', context,
+                                  highlight: true,
+                                  icon: Icons.inventory_2_outlined),
                             if (widget.release != null &&
                                 widget.release!.productSelections.length > 1)
-                              _buildInfoChip(
+                              buildInfoChip(
                                   productSelectionAbrevationList[
                                           _product.productSelection] ??
                                       '',
@@ -303,64 +306,6 @@ class _ProductItemState extends State<ProductItem> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildInfoChip(String text, BuildContext context,
-      {bool highlight = false}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-      decoration: BoxDecoration(
-        color: highlight
-            ? Theme.of(context).colorScheme.primaryContainer
-            : Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 10.sp,
-          fontWeight: FontWeight.w500,
-          color: highlight
-              ? Theme.of(context).colorScheme.onPrimaryContainer
-              : Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoChipWithFlag(
-      String country, String? countryCode, BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (countryCode != null && countryCode.isNotEmpty) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(2.r),
-              child: Flag.fromString(
-                countryCode,
-                height: 10.r,
-                width: 10.r * 4 / 3,
-              ),
-            ),
-            SizedBox(width: 4.w),
-          ],
-          Text(
-            country,
-            style: TextStyle(
-              fontSize: 10.sp,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flag/flag.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../providers/cart.dart';
@@ -13,6 +13,7 @@ import '../../providers/http_client.dart';
 import '../../services/api.dart';
 import '../../models/product.dart';
 import '../common/rating_widget.dart';
+import '../common/info_chips.dart';
 import '../../screens/product_detail_screen.dart';
 
 class CartElement extends StatefulWidget {
@@ -29,26 +30,12 @@ class CartElement extends StatefulWidget {
 }
 
 class CartElementState extends State<CartElement> {
-  bool _expanded = false;
-
   List<StockInfo> _stockList = [];
-  List<StockInfo> _sortStockList(List<StockInfo> stockList, List storeList) {
-    final storeNames = storeList.map((e) => e.name).toList();
-    Map<String, int> order = {
-      for (var key in storeNames) key: storeNames.indexOf(key)
-    };
-    final filteredList =
-        stockList.where((s) => order.containsKey(s.storeName)).toList();
-    filteredList
-        .sort((a, b) => order[a.storeName]!.compareTo(order[b.storeName]!));
-    return filteredList;
-  }
 
   @override
   Widget build(BuildContext context) {
-    final filters = Provider.of<Filter>(context, listen: false);
-    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
     final heroTag = 'cart${widget.cartItem.product.id}';
+    final double imageSize = 85.r;
     int quantity = widget.cartItem.quantity;
 
     return !widget.cartItem.inStock &&
@@ -100,34 +87,40 @@ class CartElementState extends State<CartElement> {
                     withNavBar: true,
                   );
                 },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.fastOutSlowIn,
-                  height: _expanded == true
-                      ? widget.boxImageSize + 120.r
-                      : widget.boxImageSize + 24,
-                  child: Stack(
-                    children: [
-                      Column(
+                child: Container(
+                  height: imageSize + 42.h,
+                  child: Opacity(
+                    opacity: !widget.cartItem.inStock &&
+                            widget.cartData.greyNoStock &&
+                            widget.cartData.cartStoreId.isNotEmpty
+                        ? 0.3
+                        : 1,
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 6.h),
+                      child: Stack(
                         children: [
-                          Opacity(
-                            opacity: !widget.cartItem.inStock &&
-                                    widget.cartData.greyNoStock &&
-                                    widget.cartData.cartStoreId.isNotEmpty
-                                ? 0.3
-                                : 1,
-                            child: Container(
-                              padding: EdgeInsets.all(12.r),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.cartItem.product.name,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 6.h),
+                              Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(6.r)),
-                                    child: Stack(
-                                      children: [
-                                        Hero(
+                                children: [
+                                  Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
+                                        child: Hero(
                                           tag: heroTag,
                                           child: widget.cartItem.product
                                                       .imageUrl !=
@@ -135,379 +128,476 @@ class CartElementState extends State<CartElement> {
                                               ? FancyShimmerImage(
                                                   imageUrl: widget.cartItem
                                                       .product.imageUrl!,
-                                                  height: widget.boxImageSize,
-                                                  width: widget.boxImageSize,
+                                                  height: imageSize,
+                                                  width: imageSize,
+                                                  boxFit: BoxFit.cover,
                                                   errorWidget: Image.asset(
                                                     'assets/images/placeholder.png',
-                                                    height: widget.boxImageSize,
-                                                    width: widget.boxImageSize,
+                                                    height: imageSize,
+                                                    width: imageSize,
+                                                    fit: BoxFit.cover,
                                                   ),
                                                 )
                                               : Image.asset(
                                                   'assets/images/placeholder.png',
-                                                  height: widget.boxImageSize,
-                                                  width: widget.boxImageSize,
+                                                  height: imageSize,
+                                                  width: imageSize,
+                                                  fit: BoxFit.cover,
                                                 ),
                                         ),
-                                        if (widget.cartItem.product
-                                                    .countryCode !=
-                                                null &&
-                                            widget.cartItem.product.countryCode!
-                                                .isNotEmpty)
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.only(
-                                                bottomRight:
-                                                    Radius.circular(6.r)),
-                                            child: Flag.fromString(
-                                              widget.cartItem.product
-                                                  .countryCode!,
-                                              height: 20.r,
-                                              width: 20.r * 4 / 3,
-                                            ),
-                                          )
-                                      ],
-                                    ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: _buildStoreButton(context),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    width: 10.w,
-                                  ),
+                                  SizedBox(width: 12.w),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                fontSize: 15.sp,
+                                                fontWeight: FontWeight.bold,
+                                                height: 1.0,
+                                              ),
+                                            ),
+                                            if (widget.cartItem.product
+                                                    .pricePerVolume !=
+                                                null) ...[
+                                              SizedBox(width: 6.w),
+                                              Text(
+                                                '·',
+                                                style: TextStyle(
+                                                  fontSize: 13.sp,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
+                                              SizedBox(width: 6.w),
+                                              Text(
+                                                '${widget.cartItem.product.pricePerVolume!.toStringAsFixed(0)} kr/l',
+                                                style: TextStyle(
+                                                  fontSize: 11.sp,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                        SizedBox(height: 4.h),
                                         Text(
-                                          widget.cartItem.product.name,
+                                          widget.cartItem.product.style,
                                           style: TextStyle(
-                                            fontSize: 14.sp,
+                                            fontSize: 12.sp,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
                                           ),
-                                          maxLines: 2,
+                                          maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        Container(
-                                          margin: EdgeInsets.only(top: 5.h),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
-                                                style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                        SizedBox(height: 4.h),
+                                        Row(
+                                          children: [
+                                            createRatingBar(
+                                              rating: widget.cartItem.product
+                                                      .rating ??
+                                                  0,
+                                              size: 16.r,
+                                              color: Colors.amber,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Text(
+                                              widget.cartItem.product.rating
+                                                      ?.toStringAsFixed(1) ??
+                                                  '-',
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w500,
                                               ),
-                                              if (widget.cartItem.product
-                                                      .pricePerVolume !=
-                                                  null)
-                                                Expanded(
-                                                  child: Text(
-                                                    ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                                    style: TextStyle(
-                                                        fontSize: 11.sp,
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                )
+                                            ),
+                                            if (widget.cartItem.product
+                                                    .checkins !=
+                                                null) ...[
+                                              SizedBox(width: 4.w),
+                                              Text(
+                                                '(${NumberFormat.compact().format(widget.cartItem.product.checkins)})',
+                                                style: TextStyle(
+                                                  fontSize: 11.sp,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
                                             ],
-                                          ),
+                                          ],
                                         ),
-                                        Container(
-                                          margin: EdgeInsets.only(top: 5.h),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                widget.cartItem.product
-                                                            .rating !=
-                                                        null
-                                                    ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
-                                                    : '0 ',
-                                                style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                ),
+                                        SizedBox(height: 6.h),
+                                        Wrap(
+                                          spacing: 6.w,
+                                          runSpacing: 4.h,
+                                          crossAxisAlignment:
+                                              WrapCrossAlignment.center,
+                                          children: [
+                                            buildInfoChip(
+                                              '${widget.cartItem.product.volume}L',
+                                              context,
+                                              icon: Icons.water_drop_outlined,
+                                            ),
+                                            if (widget.cartItem.product.abv !=
+                                                null)
+                                              buildInfoChip(
+                                                '${widget.cartItem.product.abv!.toStringAsFixed(1)}%',
+                                                context,
+                                                icon: Icons.percent,
                                               ),
-                                              createRatingBar(
-                                                  rating: widget.cartItem
-                                                              .product.rating !=
-                                                          null
-                                                      ? widget.cartItem.product
-                                                          .rating!
-                                                      : 0,
-                                                  size: 18.r,
-                                                  color: Colors.yellow[700]!),
-                                              Text(
+                                            if (widget.cartItem.product
+                                                        .country !=
+                                                    null &&
+                                                widget.cartItem.product.country!
+                                                    .isNotEmpty)
+                                              buildInfoChipWithFlag(
+                                                widget
+                                                    .cartItem.product.country!,
                                                 widget.cartItem.product
-                                                            .checkins !=
-                                                        null
-                                                    ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
-                                                    : '',
-                                                style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                ),
+                                                    .countryCode,
+                                                context,
                                               ),
-                                            ],
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 10.w,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Container(
-                                        height: widget.boxImageSize - 31,
-                                        width: 40.w,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 1,
-                                            color: Colors.grey[400]!,
-                                          ),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(24.r),
-                                          ),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child: Semantics(
-                                                    label: 'Legg til en',
-                                                    button: true,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        widget.cartData.addItem(
-                                                          widget.cartItem
-                                                              .product.id,
-                                                          widget
-                                                              .cartItem.product,
-                                                        );
-                                                      },
-                                                      child: Container(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                10.w,
-                                                                0,
-                                                                10.w,
-                                                                2.h),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                            Radius.circular(
-                                                                5.r),
-                                                          ),
-                                                        ),
-                                                        child: Icon(
-                                                          Icons.add,
-                                                          size: 18.r,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .onSurface,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Semantics(
-                                                    label: 'Fjern en',
-                                                    button: true,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        quantity == 1
-                                                            ? showPopupDelete(
-                                                                widget.index,
-                                                                widget
-                                                                    .boxImageSize,
-                                                                widget.cartItem,
-                                                                widget.cartData,
-                                                                context)
-                                                            : widget.cartData
-                                                                .removeSingleItem(
-                                                                    widget
-                                                                        .cartItem
-                                                                        .product
-                                                                        .id);
-                                                      },
-                                                      child: Container(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                10.w,
-                                                                2.h,
-                                                                10.w,
-                                                                0),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                            Radius.circular(
-                                                                5.r),
-                                                          ),
-                                                        ),
-                                                        child: Icon(
-                                                          Icons.remove,
-                                                          size: 18.r,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .onSurface,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Center(
-                                              child: Text(
-                                                quantity.toString(),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3.h,
-                                      ),
-                                      Semantics(
-                                        label:
-                                            'Vis butikker med varen på lager',
-                                        button: true,
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              _expanded = !_expanded;
-                                            });
-                                          },
-                                          child: Container(
-                                            height: 28.r,
-                                            width: 40.w,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                width: 1,
-                                                color: Colors.grey[400]!,
-                                              ),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(24.r),
-                                              ),
-                                            ),
-                                            child: Icon(
-                                              Icons.store_outlined,
-                                              size: 17.r,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
-                          if (_expanded == true)
-                            FutureBuilder<List<StockInfo>>(
-                              future: ApiHelper.getProductStock(
-                                  client, widget.cartItem.product.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData &&
-                                    snapshot.data!.isNotEmpty &&
-                                    filters.storeList.isNotEmpty) {
-                                  _stockList = _sortStockList(
-                                      snapshot.data!, filters.storeList);
-                                }
-                                return Expanded(
-                                  child: snapshot.connectionState ==
-                                          ConnectionState.waiting
-                                      ? const FadeIn(
-                                          duration: Duration(milliseconds: 500),
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        )
-                                      : Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              12.w, 0, 12.w, 12.h),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              if (_stockList.isNotEmpty)
-                                                Expanded(
-                                                  child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount:
-                                                        _stockList.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Column(
-                                                        children: [
-                                                          FadeIn(
-                                                            duration:
-                                                                const Duration(
-                                                                    milliseconds:
-                                                                        300),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  _stockList[
-                                                                          index]
-                                                                      .storeName,
-                                                                ),
-                                                                Text(
-                                                                  'På lager: ${_stockList[index].quantity}',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          const Divider(
-                                                              height: 5),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              if (_stockList.isEmpty)
-                                                const Expanded(
-                                                  child: Center(
-                                                    child: FadeIn(
-                                                      duration: Duration(
-                                                          milliseconds: 300),
-                                                      child: Text(
-                                                        'Ingen butikker har denne på lager',
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                            ],
-                                          ),
-                                        ),
-                                );
-                              },
-                            ),
+                          Positioned(
+                            bottom: 4.h,
+                            right: 0,
+                            child: _buildQuantityControl(context, quantity),
+                          ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           );
+  }
+
+  List<StockInfo> _sortStockList(List<StockInfo> stockList, List storeList) {
+    final storeNames = storeList.map((e) => e.name).toList();
+    Map<String, int> order = {
+      for (var key in storeNames) key: storeNames.indexOf(key)
+    };
+    final filteredList =
+        stockList.where((s) => order.containsKey(s.storeName)).toList();
+    filteredList
+        .sort((a, b) => order[a.storeName]!.compareTo(order[b.storeName]!));
+    return filteredList;
+  }
+
+  Widget _buildQuantityControl(BuildContext context, int quantity) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              widget.cartData.removeSingleItem(widget.cartItem.product.id);
+            },
+            child: Padding(
+              padding: EdgeInsets.all(6.r),
+              child: Icon(Icons.remove, size: 16.r),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6.w),
+            child: Text(
+              '$quantity',
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              widget.cartData
+                  .addItem(widget.cartItem.product.id, widget.cartItem.product);
+            },
+            child: Padding(
+              padding: EdgeInsets.all(6.r),
+              child: Icon(Icons.add, size: 16.r),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStoreButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        _showStockModal(context);
+      },
+      child: Container(
+        padding: EdgeInsets.all(5.r),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(8.r),
+            bottomRight: Radius.circular(8.r),
+          ),
+        ),
+        child: Icon(
+          Icons.store_outlined,
+          size: 18.r,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  void _showStockModal(BuildContext context) {
+    final filters = Provider.of<Filter>(context, listen: false);
+    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GestureDetector(
+        onTap: () => Navigator.pop(context),
+        behavior: HitTestBehavior.opaque,
+        child: GestureDetector(
+          onTap: () {},
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.4,
+            minChildSize: 0.2,
+            maxChildSize: 0.8,
+            builder: (context, scrollController) => Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 12.h),
+                    width: 40.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(16.r),
+                    child: Row(
+                      children: [
+                        Icon(Icons.store_outlined, size: 20.r),
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Lagerstatus',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                widget.cartItem.product.name,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Icon(
+                            Icons.close,
+                            size: 24.r,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                      height: 1,
+                      color: Theme.of(context).colorScheme.outlineVariant),
+                  Expanded(
+                    child: FutureBuilder<List<StockInfo>>(
+                      future: ApiHelper.getProductStock(
+                          client, widget.cartItem.product.id),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: SizedBox(
+                              width: 24.r,
+                              height: 24.r,
+                              child: const CircularProgressIndicator(
+                                  strokeWidth: 2),
+                            ),
+                          );
+                        }
+
+                        if (snapshot.hasData &&
+                            snapshot.data!.isNotEmpty &&
+                            filters.storeList.isNotEmpty) {
+                          _stockList =
+                              _sortStockList(snapshot.data!, filters.storeList);
+                        }
+
+                        if (_stockList.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.inventory_2_outlined,
+                                  size: 48.r,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                                SizedBox(height: 12.h),
+                                Text(
+                                  'Ikke på lager i dine butikker',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return ListView.separated(
+                          controller: scrollController,
+                          padding: EdgeInsets.all(16.r),
+                          itemCount: _stockList.length,
+                          separatorBuilder: (_, __) => SizedBox(height: 8.h),
+                          itemBuilder: (context, index) {
+                            final stock = _stockList[index];
+                            return FadeIn(
+                              duration:
+                                  Duration(milliseconds: 150 + (index * 30)),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 14.w, vertical: 12.h),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      size: 18.r,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Expanded(
+                                      child: Text(
+                                        stock.storeName,
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w, vertical: 4.h),
+                                      decoration: BoxDecoration(
+                                        color: stock.quantity > 5
+                                            ? Colors.green
+                                                .withValues(alpha: 0.15)
+                                            : stock.quantity > 0
+                                                ? Colors.orange
+                                                    .withValues(alpha: 0.15)
+                                                : Colors.red
+                                                    .withValues(alpha: 0.15),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                      ),
+                                      child: Text(
+                                        '${stock.quantity} stk',
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: stock.quantity > 5
+                                              ? Colors.green.shade700
+                                              : stock.quantity > 0
+                                                  ? Colors.orange.shade700
+                                                  : Colors.red.shade700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
