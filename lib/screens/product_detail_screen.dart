@@ -16,11 +16,11 @@ import '../services/app_launcher.dart';
 import '../models/product.dart';
 import '../widgets/common/rating_widget.dart';
 import '../widgets/common/stock_popup.dart';
+import '../widgets/common/untappd_match_sheet.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key});
   static const routeName = '/product-detail';
-  static final GlobalKey<FormState> _formKey = GlobalKey();
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -124,6 +124,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       title: const Text('Detaljer'),
       actions: [
         PopupMenuButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
           itemBuilder: (_) => [
             PopupMenuItem(
               value: 0,
@@ -164,7 +167,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ],
           onSelected: (value) {
             if (value == 0) {
-              _showWrongUntappdMatchSheet(context, client, product.id);
+              UntappdMatchSheet.show(context, client, product.id);
             } else if (value == 1) {
               AppLauncher.launchUntappd(product);
             } else if (value == 2 && product.vmpUrl != null) {
@@ -715,116 +718,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   String _cleanText(String text) => text.replaceAll('.', '').trim();
-
-  void _showWrongUntappdMatchSheet(
-      BuildContext context, http.Client client, int productId) {
-    final urlController = TextEditingController();
-
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: 12.h, bottom: 8.h),
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.r),
-              child: Form(
-                key: ProductDetailScreen._formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Untappd link',
-                      style: TextStyle(
-                          fontSize: 16.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 12.h),
-                    TextFormField(
-                      autocorrect: false,
-                      autofocus: true,
-                      controller: urlController,
-                      keyboardType: TextInputType.url,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Vennligst skriv inn Untappd link';
-                        }
-                        if (!value.contains('https://untappd.com/b/') &&
-                            !value.contains('https://untp.beer/')) {
-                          return 'Ugyldig Untappd link';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText:
-                            'https://untappd.com/b/nogne-o-imperial-stout/42871',
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: () => _submitUntappdMatch(
-                            context, client, productId, urlController.text),
-                        icon: const Icon(Icons.send),
-                        label: const Text('Send inn'),
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _submitUntappdMatch(BuildContext context, http.Client client,
-      int productId, String untappdUrl) async {
-    if (!ProductDetailScreen._formKey.currentState!.validate()) return;
-    if (untappdUrl.isEmpty) return;
-
-    try {
-      await ApiHelper.submitUntappdMatch(client, productId, untappdUrl);
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Takk! Forslaget ditt er sendt inn.',
-                textAlign: TextAlign.center),
-          ),
-        );
-      }
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kunne ikke sende forslag. Prøv igjen senere.',
-                textAlign: TextAlign.center),
-          ),
-        );
-      }
-    }
-  }
 }
 
 class _InfoRow {
