@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:rate_my_app/rate_my_app.dart';
@@ -122,54 +123,58 @@ class _MyAppState extends State<MyApp> {
                 previousCart!..update(client.apiClient),
           ),
         ],
-        child: Builder(builder: (ctx) {
-          Provider.of<Filter>(ctx, listen: false).loadFilters();
+        child: ScreenUtilInit(
+          designSize: const Size(402, 874),
+          minTextAdapt: true,
+          builder: (context, child) {
+            Provider.of<Filter>(context, listen: false).loadFilters();
 
-          return MaterialApp(
-            localizationsDelegates: const [
-              DefaultMaterialLocalizations.delegate,
-              DefaultWidgetsLocalizations.delegate,
-            ],
-            debugShowCheckedModeBanner: false,
-            scrollBehavior: MyCustomScrollBehavior(),
-            title: 'Ølmonopolet',
-            theme: theme,
-            darkTheme: darkTheme,
-            home: RateMyAppBuilder(
-              builder: (context) => const HomeScreen(),
-              onInitialized: (context, rateMyApp) {
-                if (rateMyApp.shouldOpenDialog) {
-                  rateMyApp.showStarRateDialog(
-                    context,
-                    title: 'Rate Ølmonopolet!',
-                    message:
-                        'Bruk et øyeblikk på å gi en rating til Ølmonopolet også, det hjelper veldig!',
-                    actionsBuilder: (context, stars) {
-                      return [
-                        TextButton(
-                          child: const Text('OK'),
-                          onPressed: () async {
-                            await rateMyApp.callEvent(
-                                RateMyAppEventType.rateButtonPressed);
-                            Navigator.pop<RateMyAppDialogButton>(
-                                context, RateMyAppDialogButton.rate);
-                          },
-                        ),
-                      ];
-                    },
-                    onDismissed: () => rateMyApp
-                        .callEvent(RateMyAppEventType.laterButtonPressed),
-                  );
-                }
+            return MaterialApp(
+              localizationsDelegates: const [
+                DefaultMaterialLocalizations.delegate,
+                DefaultWidgetsLocalizations.delegate,
+              ],
+              debugShowCheckedModeBanner: false,
+              scrollBehavior: MyCustomScrollBehavior(),
+              title: 'Ølmonopolet',
+              theme: theme,
+              darkTheme: darkTheme,
+              home: RateMyAppBuilder(
+                builder: (context) => const HomeScreen(),
+                onInitialized: (context, rateMyApp) {
+                  if (rateMyApp.shouldOpenDialog) {
+                    rateMyApp.showStarRateDialog(
+                      context,
+                      title: 'Rate Ølmonopolet!',
+                      message:
+                          'Bruk et øyeblikk på å gi en rating til Ølmonopolet også, det hjelper veldig!',
+                      actionsBuilder: (context, stars) {
+                        return [
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () async {
+                              await rateMyApp.callEvent(
+                                  RateMyAppEventType.rateButtonPressed);
+                              Navigator.pop<RateMyAppDialogButton>(
+                                  context, RateMyAppDialogButton.rate);
+                            },
+                          ),
+                        ];
+                      },
+                      onDismissed: () => rateMyApp
+                          .callEvent(RateMyAppEventType.laterButtonPressed),
+                    );
+                  }
+                },
+              ),
+              routes: {
+                ProductDetailScreen.routeName: (ctx) =>
+                    const ProductDetailScreen(),
+                AboutScreen.routeName: (ctx) => const AboutScreen(),
               },
-            ),
-            routes: {
-              ProductDetailScreen.routeName: (ctx) =>
-                  const ProductDetailScreen(),
-              AboutScreen.routeName: (ctx) => const AboutScreen(),
-            },
-          );
-        }),
+            );
+          },
+        ),
       ),
     );
   }

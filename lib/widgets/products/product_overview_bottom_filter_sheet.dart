@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flag/flag.dart';
@@ -69,9 +70,9 @@ class ProductOverviewBottomFilterSheetState
   }
 
   Widget _showPopup() {
-    final mediaQueryData = MediaQuery.of(context);
+    final orientation = MediaQuery.of(context).orientation;
     return SizedBox(
-      height: mediaQueryData.size.height * 0.60,
+      height: 0.6.sh,
       child:
           StatefulBuilder(builder: (BuildContext context, StateSetter mystate) {
         return Column(
@@ -122,11 +123,10 @@ class ProductOverviewBottomFilterSheetState
             ),
             Flexible(
               child: ListView(
-                padding: mediaQueryData.size.width > 600 &&
-                        mediaQueryData.orientation == Orientation.landscape
+                padding: 1.sw > 600 && orientation == Orientation.landscape
                     ? EdgeInsets.symmetric(
                         vertical: 16,
-                        horizontal: mediaQueryData.size.width * 0.15,
+                        horizontal: 0.15.sw,
                       )
                     : const EdgeInsets.fromLTRB(16, 5, 16, 16),
                 children: <Widget>[

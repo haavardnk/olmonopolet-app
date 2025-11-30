@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
@@ -62,7 +63,7 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
   Widget _showPopup() {
     final cart = Provider.of<Cart>(context, listen: false);
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6,
+      height: 0.6.sh,
       child: StatefulBuilder(
         builder: (BuildContext context, StateSetter mystate) {
           return Column(

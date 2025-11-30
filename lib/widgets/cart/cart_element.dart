@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:intl/intl.dart';
@@ -70,7 +71,7 @@ class CartElementState extends State<CartElement> {
             },
             background: Container(
               color: Colors.pink,
-              padding: const EdgeInsets.only(left: 50),
+              padding: EdgeInsets.only(left: 50.w),
               child: const Row(
                 children: <Widget>[
                   Icon(
@@ -103,9 +104,7 @@ class CartElementState extends State<CartElement> {
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.fastOutSlowIn,
                   height: _expanded == true
-                      ? widget.boxImageSize +
-                          110 +
-                          MediaQuery.of(context).textScaleFactor * 10
+                      ? widget.boxImageSize + 120.r
                       : widget.boxImageSize + 24,
                   child: Stack(
                     children: [
@@ -118,14 +117,14 @@ class CartElementState extends State<CartElement> {
                                 ? 0.3
                                 : 1,
                             child: Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: EdgeInsets.all(12.r),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(6)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6.r)),
                                     child: Stack(
                                       children: [
                                         Hero(
@@ -156,22 +155,21 @@ class CartElementState extends State<CartElement> {
                                             widget.cartItem.product.countryCode!
                                                 .isNotEmpty)
                                           ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                    bottomRight:
-                                                        Radius.circular(6)),
+                                            borderRadius: BorderRadius.only(
+                                                bottomRight:
+                                                    Radius.circular(6.r)),
                                             child: Flag.fromString(
                                               widget.cartItem.product
                                                   .countryCode!,
-                                              height: 20,
-                                              width: 20 * 4 / 3,
+                                              height: 20.r,
+                                              width: 20.r * 4 / 3,
                                             ),
                                           )
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 10,
+                                  SizedBox(
+                                    width: 10.w,
                                   ),
                                   Expanded(
                                     child: Column(
@@ -180,20 +178,20 @@ class CartElementState extends State<CartElement> {
                                       children: [
                                         Text(
                                           widget.cartItem.product.name,
-                                          style: const TextStyle(
-                                            fontSize: 14,
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
                                           ),
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Container(
-                                          margin: const EdgeInsets.only(top: 5),
+                                          margin: EdgeInsets.only(top: 5.h),
                                           child: Row(
                                             children: [
                                               Text(
                                                 'Kr ${widget.cartItem.product.price.toStringAsFixed(2)}',
-                                                style: const TextStyle(
-                                                    fontSize: 13,
+                                                style: TextStyle(
+                                                    fontSize: 13.sp,
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
@@ -203,8 +201,8 @@ class CartElementState extends State<CartElement> {
                                                 Expanded(
                                                   child: Text(
                                                     ' - Kr ${widget.cartItem.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                                    style: const TextStyle(
-                                                        fontSize: 11,
+                                                    style: TextStyle(
+                                                        fontSize: 11.sp,
                                                         overflow: TextOverflow
                                                             .ellipsis),
                                                   ),
@@ -213,7 +211,7 @@ class CartElementState extends State<CartElement> {
                                           ),
                                         ),
                                         Container(
-                                          margin: const EdgeInsets.only(top: 5),
+                                          margin: EdgeInsets.only(top: 5.h),
                                           child: Row(
                                             children: [
                                               Text(
@@ -222,8 +220,8 @@ class CartElementState extends State<CartElement> {
                                                         null
                                                     ? '${widget.cartItem.product.rating!.toStringAsFixed(2)} '
                                                     : '0 ',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
                                                 ),
                                               ),
                                               createRatingBar(
@@ -233,7 +231,7 @@ class CartElementState extends State<CartElement> {
                                                       ? widget.cartItem.product
                                                           .rating!
                                                       : 0,
-                                                  size: 18,
+                                                  size: 18.r,
                                                   color: Colors.yellow[700]!),
                                               Text(
                                                 widget.cartItem.product
@@ -241,8 +239,8 @@ class CartElementState extends State<CartElement> {
                                                         null
                                                     ? ' ${NumberFormat.compact().format(widget.cartItem.product.checkins)}'
                                                     : '',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
                                                 ),
                                               ),
                                             ],
@@ -251,8 +249,8 @@ class CartElementState extends State<CartElement> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 10,
+                                  SizedBox(
+                                    width: 10.w,
                                   ),
                                   Column(
                                     mainAxisAlignment:
@@ -260,14 +258,14 @@ class CartElementState extends State<CartElement> {
                                     children: [
                                       Container(
                                         height: widget.boxImageSize - 31,
-                                        width: 40,
+                                        width: 40.w,
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             width: 1,
                                             color: Colors.grey[400]!,
                                           ),
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(24),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(24.r),
                                           ),
                                         ),
                                         child: Stack(
@@ -292,19 +290,22 @@ class CartElementState extends State<CartElement> {
                                                       },
                                                       child: Container(
                                                         padding:
-                                                            const EdgeInsets
-                                                                .fromLTRB(
-                                                                10, 0, 10, 2),
+                                                            EdgeInsets.fromLTRB(
+                                                                10.w,
+                                                                0,
+                                                                10.w,
+                                                                2.h),
                                                         decoration:
-                                                            const BoxDecoration(
+                                                            BoxDecoration(
                                                           borderRadius:
                                                               BorderRadius.all(
-                                                            Radius.circular(5),
+                                                            Radius.circular(
+                                                                5.r),
                                                           ),
                                                         ),
                                                         child: Icon(
                                                           Icons.add,
-                                                          size: 18,
+                                                          size: 18.r,
                                                           color:
                                                               Theme.of(context)
                                                                   .colorScheme
@@ -337,19 +338,22 @@ class CartElementState extends State<CartElement> {
                                                       },
                                                       child: Container(
                                                         padding:
-                                                            const EdgeInsets
-                                                                .fromLTRB(
-                                                                10, 2, 10, 0),
+                                                            EdgeInsets.fromLTRB(
+                                                                10.w,
+                                                                2.h,
+                                                                10.w,
+                                                                0),
                                                         decoration:
-                                                            const BoxDecoration(
+                                                            BoxDecoration(
                                                           borderRadius:
                                                               BorderRadius.all(
-                                                            Radius.circular(5),
+                                                            Radius.circular(
+                                                                5.r),
                                                           ),
                                                         ),
                                                         child: Icon(
                                                           Icons.remove,
-                                                          size: 18,
+                                                          size: 18.r,
                                                           color:
                                                               Theme.of(context)
                                                                   .colorScheme
@@ -369,8 +373,8 @@ class CartElementState extends State<CartElement> {
                                           ],
                                         ),
                                       ),
-                                      const SizedBox(
-                                        height: 3,
+                                      SizedBox(
+                                        height: 3.h,
                                       ),
                                       Semantics(
                                         label:
@@ -383,21 +387,20 @@ class CartElementState extends State<CartElement> {
                                             });
                                           },
                                           child: Container(
-                                            height: 28,
-                                            width: 40,
+                                            height: 28.r,
+                                            width: 40.w,
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 width: 1,
                                                 color: Colors.grey[400]!,
                                               ),
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                Radius.circular(24),
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(24.r),
                                               ),
                                             ),
                                             child: Icon(
                                               Icons.store_outlined,
-                                              size: 17,
+                                              size: 17.r,
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .onSurface,
@@ -432,8 +435,8 @@ class CartElementState extends State<CartElement> {
                                           ),
                                         )
                                       : Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              12, 0, 12, 12),
+                                          padding: EdgeInsets.fromLTRB(
+                                              12.w, 0, 12.w, 12.h),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,

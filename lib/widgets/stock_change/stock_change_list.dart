@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 import 'package:retry/retry.dart';
@@ -65,12 +66,7 @@ class StockChangeListViewState extends State<StockChangeList> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQueryData = MediaQuery.of(context);
-    _pageSize = mediaQueryData.size.width ~/
-                (350 + mediaQueryData.textScaleFactor * 21) >=
-            2
-        ? 24
-        : 14;
+    _pageSize = 1.sw ~/ 371.r >= 2 ? 24 : 14;
 
     return RefreshIndicator(
       onRefresh: () => Future.sync(
@@ -80,9 +76,7 @@ class StockChangeListViewState extends State<StockChangeList> {
         builder: (context, filterProvider, child) {
           return PagingListener(
             controller: _pagingController,
-            builder: (context, state, fetchNextPage) => mediaQueryData
-                        .size.width <
-                    600
+            builder: (context, state, fetchNextPage) => 1.sw < 600
                 ? PagedListView<int, StockChange>(
                     state: state,
                     fetchNextPage: fetchNextPage,
@@ -120,13 +114,8 @@ class StockChangeListViewState extends State<StockChangeList> {
                     showNewPageErrorIndicatorAsGridChild: false,
                     showNoMoreItemsIndicatorAsGridChild: false,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisExtent: 100 + mediaQueryData.textScaleFactor * 48,
-                      crossAxisCount: mediaQueryData.size.width ~/
-                                  (350 + mediaQueryData.textScaleFactor * 21) <=
-                              4
-                          ? mediaQueryData.size.width ~/
-                              (350 + mediaQueryData.textScaleFactor * 21)
-                          : 4,
+                      mainAxisExtent: 148.r,
+                      crossAxisCount: 1.sw ~/ 371.r <= 4 ? 1.sw ~/ 371.r : 4,
                     ),
                     builderDelegate: PagedChildBuilderDelegate<StockChange>(
                       animateTransitions: true,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../assets/constants.dart';
@@ -18,7 +19,7 @@ class ProductOverviewReleaseProductSelection extends StatelessWidget {
     return Consumer<Filter>(
       builder: (context, filter, _) => Container(
         height: kToolbarHeight,
-        width: MediaQuery.of(context).size.width,
+        width: 1.sw,
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         child: SegmentedButton(
           segments: <ButtonSegment<String>>[

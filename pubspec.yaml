@@ -41,6 +41,7 @@ dependencies:
   sqflite: ^2.0.2
   url_launcher: ^6.0.18
   path: ^1.9.1
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:

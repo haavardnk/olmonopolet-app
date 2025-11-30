@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flag/flag.dart';
@@ -28,11 +29,9 @@ class _StockChangeItemState extends State<StockChangeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
-    final tabletMode = mediaQueryData.size.shortestSide >= 600 ? true : false;
-    final double boxImageSize = tabletMode
-        ? 60 + mediaQueryData.textScaleFactor * 10
-        : mediaQueryData.size.shortestSide / 5.9;
+    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
+    final tabletMode = shortestSide >= 600;
+    final double boxImageSize = tabletMode ? 70.r : shortestSide / 5.9;
     final heroTag = 'stock${widget.stockChange.product.id}';
 
     return Column(
@@ -41,11 +40,11 @@ class _StockChangeItemState extends State<StockChangeItem> {
         if (widget.lastDate == null ||
             widget.lastDate!.day != widget.stockChange.stockUnstockAt!.day)
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(8.r),
             child: Text(
               toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO')
                   .format(widget.stockChange.stockUnstockAt!)),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
             ),
           ),
         if ((widget.lastDate == null ||
@@ -75,15 +74,15 @@ class _StockChangeItemState extends State<StockChangeItem> {
               );
             },
             child: Container(
-              margin: const EdgeInsets.fromLTRB(12, 4, 12, 6),
+              margin: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 8.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: EdgeInsets.only(top: 4.h),
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      borderRadius: BorderRadius.all(Radius.circular(6.r)),
                       child: Stack(
                         children: [
                           Hero(
@@ -113,20 +112,20 @@ class _StockChangeItemState extends State<StockChangeItem> {
                               widget
                                   .stockChange.product.countryCode!.isNotEmpty)
                             ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                  bottomRight: Radius.circular(6)),
+                              borderRadius: BorderRadius.only(
+                                  bottomRight: Radius.circular(6.r)),
                               child: Flag.fromString(
                                 widget.stockChange.product.countryCode!,
-                                height: 20,
-                                width: 20 * 4 / 3,
+                                height: 20.r,
+                                width: 20.r * 4 / 3,
                               ),
                             )
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
+                  SizedBox(
+                    width: 10.w,
                   ),
                   Expanded(
                     child: Column(
@@ -134,8 +133,8 @@ class _StockChangeItemState extends State<StockChangeItem> {
                       children: [
                         Text(
                           widget.stockChange.product.name,
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -143,23 +142,23 @@ class _StockChangeItemState extends State<StockChangeItem> {
                           children: [
                             Text(
                               'Kr ${widget.stockChange.product.price.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 13,
+                              style: TextStyle(
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               ' - Kr ${widget.stockChange.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                              style: const TextStyle(
-                                fontSize: 11,
+                              style: TextStyle(
+                                fontSize: 11.sp,
                               ),
                             )
                           ],
                         ),
                         Text(
                           widget.stockChange.product.style,
-                          style: const TextStyle(
-                            fontSize: 12,
+                          style: TextStyle(
+                            fontSize: 12.sp,
                           ),
                         ),
                         Row(
@@ -168,8 +167,8 @@ class _StockChangeItemState extends State<StockChangeItem> {
                               widget.stockChange.product.rating != null
                                   ? '${widget.stockChange.product.rating!.toStringAsFixed(2)} '
                                   : '0 ',
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: TextStyle(
+                                fontSize: 12.sp,
                               ),
                             ),
                             createRatingBar(
@@ -177,14 +176,14 @@ class _StockChangeItemState extends State<StockChangeItem> {
                                     widget.stockChange.product.rating != null
                                         ? widget.stockChange.product.rating!
                                         : 0,
-                                size: 18,
+                                size: 18.r,
                                 color: Colors.yellow[700]!),
                             Text(
                               widget.stockChange.product.checkins != null
                                   ? ' ${NumberFormat.compact().format(widget.stockChange.product.checkins)}'
                                   : '',
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: TextStyle(
+                                fontSize: 12.sp,
                               ),
                             ),
                           ],
@@ -193,16 +192,16 @@ class _StockChangeItemState extends State<StockChangeItem> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.only(top: 20.h),
                     child: widget.stockChange.quantity > 0
                         ? Text(
                             '+${widget.stockChange.quantity}',
-                            style: const TextStyle(
-                                fontSize: 22, color: Colors.green),
+                            style:
+                                TextStyle(fontSize: 22.sp, color: Colors.green),
                           )
-                        : const Icon(
+                        : Icon(
                             Icons.close,
-                            size: 34,
+                            size: 34.r,
                             color: Colors.red,
                           ),
                   )

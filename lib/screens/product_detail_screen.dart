@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
@@ -52,10 +53,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
-    final mediaQueryData = MediaQuery.of(context);
-    final tabletMode = mediaQueryData.size.width >= 600 ? true : false;
-    final boxImageSize =
-        mediaQueryData.size.shortestSide * (tabletMode ? 0.4 : 0.75);
+    final orientation = MediaQuery.of(context).orientation;
+    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
+    final tabletMode = 1.sw >= 600;
+    final boxImageSize = shortestSide * (tabletMode ? 0.4 : 0.75);
 
     if (init == false) {
       wishlisted = false;
@@ -207,10 +208,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 Expanded(
                   child: ListView(
-                    padding: tabletMode &&
-                            mediaQueryData.orientation == Orientation.landscape
-                        ? EdgeInsets.symmetric(
-                            horizontal: mediaQueryData.size.width * 0.15)
+                    padding: tabletMode && orientation == Orientation.landscape
+                        ? EdgeInsets.symmetric(horizontal: 0.15.sw)
                         : null,
                     children: [
                       Container(
@@ -241,7 +240,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                        padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -252,7 +251,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 Expanded(
                                   child: Text(
                                     product.name,
-                                    style: const TextStyle(fontSize: 18),
+                                    style: TextStyle(fontSize: 18.sp),
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -263,27 +262,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               children: [
                                 Text(
                                   'Kr ${product.price.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                      fontSize: 20,
+                                  style: TextStyle(
+                                      fontSize: 20.sp,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 if (product.pricePerVolume != null)
                                   Text(
                                     ' - Kr ${product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                                    style: const TextStyle(
-                                      fontSize: 15,
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
                                     ),
                                   )
                               ],
                             ),
                             Text(
                               product.style,
-                              style: const TextStyle(
-                                fontSize: 14,
+                              style: TextStyle(
+                                fontSize: 14.sp,
                               ),
                             ),
-                            const Divider(
-                              height: 15,
+                            Divider(
+                              height: 15.h,
                             ),
                           ],
                         ),
@@ -292,13 +291,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Column(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.height / 8,
+                              height: 0.125.sh,
                             ),
                             Center(
                               child: Column(
                                 children: [
-                                  const Icon(Icons.error_outline, size: 48),
-                                  const SizedBox(height: 16),
+                                  Icon(Icons.error_outline, size: 48.r),
+                                  SizedBox(height: 16.h),
                                   Text(
                                       'Kunne ikke laste detaljer: ${snapshot.error}'),
                                 ],
@@ -310,7 +309,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Column(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.height / 8,
+                              height: 0.125.sh,
                             ),
                             const Center(
                               child: CircularProgressIndicator(),
@@ -1101,8 +1100,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.27 +
-          MediaQuery.of(context).viewInsets.bottom,
+      height: 0.27.sh + MediaQuery.of(context).viewInsets.bottom,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1169,10 +1167,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _showFriendsCheckinsPopup(BuildContext context, List<dynamic> checkins,
-      MediaQueryData mediaQueryData) {
+  Widget _showFriendsCheckinsPopup(
+      BuildContext context, List<dynamic> checkins) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.4,
+      height: 0.4.sh,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1188,8 +1186,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            height: mediaQueryData.size.height * 0.4 - 28,
-            width: mediaQueryData.size.width,
+            height: 0.4.sh - 28,
+            width: 1.sw,
             child: ListView.builder(
                 itemCount: checkins.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -1266,7 +1264,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  void friendsCheckins(List<dynamic> checkins, MediaQueryData mediaQueryData) {
+  void friendsCheckins(List<dynamic> checkins) {
     showModalBottomSheet<void>(
       isScrollControlled: true,
       context: context,
@@ -1275,7 +1273,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             topLeft: Radius.circular(24), topRight: Radius.circular(24)),
       ),
       builder: (BuildContext context) {
-        return _showFriendsCheckinsPopup(context, checkins, mediaQueryData);
+        return _showFriendsCheckinsPopup(context, checkins);
       },
     );
   }

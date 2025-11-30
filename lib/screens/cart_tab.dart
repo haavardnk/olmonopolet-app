@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/cart.dart';
@@ -11,12 +12,10 @@ class CartTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
     final cartData = Provider.of<Cart>(context);
-    final tabletMode = mediaQueryData.size.width >= 600 ? true : false;
-    final double boxImageSize = tabletMode
-        ? 100 + mediaQueryData.textScaleFactor * 10
-        : mediaQueryData.size.shortestSide / 4;
+    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
+    final tabletMode = 1.sw >= 600;
+    final double boxImageSize = tabletMode ? 110.r : shortestSide / 4;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +33,7 @@ class CartTab extends StatelessWidget {
       ),
       drawer: const AppDrawer(),
       body: SizedBox(
-        height: MediaQuery.of(context).size.height,
+        height: 1.sh,
         child: Column(
           children: [
             Expanded(

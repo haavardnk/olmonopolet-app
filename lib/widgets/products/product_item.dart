@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flag/flag.dart';
@@ -33,12 +34,10 @@ class _ProductItemState extends State<ProductItem> {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
-    final tabletMode = mediaQueryData.size.shortestSide >= 600 ? true : false;
+    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
+    final tabletMode = shortestSide >= 600;
     final cart = Provider.of<Cart>(context, listen: false);
-    final double boxImageSize = tabletMode
-        ? 100 + mediaQueryData.textScaleFactor * 10
-        : mediaQueryData.size.shortestSide / 4;
+    final double boxImageSize = tabletMode ? 110.r : shortestSide / 4;
     final heroTag = widget.release != null
         ? 'release${_product.id}'
         : 'products${_product.id}';
@@ -72,15 +71,15 @@ class _ProductItemState extends State<ProductItem> {
         child: Stack(
           children: [
             Container(
-              margin: const EdgeInsets.fromLTRB(12, 6, 20, 10),
+              margin: EdgeInsets.fromLTRB(12.w, 6.h, 20.w, 10.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(top: 4),
+                    padding: EdgeInsets.only(top: 4.h),
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      borderRadius: BorderRadius.all(Radius.circular(6.r)),
                       child: Stack(
                         children: [
                           Hero(
@@ -106,20 +105,20 @@ class _ProductItemState extends State<ProductItem> {
                           if (_product.countryCode != null &&
                               _product.countryCode!.isNotEmpty)
                             ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                  bottomRight: Radius.circular(6)),
+                              borderRadius: BorderRadius.only(
+                                  bottomRight: Radius.circular(6.r)),
                               child: Flag.fromString(
                                 _product.countryCode!,
-                                height: 20,
-                                width: 20 * 4 / 3,
+                                height: 20.r,
+                                width: 20.r * 4 / 3,
                               ),
                             )
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
+                  SizedBox(
+                    width: 10.w,
                   ),
                   Expanded(
                     child: Column(
@@ -127,8 +126,8 @@ class _ProductItemState extends State<ProductItem> {
                       children: [
                         Text(
                           _product.name,
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                           ),
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
@@ -137,23 +136,23 @@ class _ProductItemState extends State<ProductItem> {
                           children: [
                             Text(
                               'Kr ${_product.price.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 13,
+                              style: TextStyle(
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               ' - Kr ${_product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                              style: const TextStyle(
-                                fontSize: 11,
+                              style: TextStyle(
+                                fontSize: 11.sp,
                               ),
                             )
                           ],
                         ),
                         Text(
                           _product.style,
-                          style: const TextStyle(
-                            fontSize: 12,
+                          style: TextStyle(
+                            fontSize: 12.sp,
                           ),
                         ),
                         Row(
@@ -162,29 +161,29 @@ class _ProductItemState extends State<ProductItem> {
                               _product.rating != null
                                   ? '${_product.rating!.toStringAsFixed(2)} '
                                   : '0 ',
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: TextStyle(
+                                fontSize: 12.sp,
                               ),
                             ),
                             createRatingBar(
                                 rating: _product.rating != null
                                     ? _product.rating!
                                     : 0,
-                                size: 18,
+                                size: 18.r,
                                 color: Colors.yellow[700]!),
                             Text(
                               _product.checkins != null
                                   ? ' ${NumberFormat.compact().format(_product.checkins)}'
                                   : '',
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: TextStyle(
+                                fontSize: 12.sp,
                               ),
                             ),
                           ],
                         ),
                         Container(
-                          height: 11,
-                          margin: const EdgeInsets.only(top: 2),
+                          height: 11.h,
+                          margin: EdgeInsets.only(top: 2.h),
                           child: Row(
                             children: [
                               if (_product.stock != null && _product.stock != 0)
@@ -192,13 +191,13 @@ class _ProductItemState extends State<ProductItem> {
                                   children: [
                                     Text(
                                       'På lager: ${_product.stock}',
-                                      style: const TextStyle(
-                                        fontSize: 11,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
                                         height: 0.9,
                                       ),
                                     ),
                                     VerticalDivider(
-                                      width: 15,
+                                      width: 15.w,
                                       thickness: 1,
                                       color: Colors.grey[300],
                                     ),
@@ -210,21 +209,21 @@ class _ProductItemState extends State<ProductItem> {
                                     _product.abv != null
                                         ? '${_product.abv!.toStringAsFixed(1)}%'
                                         : '',
-                                    style: const TextStyle(
-                                      fontSize: 11,
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
                                       height: 0.9,
                                     ),
                                   ),
                                   if (_product.abv != null)
                                     VerticalDivider(
-                                      width: 15,
+                                      width: 15.w,
                                       thickness: 1,
                                       color: Colors.grey[300],
                                     ),
                                   Text(
                                     '${_product.volume}l',
-                                    style: const TextStyle(
-                                      fontSize: 11,
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
                                       height: 0.9,
                                     ),
                                   ),
@@ -232,7 +231,7 @@ class _ProductItemState extends State<ProductItem> {
                                       widget.release!.productSelections.length >
                                           1)
                                     VerticalDivider(
-                                      width: 15,
+                                      width: 15.w,
                                       thickness: 1,
                                       color: Colors.grey[300],
                                     ),
@@ -241,8 +240,8 @@ class _ProductItemState extends State<ProductItem> {
                                           1)
                                     Text(
                                       '${productSelectionAbrevationList[_product.productSelection]}',
-                                      style: const TextStyle(
-                                        fontSize: 11,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
                                         height: 0.9,
                                       ),
                                     ),
@@ -258,9 +257,9 @@ class _ProductItemState extends State<ProductItem> {
               ),
             ),
             Positioned(
-              bottom: tabletMode ? null : 10,
-              top: !tabletMode ? null : boxImageSize + 11 - 35,
-              right: 12,
+              bottom: tabletMode ? null : 10.h,
+              top: !tabletMode ? null : boxImageSize + 11.h - 35.r,
+              right: 12.w,
               child: Semantics(
                 button: true,
                 label: 'Legg i handleliste',
@@ -298,15 +297,15 @@ class _ProductItemState extends State<ProductItem> {
                     }
                   },
                   child: Container(
-                    height: 35,
-                    width: 50,
+                    height: 35.r,
+                    width: 50.r,
                     decoration: BoxDecoration(
                       border: Border.all(
                         width: 1,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(24),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(24.r),
                       ),
                     ),
                     child: Consumer<Cart>(
@@ -318,7 +317,7 @@ class _ProductItemState extends State<ProductItem> {
                               : ''),
                           child: Icon(
                             Icons.shopping_cart_outlined,
-                            size: 20,
+                            size: 20.r,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),

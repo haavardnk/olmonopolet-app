@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
@@ -36,7 +37,7 @@ class _AppDrawerState extends State<AppDrawer> {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          const SizedBox(height: 70),
+          SizedBox(height: 70.h),
           ListTile(
             trailing: Icon(
               _themeMode == AdaptiveThemeMode.dark
