@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:flag/flag.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../models/stock_change.dart';
 import '../../screens/product_detail_screen.dart';
 import '../common/rating_widget.dart';
+import '../common/info_chips.dart';
 
 class StockChangeItem extends StatefulWidget {
   const StockChangeItem({required this.stockChange, this.lastDate, super.key});
@@ -29,10 +29,11 @@ class _StockChangeItemState extends State<StockChangeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
-    final tabletMode = shortestSide >= 600;
-    final double boxImageSize = tabletMode ? 70.r : shortestSide / 5.9;
-    final heroTag = 'stock${widget.stockChange.product.id}';
+    final product = widget.stockChange.product;
+    final double imageSize = 85.r;
+    final heroTag = 'stock${product.id}';
+    final displayImageUrl = product.labelHdUrl ?? product.imageUrl;
+    final colors = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,32 +41,24 @@ class _StockChangeItemState extends State<StockChangeItem> {
         if (widget.lastDate == null ||
             widget.lastDate!.day != widget.stockChange.stockUnstockAt!.day)
           Padding(
-            padding: EdgeInsets.all(8.r),
+            padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
             child: Text(
               toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO')
                   .format(widget.stockChange.stockUnstockAt!)),
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
             ),
           ),
-        if ((widget.lastDate == null ||
-                widget.lastDate!.day ==
-                    widget.stockChange.stockUnstockAt!.day) &&
-            widget.lastDate != null)
-          const Divider(
-            height: 0,
-          ),
         Semantics(
-          label: widget.stockChange.product.name,
+          label: product.name,
           button: true,
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
+          child: InkWell(
             onTap: () {
               pushScreen(
                 context,
                 settings: RouteSettings(
                     name: ProductDetailScreen.routeName,
                     arguments: <String, dynamic>{
-                      'product': widget.stockChange.product,
+                      'product': product,
                       'herotag': heroTag,
                     }),
                 screen: const ProductDetailScreen(),
@@ -73,144 +66,193 @@ class _StockChangeItemState extends State<StockChangeItem> {
                 withNavBar: true,
               );
             },
-            child: Container(
-              margin: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 8.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 10.h),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 4.h),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(6.r)),
-                      child: Stack(
+                children: [
+                  Text(
+                    product.name,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 6.h),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
                         children: [
-                          Hero(
-                            tag: heroTag,
-                            child: widget.stockChange.product.imageUrl !=
-                                        null &&
-                                    widget.stockChange.product.imageUrl!
-                                        .isNotEmpty
-                                ? FancyShimmerImage(
-                                    imageUrl:
-                                        widget.stockChange.product.imageUrl!,
-                                    height: boxImageSize,
-                                    width: boxImageSize,
-                                    errorWidget: Image.asset(
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.r),
+                            child: Hero(
+                              tag: heroTag,
+                              child: displayImageUrl != null &&
+                                      displayImageUrl.isNotEmpty
+                                  ? FancyShimmerImage(
+                                      imageUrl: displayImageUrl,
+                                      height: imageSize,
+                                      width: imageSize,
+                                      boxFit: BoxFit.cover,
+                                      errorWidget: Image.asset(
+                                        'assets/images/placeholder.png',
+                                        height: imageSize,
+                                        width: imageSize,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Image.asset(
                                       'assets/images/placeholder.png',
-                                      height: boxImageSize,
-                                      width: boxImageSize,
+                                      height: imageSize,
+                                      width: imageSize,
+                                      fit: BoxFit.cover,
                                     ),
-                                  )
-                                : Image.asset(
-                                    'assets/images/placeholder.png',
-                                    height: boxImageSize,
-                                    width: boxImageSize,
-                                  ),
+                            ),
                           ),
-                          if (widget.stockChange.product.countryCode != null &&
-                              widget
-                                  .stockChange.product.countryCode!.isNotEmpty)
-                            ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                  bottomRight: Radius.circular(6.r)),
-                              child: Flag.fromString(
-                                widget.stockChange.product.countryCode!,
-                                height: 20.r,
-                                width: 20.r * 4 / 3,
-                              ),
-                            )
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: _buildStockBadge(),
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10.w,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.stockChange.product.name,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Row(
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Kr ${widget.stockChange.product.price.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Kr ${product.price.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1.0,
+                                  ),
+                                ),
+                                SizedBox(width: 6.w),
+                                Text(
+                                  '·',
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                                SizedBox(width: 6.w),
+                                Text(
+                                  '${product.pricePerVolume!.toStringAsFixed(0)} kr/l',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ),
+                            SizedBox(height: 4.h),
                             Text(
-                              ' - Kr ${widget.stockChange.product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                              ),
-                            )
-                          ],
-                        ),
-                        Text(
-                          widget.stockChange.product.style,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              widget.stockChange.product.rating != null
-                                  ? '${widget.stockChange.product.rating!.toStringAsFixed(2)} '
-                                  : '0 ',
+                              product.style,
                               style: TextStyle(
                                 fontSize: 12.sp,
+                                color: colors.onSurfaceVariant,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            createRatingBar(
-                                rating:
-                                    widget.stockChange.product.rating != null
-                                        ? widget.stockChange.product.rating!
-                                        : 0,
-                                size: 18.r,
-                                color: Colors.yellow[700]!),
-                            Text(
-                              widget.stockChange.product.checkins != null
-                                  ? ' ${NumberFormat.compact().format(widget.stockChange.product.checkins)}'
-                                  : '',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                              ),
+                            SizedBox(height: 4.h),
+                            Row(
+                              children: [
+                                createRatingBar(
+                                    rating: product.rating ?? 0,
+                                    size: 16.r,
+                                    color: Colors.amber),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  product.rating?.toStringAsFixed(1) ?? '-',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                if (product.checkins != null) ...[
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    '(${NumberFormat.compact().format(product.checkins)})',
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            SizedBox(height: 6.h),
+                            Wrap(
+                              spacing: 6.w,
+                              runSpacing: 4.h,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                buildInfoChip('${product.volume}L', context,
+                                    icon: Icons.water_drop_outlined),
+                                if (product.abv != null)
+                                  buildInfoChip(
+                                      '${product.abv!.toStringAsFixed(1)}%',
+                                      context,
+                                      icon: Icons.percent),
+                                if (product.country != null &&
+                                    product.country!.isNotEmpty)
+                                  buildInfoChipWithFlag(
+                                    product.country!,
+                                    product.countryCode,
+                                    context,
+                                  ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.h),
-                    child: widget.stockChange.quantity > 0
-                        ? Text(
-                            '+${widget.stockChange.quantity}',
-                            style:
-                                TextStyle(fontSize: 22.sp, color: Colors.green),
-                          )
-                        : Icon(
-                            Icons.close,
-                            size: 34.r,
-                            color: Colors.red,
-                          ),
-                  )
                 ],
               ),
             ),
           ),
         ),
+        const Divider(height: 1),
       ],
+    );
+  }
+
+  Widget _buildStockBadge() {
+    final isPositive = widget.stockChange.quantity > 0;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+      decoration: BoxDecoration(
+        color: isPositive
+            ? Colors.green.withValues(alpha: 0.9)
+            : Colors.red.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8.r),
+          bottomRight: Radius.circular(8.r),
+        ),
+      ),
+      child: isPositive
+          ? Text(
+              '+${widget.stockChange.quantity}',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            )
+          : Icon(
+              Icons.close,
+              size: 14.r,
+              color: Colors.white,
+            ),
     );
   }
 }

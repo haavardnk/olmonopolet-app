@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 
@@ -8,7 +7,6 @@ Future<void> showStockChangeStoreDialog(
   TextEditingController? searchController;
   String searchQuery = '';
 
-  // Load stores if needed
   if (filters.storeList.isEmpty && !filters.storesLoading) {
     await filters.getStores();
   }
@@ -25,8 +23,7 @@ Future<void> showStockChangeStoreDialog(
           final filteredStores = searchQuery.isEmpty
               ? filters.storeList
               : filters.storeList
-                  .where(
-                      (s) => s.name.toLowerCase().contains(searchQuery))
+                  .where((s) => s.name.toLowerCase().contains(searchQuery))
                   .toList();
 
           return Dialog(
@@ -43,49 +40,24 @@ Future<void> showStockChangeStoreDialog(
                 children: [
                   // Header
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                    child: Column(
-                      children: [
-                        Consumer<Filter>(
-                          builder: (context, _, __) {
-                            return SwitchListTile(
-                              contentPadding:
-                                  const EdgeInsets.only(left: 4, right: 0),
-                              title: const Text(
-                                'Husk valgt butikk',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              value: filters.filterSaveSettings[11]['save'],
-                              onChanged: (bool newValue) {
-                                setDialogState(() {
-                                  filters.filterSaveSettings[11]['save'] =
-                                      newValue;
-                                  filters.saveFilterSettings();
-                                });
-                              },
-                            );
-                          },
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                    child: TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Søk etter butikk...',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Søk etter butikk...',
-                            prefixIcon: const Icon(Icons.search, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          onChanged: (value) {
-                            searchQuery = value.toLowerCase();
-                            setDialogState(() {});
-                          },
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-                      ],
+                      ),
+                      onChanged: (value) {
+                        searchQuery = value.toLowerCase();
+                        setDialogState(() {});
+                      },
                     ),
                   ),
                   Divider(
@@ -114,9 +86,9 @@ Future<void> showStockChangeStoreDialog(
                             itemCount: filteredStores.length,
                             itemBuilder: (context, index) {
                               final store = filteredStores[index];
-                              final isSelected = filters
-                                      .stockChangeSelectedStore ==
-                                  store.name;
+                              final isSelected =
+                                  filters.stockChangeSelectedStore ==
+                                      store.name;
                               return ListTile(
                                 dense: true,
                                 title: Text(store.name),
