@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../services/app_launcher.dart';
-import '../../screens/about_screen.dart';
 import '../../utils/environment.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -248,20 +246,6 @@ class _AppDrawerState extends State<AppDrawer> {
                       onTap: () => launchUrl(
                         Uri.parse('mailto:${Environment.feedbackEmail}'),
                       ),
-                    ),
-                    _buildMenuItem(
-                      context,
-                      icon: Icons.info_outline,
-                      label: 'Om appen',
-                      onTap: () {
-                        Navigator.pop(context);
-                        pushScreen(
-                          context,
-                          settings:
-                              const RouteSettings(name: AboutScreen.routeName),
-                          screen: const AboutScreen(),
-                        );
-                      },
                     ),
                   ],
                 ),
