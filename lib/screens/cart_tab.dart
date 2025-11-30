@@ -19,7 +19,6 @@ class CartTab extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: const FittedBox(
           fit: BoxFit.contain,

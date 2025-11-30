@@ -65,7 +65,6 @@ class _ReleaseTabState extends State<ReleaseTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: const FittedBox(
           fit: BoxFit.contain,

@@ -20,7 +20,6 @@ class _StockChangeTabState extends State<StockChangeTab> {
 
     return Scaffold(
       appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: Consumer<Filter>(
           builder: (context, filter, _) => FittedBox(

@@ -101,10 +101,20 @@ class _MyAppState extends State<MyApp> {
       light: ThemeData(
         useMaterial3: true,
         colorScheme: lightColorScheme,
+        appBarTheme: AppBarTheme(
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: lightColorScheme.surface,
+        ),
       ),
       dark: ThemeData(
         useMaterial3: true,
         colorScheme: darkColorScheme,
+        appBarTheme: AppBarTheme(
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: darkColorScheme.surface,
+        ),
       ),
       initial: AdaptiveThemeMode.system,
       builder: (theme, darkTheme) => MultiProvider(
