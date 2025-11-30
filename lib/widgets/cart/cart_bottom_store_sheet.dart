@@ -129,7 +129,7 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       title: const Text(
                           'Grå ut dersom ingen på lager i valgte butikker'),
                       value: cart.greyNoStock,
-                      activeColor: Theme.of(context).colorScheme.primary,
+                      activeThumbColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
                         mystate(() {
                           cart.greyNoStock = value;
@@ -143,7 +143,7 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       title: const Text(
                           'Skjul dersom ingen på lager i valgte butikker'),
                       value: cart.hideNoStock,
-                      activeColor: Theme.of(context).colorScheme.primary,
+                      activeThumbColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
                         mystate(() {
                           cart.hideNoStock = value;
@@ -156,7 +156,7 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                       contentPadding: const EdgeInsets.only(left: 16, right: 4),
                       title: const Text('Bruk butikkvalg fra oversikt'),
                       value: cart.useOverviewStoreSelection,
-                      activeColor: Theme.of(context).colorScheme.primary,
+                      activeThumbColor: Theme.of(context).colorScheme.primary,
                       onChanged: (bool value) {
                         mystate(() {
                           cart.useOverviewStoreSelection = value;
@@ -227,8 +227,8 @@ class BottomStoreSheetState extends State<CartBottomStoreSheet> {
                                             return Text(
                                               cart.cartSelectedStores.isNotEmpty
                                                   ? cart.cartSelectedStores
-                                                      .reduce((a, b) =>
-                                                          a + ', ' + b)
+                                                      .reduce(
+                                                          (a, b) => '$a, $b')
                                                   : 'Velg butikker',
                                               style:
                                                   const TextStyle(fontSize: 16),

@@ -28,11 +28,11 @@ class _StockChangeItemState extends State<StockChangeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData _mediaQueryData = MediaQuery.of(context);
-    final _tabletMode = _mediaQueryData.size.shortestSide >= 600 ? true : false;
-    final double _boxImageSize = _tabletMode
-        ? 60 + _mediaQueryData.textScaleFactor * 10
-        : _mediaQueryData.size.shortestSide / 5.9;
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
+    final tabletMode = mediaQueryData.size.shortestSide >= 600 ? true : false;
+    final double boxImageSize = tabletMode
+        ? 60 + mediaQueryData.textScaleFactor * 10
+        : mediaQueryData.size.shortestSide / 5.9;
     final heroTag = 'stock${widget.stockChange.product.id}';
 
     return Column(
@@ -95,18 +95,18 @@ class _StockChangeItemState extends State<StockChangeItem> {
                                 ? FancyShimmerImage(
                                     imageUrl:
                                         widget.stockChange.product.imageUrl!,
-                                    height: _boxImageSize,
-                                    width: _boxImageSize,
+                                    height: boxImageSize,
+                                    width: boxImageSize,
                                     errorWidget: Image.asset(
                                       'assets/images/placeholder.png',
-                                      height: _boxImageSize,
-                                      width: _boxImageSize,
+                                      height: boxImageSize,
+                                      width: boxImageSize,
                                     ),
                                   )
                                 : Image.asset(
                                     'assets/images/placeholder.png',
-                                    height: _boxImageSize,
-                                    width: _boxImageSize,
+                                    height: boxImageSize,
+                                    width: boxImageSize,
                                   ),
                           ),
                           if (widget.stockChange.product.countryCode != null &&
