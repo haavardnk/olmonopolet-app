@@ -106,7 +106,8 @@ class Filter with ChangeNotifier {
     }
     try {
       releasesLoading = true;
-      var releases = await ApiHelper.getReleaseList(_client, page: 1, pageSize: 100);
+      var releases =
+          await ApiHelper.getReleaseList(_client, page: 1, pageSize: 100);
       releaseList = releases;
       releaseSelectedList = List<bool>.filled(releaseList.length, false);
       releasesLoading = false;

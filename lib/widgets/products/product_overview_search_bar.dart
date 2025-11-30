@@ -29,17 +29,17 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      height: kToolbarHeight,
+    return SizedBox(
+      height: 40,
       child: Material(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         elevation: 3,
         surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
         shadowColor: Colors.transparent,
         child: TextFormField(
           controller: _search,
           maxLines: 1,
+          textAlignVertical: TextAlignVertical.center,
           style: const TextStyle(
             fontSize: 16,
           ),
@@ -50,6 +50,8 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
           },
           decoration: InputDecoration(
             hintText: 'Søk',
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
             prefixIcon: Icon(
               Icons.search,
               color: Theme.of(context).colorScheme.onSurface,
@@ -68,15 +70,7 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-            focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(
-              color: Colors.transparent,
-            )),
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.transparent,
-              ),
-            ),
+            border: InputBorder.none,
           ),
         ),
       ),
