@@ -231,29 +231,30 @@ class Cart with ChangeNotifier {
   }
 
   Future<void> checkCartStockStatus() async {
-    if (cartStoreId.isNotEmpty) {
-      String cartItemIds = '';
-      _items.forEach((key, value) {
-        if (cartItemIds.isNotEmpty) {
-          cartItemIds += ',';
-        }
-        cartItemIds += value.product.id.toString();
-      });
-      var response =
-          await ApiHelper.checkStock(_client, cartItemIds, cartStoreId);
-      itemsInStock = [];
-      for (var element in response) {
-        itemsInStock.add(element['vmp_id']);
-      }
-      _items.forEach((key, value) {
-        if (itemsInStock.contains(value.product.id)) {
-          value.inStock = true;
-        } else {
-          value.inStock = false;
-        }
-      });
-      notifyListeners();
+    if (cartStoreId.isEmpty || _items.isEmpty) {
+      return;
     }
+    String cartItemIds = '';
+    _items.forEach((key, value) {
+      if (cartItemIds.isNotEmpty) {
+        cartItemIds += ',';
+      }
+      cartItemIds += value.product.id.toString();
+    });
+    var response =
+        await ApiHelper.checkStock(_client, cartItemIds, cartStoreId);
+    itemsInStock = [];
+    for (var element in response) {
+      itemsInStock.add(element['vmp_id']);
+    }
+    _items.forEach((key, value) {
+      if (itemsInStock.contains(value.product.id)) {
+        value.inStock = true;
+      } else {
+        value.inStock = false;
+      }
+    });
+    notifyListeners();
   }
 
   void setCartStore(List<Store> storeList) {
