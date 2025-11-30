@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -34,10 +35,8 @@ class _ProductItemState extends State<ProductItem> {
 
   @override
   Widget build(BuildContext context) {
-    final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
-    final tabletMode = shortestSide >= 600;
     final cart = Provider.of<Cart>(context, listen: false);
-    final double boxImageSize = tabletMode ? 110.r : shortestSide / 4;
+    final double imageSize = 85.r;
     final heroTag = widget.release != null
         ? 'release${_product.id}'
         : 'products${_product.id}';
@@ -46,8 +45,7 @@ class _ProductItemState extends State<ProductItem> {
     return Semantics(
       label: _product.name,
       button: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
+      child: InkWell(
         onTap: () {
           pushScreen(
             context,
@@ -68,267 +66,300 @@ class _ProductItemState extends State<ProductItem> {
             }
           });
         },
-        child: Stack(
-          children: [
-            Container(
-              margin: EdgeInsets.fromLTRB(12.w, 6.h, 20.w, 10.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 10.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _product.name,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 6.h),
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 4.h),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(6.r)),
-                      child: Stack(
-                        children: [
-                          Hero(
-                            tag: heroTag,
-                            child: displayImageUrl != null &&
-                                    displayImageUrl.isNotEmpty
-                                ? FancyShimmerImage(
-                                    imageUrl: displayImageUrl,
-                                    height: boxImageSize,
-                                    width: boxImageSize,
-                                    errorWidget: Image.asset(
-                                      'assets/images/placeholder.png',
-                                      height: boxImageSize,
-                                      width: boxImageSize,
-                                    ),
-                                  )
-                                : Image.asset(
+                children: [
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: Hero(
+                          tag: heroTag,
+                          child: displayImageUrl != null &&
+                                  displayImageUrl.isNotEmpty
+                              ? FancyShimmerImage(
+                                  imageUrl: displayImageUrl,
+                                  height: imageSize,
+                                  width: imageSize,
+                                  boxFit: BoxFit.cover,
+                                  errorWidget: Image.asset(
                                     'assets/images/placeholder.png',
-                                    height: boxImageSize,
-                                    width: boxImageSize,
+                                    height: imageSize,
+                                    width: imageSize,
+                                    fit: BoxFit.cover,
                                   ),
-                          ),
-                          if (_product.countryCode != null &&
-                              _product.countryCode!.isNotEmpty)
-                            ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                  bottomRight: Radius.circular(6.r)),
-                              child: Flag.fromString(
-                                _product.countryCode!,
-                                height: 20.r,
-                                width: 20.r * 4 / 3,
-                              ),
-                            )
-                        ],
+                                )
+                              : Image.asset(
+                                  'assets/images/placeholder.png',
+                                  height: imageSize,
+                                  width: imageSize,
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
                       ),
-                    ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: _buildCartButton(context, cart),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    width: 10.w,
-                  ),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          _product.name,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
                         Row(
                           children: [
                             Text(
                               'Kr ${_product.price.toStringAsFixed(2)}',
                               style: TextStyle(
-                                fontSize: 13.sp,
+                                fontSize: 15.sp,
                                 fontWeight: FontWeight.bold,
+                                height: 1.0,
                               ),
                             ),
+                            SizedBox(width: 6.w),
                             Text(
-                              ' - Kr ${_product.pricePerVolume!.toStringAsFixed(2)} pr. liter',
+                              '·',
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                            ),
+                            SizedBox(width: 6.w),
+                            Text(
+                              '${_product.pricePerVolume!.toStringAsFixed(0)} kr/l',
                               style: TextStyle(
                                 fontSize: 11.sp,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
-                            )
+                            ),
                           ],
                         ),
+                        SizedBox(height: 4.h),
                         Text(
                           _product.style,
                           style: TextStyle(
                             fontSize: 12.sp,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        SizedBox(height: 4.h),
                         Row(
                           children: [
-                            Text(
-                              _product.rating != null
-                                  ? '${_product.rating!.toStringAsFixed(2)} '
-                                  : '0 ',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                              ),
-                            ),
                             createRatingBar(
-                                rating: _product.rating != null
-                                    ? _product.rating!
-                                    : 0,
-                                size: 18.r,
-                                color: Colors.yellow[700]!),
+                                rating: _product.rating ?? 0,
+                                size: 16.r,
+                                color: Colors.amber),
+                            SizedBox(width: 4.w),
                             Text(
-                              _product.checkins != null
-                                  ? ' ${NumberFormat.compact().format(_product.checkins)}'
-                                  : '',
+                              _product.rating?.toStringAsFixed(1) ?? '-',
                               style: TextStyle(
                                 fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ],
-                        ),
-                        Container(
-                          height: 11.h,
-                          margin: EdgeInsets.only(top: 2.h),
-                          child: Row(
-                            children: [
-                              if (_product.stock != null && _product.stock != 0)
-                                Row(
-                                  children: [
-                                    Text(
-                                      'På lager: ${_product.stock}',
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        height: 0.9,
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      width: 15.w,
-                                      thickness: 1,
-                                      color: Colors.grey[300],
-                                    ),
-                                  ],
+                            if (_product.checkins != null) ...[
+                              SizedBox(width: 4.w),
+                              Text(
+                                '(${NumberFormat.compact().format(_product.checkins)})',
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
-                              Row(
-                                children: [
-                                  Text(
-                                    _product.abv != null
-                                        ? '${_product.abv!.toStringAsFixed(1)}%'
-                                        : '',
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      height: 0.9,
-                                    ),
-                                  ),
-                                  if (_product.abv != null)
-                                    VerticalDivider(
-                                      width: 15.w,
-                                      thickness: 1,
-                                      color: Colors.grey[300],
-                                    ),
-                                  Text(
-                                    '${_product.volume}l',
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      height: 0.9,
-                                    ),
-                                  ),
-                                  if (widget.release != null &&
-                                      widget.release!.productSelections.length >
-                                          1)
-                                    VerticalDivider(
-                                      width: 15.w,
-                                      thickness: 1,
-                                      color: Colors.grey[300],
-                                    ),
-                                  if (widget.release != null &&
-                                      widget.release!.productSelections.length >
-                                          1)
-                                    Text(
-                                      '${productSelectionAbrevationList[_product.productSelection]}',
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        height: 0.9,
-                                      ),
-                                    ),
-                                ],
                               ),
                             ],
-                          ),
+                          ],
+                        ),
+                        SizedBox(height: 6.h),
+                        Wrap(
+                          spacing: 6.w,
+                          runSpacing: 4.h,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            _buildInfoChip('${_product.volume}L', context),
+                            if (_product.abv != null)
+                              _buildInfoChip(
+                                  '${_product.abv!.toStringAsFixed(1)}%',
+                                  context),
+                            if (_product.country != null &&
+                                _product.country!.isNotEmpty)
+                              _buildInfoChipWithFlag(
+                                _product.country!,
+                                _product.countryCode,
+                                context,
+                              ),
+                            if (_product.stock != null && _product.stock! > 0)
+                              _buildInfoChip('${_product.stock} stk', context,
+                                  highlight: true),
+                            if (widget.release != null &&
+                                widget.release!.productSelections.length > 1)
+                              _buildInfoChip(
+                                  productSelectionAbrevationList[
+                                          _product.productSelection] ??
+                                      '',
+                                  context),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
-            Positioned(
-              bottom: tabletMode ? null : 10.h,
-              top: !tabletMode ? null : boxImageSize + 11.h - 35.r,
-              right: 12.w,
-              child: Semantics(
-                button: true,
-                label: 'Legg i handleliste',
-                child: InkWell(
-                  onTap: () {
-                    cart.addItem(_product.id, _product);
-                    cart.updateCartItemsData();
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Lagt til i handlelisten!',
-                          textAlign: TextAlign.center,
-                        ),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  onLongPress: () {
-                    if (cart.items.keys.contains(_product.id)) {
-                      cart.removeSingleItem(_product.id);
-                      cart.updateCartItemsData();
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            cart.items.keys.contains(_product.id)
-                                ? 'Fjernet en fra handlelisten!'
-                                : 'Fjernet helt fra handlelisten!',
-                            textAlign: TextAlign.center,
-                          ),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    height: 35.r,
-                    width: 50.r,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 1,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(24.r),
-                      ),
-                    ),
-                    child: Consumer<Cart>(
-                      builder: (_, cart, __) => Center(
-                        child: Badge(
-                          isLabelVisible: cart.items.keys.contains(_product.id),
-                          label: Text(cart.items.keys.contains(_product.id)
-                              ? cart.items[_product.id]!.quantity.toString()
-                              : ''),
-                          child: Icon(
-                            Icons.shopping_cart_outlined,
-                            size: 20.r,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartButton(BuildContext context, Cart cart) {
+    return Consumer<Cart>(
+      builder: (_, cartData, __) {
+        final inCart = cartData.items.keys.contains(_product.id);
+        final quantity = inCart ? cartData.items[_product.id]!.quantity : 0;
+
+        return GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            cart.addItem(_product.id, _product);
+            cart.updateCartItemsData();
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Lagt til i handlelisten!',
+                  textAlign: TextAlign.center,
                 ),
+                duration: Duration(seconds: 1),
+              ),
+            );
+          },
+          onLongPress: () {
+            if (inCart) {
+              HapticFeedback.mediumImpact();
+              cart.removeSingleItem(_product.id);
+              cart.updateCartItemsData();
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    cart.items.keys.contains(_product.id)
+                        ? 'Fjernet en fra handlelisten!'
+                        : 'Fjernet helt fra handlelisten!',
+                    textAlign: TextAlign.center,
+                  ),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.all(5.r),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.r),
+                bottomRight: Radius.circular(8.r),
               ),
             ),
-          ],
+            child: Badge(
+              isLabelVisible: inCart,
+              label: Text(
+                quantity.toString(),
+                style: TextStyle(fontSize: 9.sp),
+              ),
+              child: Icon(
+                inCart ? Icons.shopping_cart : Icons.add_shopping_cart_outlined,
+                size: 18.r,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoChip(String text, BuildContext context,
+      {bool highlight = false}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: highlight
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10.sp,
+          fontWeight: FontWeight.w500,
+          color: highlight
+              ? Theme.of(context).colorScheme.onPrimaryContainer
+              : Theme.of(context).colorScheme.onSurface,
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChipWithFlag(
+      String country, String? countryCode, BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (countryCode != null && countryCode.isNotEmpty) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(2.r),
+              child: Flag.fromString(
+                countryCode,
+                height: 10.r,
+                width: 10.r * 4 / 3,
+              ),
+            ),
+            SizedBox(width: 4.w),
+          ],
+          Text(
+            country,
+            style: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
       ),
     );
   }

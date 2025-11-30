@@ -64,6 +64,7 @@ const Map<String, String> productSelectionAbrevationList = {
   'Partiutvalget': 'Parti',
   'Testutvalget': 'Test',
   'Tilleggsutvalget': 'TU',
+  'Spesialutvalg': 'Spesial'
 };
 
 const List<Map<String, String>> productSelectionList = [

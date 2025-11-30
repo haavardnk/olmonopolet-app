@@ -68,10 +68,7 @@ class Product extends Equatable {
         rating: json['rating'],
         checkins: json['checkins'],
         abv: json['abv'],
-        imageUrl: json['label_sm_url'] != null &&
-                json['label_sm_url'].contains('badge-beer-default.png')
-            ? null
-            : json['label_sm_url'],
+        imageUrl: json['label_sm_url'],
         vmpUrl: json['vmp_url'],
         untappdUrl: json['untpd_url'],
         untappdId: json['untpd_id'],
