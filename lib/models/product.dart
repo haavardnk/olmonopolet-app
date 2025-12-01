@@ -23,6 +23,7 @@ class Product extends Equatable {
     required this.price,
     required this.volume,
     this.pricePerVolume,
+    this.pricePerAlcoholUnit,
     this.stock,
     this.rating,
     this.checkins,
@@ -67,6 +68,7 @@ class Product extends Equatable {
         price: json['price'],
         volume: json['volume'],
         pricePerVolume: json['price_per_volume'],
+        pricePerAlcoholUnit: json['price_per_alcohol_unit'],
         rating: json['rating'],
         checkins: json['checkins'],
         abv: json['abv'],
@@ -137,6 +139,7 @@ class Product extends Equatable {
   final double price;
   final double volume;
   final double? pricePerVolume;
+  final double? pricePerAlcoholUnit;
   final int? stock;
   final double? rating;
   final int? checkins;

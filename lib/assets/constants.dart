@@ -44,6 +44,8 @@ const Map<String, String> sortList = {
   'Pris - Lav til høy': 'price',
   'Pris per liter - Høy til lav': '-price_per_volume',
   'Pris per liter - Lav til høy': 'price_per_volume',
+  'Pris per alkoholenhet - Høy til lav': '-price_per_alcohol_unit',
+  'Pris per alkoholenhet - Lav til høy': 'price_per_alcohol_unit',
 };
 
 const List<String> cartSortList = [

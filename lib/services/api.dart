@@ -79,7 +79,7 @@ class ApiHelper {
   ) async {
     const fields =
         'vmp_id,vmp_name,style,sub_category,main_category,stock,price,volume,'
-        'price_per_volume,rating,checkins,abv,label_sm_url,vmp_url,untpd_url,'
+        'price_per_volume,price_per_alcohol_unit,rating,checkins,abv,label_sm_url,vmp_url,untpd_url,'
         'untpd_id,country,country_code,product_selection,label_hd_url,ibu,'
         'description,brewery,year,color,aroma,taste,storable,food_pairing,'
         'raw_materials,fullness,sweetness,freshness,bitterness,sugar,acid,'
@@ -174,13 +174,13 @@ class ApiHelper {
     );
   }
 
-  static Future<List<Product>> getProductsData(
+  static Future<List<Product>?> getProductsByIds(
     http.Client client,
     String productIds,
   ) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,volume,price_per_volume,'
+        'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,'
         'vmp_url,untpd_url,untpd_id,country,country_code,is_christmas_beer';
     final endpoint = 'beers/?beers=$productIds&fields=$fields';
 
@@ -311,7 +311,7 @@ class ApiHelper {
   static Uri _buildProductUrl(int page, Filter filter, int pageSize) {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,volume,price_per_volume,vmp_url,'
+        'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,vmp_url,'
         'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer';
 
     final params = <String, String>{
@@ -368,7 +368,7 @@ class ApiHelper {
   ) {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
-        'sub_category,style,stock,abv,volume,price_per_volume,vmp_url,'
+        'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,vmp_url,'
         'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer';
 
     final params = <String, String>{

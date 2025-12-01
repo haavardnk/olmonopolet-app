@@ -148,6 +148,28 @@ class _ProductItemState extends State<ProductItem> {
                                       .onSurfaceVariant,
                                 ),
                               ),
+                              if (_product.pricePerAlcoholUnit != null) ...[
+                                SizedBox(width: 6.w),
+                                Text(
+                                  '·',
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                ),
+                                SizedBox(width: 6.w),
+                                Text(
+                                  '${_product.pricePerAlcoholUnit!.toStringAsFixed(0)} kr/AE',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                           SizedBox(height: 4.h),

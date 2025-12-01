@@ -290,11 +290,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildHeader(BuildContext context, Product product, Product? details,
       String? displayImageUrl, double imageSize, ColorScheme colors) {
-    double? pricePerUnit;
-    if (details?.alcoholUnits != null && details!.alcoholUnits! > 0) {
-      pricePerUnit = product.price / details.alcoholUnits!;
-    }
-
     return Container(
       padding: EdgeInsets.fromLTRB(0, 8.h, 0, 4.h),
       child: Column(
@@ -341,14 +336,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             fontSize: 13.sp, color: colors.onSurfaceVariant),
                       ),
                     ],
-                    if (pricePerUnit != null) ...[
+                    if (product.pricePerAlcoholUnit != null) ...[
                       SizedBox(width: 6.w),
                       Text('·',
                           style: TextStyle(
                               fontSize: 14.sp, color: colors.onSurfaceVariant)),
                       SizedBox(width: 6.w),
                       Text(
-                        '${pricePerUnit.toStringAsFixed(0)} kr/enhet',
+                        '${product.pricePerAlcoholUnit!.toStringAsFixed(0)} kr/alkoholenhet',
                         style: TextStyle(
                             fontSize: 13.sp, color: colors.onSurfaceVariant),
                       ),
