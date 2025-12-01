@@ -337,16 +337,6 @@ class ApiHelper {
     if (filter.storeId.isNotEmpty) {
       params['store'] = filter.storeId;
     }
-    if (filter.checkIn == 1 || filter.sortBy.contains('checkin__rating')) {
-      params['user_checkin'] = 'True';
-    } else if (filter.checkIn == 2) {
-      params['user_checkin'] = 'False';
-    }
-    if (filter.wishlisted == 1) {
-      params['user_wishlisted'] = 'True';
-    } else if (filter.wishlisted == 2) {
-      params['user_wishlisted'] = 'False';
-    }
     if (filter.deliverySelectedList[0]) {
       params['store_delivery'] = 'True';
     }

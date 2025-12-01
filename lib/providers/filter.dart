@@ -27,8 +27,6 @@ class Filter with ChangeNotifier {
   String releaseSortBy = '-rating';
   String release = '';
   String releaseProductSelectionChoice = '';
-  int checkIn = 0;
-  int wishlisted = 0;
   int styleChoice = 0;
   bool christmasBeerOnly = false;
 
@@ -328,18 +326,6 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
-  void setCheckin(int index) {
-    checkIn = index;
-    notifyListeners();
-    saveFilters();
-  }
-
-  void setWishlisted(int index) {
-    wishlisted = index;
-    notifyListeners();
-    saveFilters();
-  }
-
   void setChristmasBeerOnly(bool value) {
     christmasBeerOnly = value;
     notifyListeners();
@@ -535,8 +521,6 @@ class Filter with ChangeNotifier {
     abvLow = '';
     sortBy = '-rating';
     release = '';
-    checkIn = 0;
-    wishlisted = 0;
     christmasBeerOnly = false;
     notifyListeners();
     saveFilters();
@@ -626,12 +610,6 @@ class Filter with ChangeNotifier {
                 .map((e) => e == true ? 'true' : 'false')
                 .toList());
       }
-      if (filter['name'] == 'checkIn' && filter['save'] == true) {
-        prefs.setInt('checkIn', checkIn);
-      }
-      if (filter['name'] == 'wishlisted' && filter['save'] == true) {
-        prefs.setInt('wishlisted', wishlisted);
-      }
     }
   }
 
@@ -713,12 +691,6 @@ class Filter with ChangeNotifier {
         deliverySelectedList = tempList != null
             ? tempList.map((e) => e == "true").toList()
             : List<bool>.filled(2, false);
-      }
-      if (filter['name'] == 'delivery' && filter['save'] == true) {
-        checkIn = prefs.getInt('checkIn') ?? 0;
-      }
-      if (filter['name'] == 'wishlisted' && filter['save'] == true) {
-        wishlisted = prefs.getInt('wishlisted') ?? 0;
       }
     }
     notifyListeners();
