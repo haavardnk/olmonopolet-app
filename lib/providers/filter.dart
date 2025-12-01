@@ -30,6 +30,7 @@ class Filter with ChangeNotifier {
   int checkIn = 0;
   int wishlisted = 0;
   int styleChoice = 0;
+  bool christmasBeerOnly = false;
 
   RangeValues priceRange = const RangeValues(0, 500);
   RangeValues pricePerVolumeRange = const RangeValues(0, 1000);
@@ -324,6 +325,12 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
+  void setChristmasBeerOnly(bool value) {
+    christmasBeerOnly = value;
+    notifyListeners();
+    saveFilters();
+  }
+
   void setStyleChoice(int index) {
     styleChoice = index;
     selectedStyles = [];
@@ -415,6 +422,7 @@ class Filter with ChangeNotifier {
     release = '';
     checkIn = 0;
     wishlisted = 0;
+    christmasBeerOnly = false;
     notifyListeners();
     saveFilters();
   }

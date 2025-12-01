@@ -160,14 +160,24 @@ class _StockChangeItemState extends State<StockChangeItem> {
                                 ],
                               ),
                               SizedBox(height: 4.h),
-                              Text(
-                                product.style,
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: colors.onSurfaceVariant,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              Row(
+                                children: [
+                                  if (product.isChristmasBeer) ...[
+                                    buildChristmasChip(context),
+                                    SizedBox(width: 6.w),
+                                  ],
+                                  Expanded(
+                                    child: Text(
+                                      product.style,
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                               SizedBox(height: 4.h),
                               Row(

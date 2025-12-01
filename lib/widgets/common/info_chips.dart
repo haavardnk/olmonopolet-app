@@ -74,3 +74,31 @@ Widget buildInfoChipWithFlag(
     ),
   );
 }
+
+Widget buildChristmasChip(BuildContext context) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1B5E20),
+      borderRadius: BorderRadius.circular(12.r),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '🎄',
+          style: TextStyle(fontSize: 9.sp),
+        ),
+        SizedBox(width: 3.w),
+        Text(
+          'Juleøl',
+          style: TextStyle(
+            fontSize: 10.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    ),
+  );
+}

@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/app_launcher.dart';
 import '../../utils/environment.dart';
+import '../../utils/date_utils.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -182,12 +183,23 @@ class _AppDrawerState extends State<AppDrawer> {
                     ),
                   ),
                   SizedBox(width: 16.w),
-                  Text(
-                    'Ølmonopolet',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Ølmonopolet',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (isHolidaySeason()) ...[
+                        SizedBox(width: 8.w),
+                        Text(
+                          '🎄',
+                          style: TextStyle(fontSize: 20.sp),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

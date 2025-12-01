@@ -25,6 +25,7 @@ class Release {
     this.releaseDate,
     required this.productSelections,
     this.productStats,
+    this.isChristmasRelease = false,
   });
 
   factory Release.fromJson(Map<String, dynamic> release) => Release(
@@ -36,10 +37,12 @@ class Release {
         productStats: release['product_stats'] != null
             ? ProductStats.fromJson(release['product_stats'])
             : null,
+        isChristmasRelease: release['is_christmas_release'] ?? false,
       );
 
   String name;
   DateTime? releaseDate;
   List<String> productSelections;
   ProductStats? productStats;
+  bool isChristmasRelease;
 }

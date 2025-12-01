@@ -8,6 +8,7 @@ import '../../assets/constants.dart';
 import '../../providers/filter.dart';
 import '../../screens/product_overview_tab.dart';
 import '../../models/release.dart';
+import '../common/info_chips.dart';
 
 class ReleaseItem extends StatelessWidget {
   final Release release;
@@ -135,6 +136,10 @@ class ReleaseItem extends StatelessWidget {
                                     .onSurfaceVariant,
                               ),
                             ),
+                          if (release.isChristmasRelease) ...[
+                            SizedBox(width: 8.w),
+                            buildChristmasChip(context),
+                          ],
                         ],
                       ),
                     ],

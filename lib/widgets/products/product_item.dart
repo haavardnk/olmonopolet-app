@@ -164,16 +164,26 @@ class _ProductItemState extends State<ProductItem> {
                             ],
                           ),
                           SizedBox(height: 4.h),
-                          Text(
-                            _product.style,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          Row(
+                            children: [
+                              if (_product.isChristmasBeer) ...[
+                                buildChristmasChip(context),
+                                SizedBox(width: 6.w),
+                              ],
+                              Expanded(
+                                child: Text(
+                                  _product.style,
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height: 4.h),
                           Row(

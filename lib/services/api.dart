@@ -83,7 +83,7 @@ class ApiHelper {
         'untpd_id,country,country_code,product_selection,label_hd_url,ibu,'
         'description,brewery,year,color,aroma,taste,storable,food_pairing,'
         'raw_materials,fullness,sweetness,freshness,bitterness,sugar,acid,'
-        'method,allergens,alcohol_units,all_stock,value_score';
+        'method,allergens,alcohol_units,all_stock,value_score,is_christmas_beer';
     final endpoint = 'beers/?beers=${product.id}&fields=$fields&all_stock=true';
     return _handleRequest(
       request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
@@ -167,7 +167,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,'
-        'vmp_url,untpd_url,untpd_id,country,country_code';
+        'vmp_url,untpd_url,untpd_id,country,country_code,is_christmas_beer';
     final endpoint = 'beers/?beers=$productIds&fields=$fields';
 
     return _handleRequest(
@@ -246,7 +246,7 @@ class ApiHelper {
     required int pageSize,
   }) async {
     final endpoint =
-        'release/?fields=name,release_date,product_selections,product_stats&page=$page&page_size=$pageSize';
+        'release/?fields=name,release_date,product_selections,product_stats,is_christmas_release&page=$page&page_size=$pageSize';
     return _handleRequest(
       request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
       parser: (json) =>
@@ -269,7 +269,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,vmp_url,'
-        'untpd_url,untpd_id,country,country_code,product_selection';
+        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer';
 
     final params = <String, String>{
       'fields': fields,
@@ -310,6 +310,9 @@ class ApiHelper {
     if (filter.deliverySelectedList[1]) {
       params['post_delivery'] = 'True';
     }
+    if (filter.christmasBeerOnly) {
+      params['is_christmas_beer'] = 'true';
+    }
 
     return Uri.parse('${_baseUrl}beers/').replace(queryParameters: params);
   }
@@ -323,7 +326,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,vmp_url,'
-        'untpd_url,untpd_id,country,country_code,product_selection';
+        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer';
 
     final params = <String, String>{
       'fields': fields,

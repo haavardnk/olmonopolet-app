@@ -193,16 +193,27 @@ class CartElementState extends State<CartElement> {
                                           ],
                                         ),
                                         SizedBox(height: 4.h),
-                                        Text(
-                                          widget.cartItem.product.style,
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurfaceVariant,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                widget.cartItem.product.style,
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            if (widget.cartItem.product
+                                                .isChristmasBeer) ...[
+                                              SizedBox(width: 6.w),
+                                              buildChristmasChip(context),
+                                            ],
+                                          ],
                                         ),
                                         SizedBox(height: 4.h),
                                         Row(

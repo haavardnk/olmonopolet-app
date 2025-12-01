@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 import '../../assets/constants.dart';
+import '../../utils/date_utils.dart';
 import 'filter_section.dart';
 
 class ChipFilter extends StatelessWidget {
@@ -125,6 +127,58 @@ class ProductSelectionFilter extends StatelessWidget {
               List<bool>.filled(productSelectionList.length, false);
           filters.setFilters();
         }),
+      ),
+    );
+  }
+}
+
+class ChristmasBeerFilter extends StatelessWidget {
+  final StateSetter parentSetState;
+
+  const ChristmasBeerFilter({super.key, required this.parentSetState});
+
+  @override
+  Widget build(BuildContext context) {
+    // Only show in November and December (holiday season)
+    if (!isHolidaySeason()) {
+      return const SizedBox.shrink();
+    }
+
+    final filters = Provider.of<Filter>(context, listen: false);
+    final colors = Theme.of(context).colorScheme;
+
+    return Consumer<Filter>(
+      builder: (context, flt, _) => Padding(
+        padding: EdgeInsets.symmetric(vertical: 6.h),
+        child: Row(
+          children: [
+            Text(
+              '🎄',
+              style: TextStyle(fontSize: 16.sp),
+            ),
+            SizedBox(width: 6.w),
+            Expanded(
+              child: Text(
+                'Kun juleøl',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: colors.primary,
+                ),
+              ),
+            ),
+            Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                value: flt.christmasBeerOnly,
+                onChanged: (value) {
+                  filters.setChristmasBeerOnly(value);
+                  parentSetState(() {});
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
