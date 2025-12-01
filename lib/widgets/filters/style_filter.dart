@@ -18,6 +18,7 @@ class StyleFilter extends StatelessWidget {
     return Consumer<Filter>(
       builder: (context, flt, _) => FilterSection(
         title: 'Stil',
+        icon: Icons.local_bar_outlined,
         resetLabel: filters.selectedStyles.isNotEmpty ? 'Nullstill' : null,
         onReset: filters.selectedStyles.isNotEmpty
             ? () => parentSetState(() {
@@ -51,7 +52,8 @@ class StyleFilter extends StatelessWidget {
                     ),
                   ),
                 ),
-                Icon(Icons.expand_more, size: 20, color: colors.onSurfaceVariant),
+                Icon(Icons.expand_more,
+                    size: 20, color: colors.onSurfaceVariant),
               ],
             ),
           ),
@@ -63,7 +65,8 @@ class StyleFilter extends StatelessWidget {
   Future<void> _showStyleDialog(BuildContext context, Filter filters) async {
     await showDialog(
       context: context,
-      builder: (_) => _StyleDialogContent(filters: filters, parentSetState: parentSetState),
+      builder: (_) =>
+          _StyleDialogContent(filters: filters, parentSetState: parentSetState),
     );
   }
 }
@@ -72,7 +75,8 @@ class _StyleDialogContent extends StatefulWidget {
   final Filter filters;
   final StateSetter parentSetState;
 
-  const _StyleDialogContent({required this.filters, required this.parentSetState});
+  const _StyleDialogContent(
+      {required this.filters, required this.parentSetState});
 
   @override
   State<_StyleDialogContent> createState() => _StyleDialogContentState();
@@ -98,7 +102,9 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
 
   void _loadStylesIfNeeded() {
     if (_filters.styleChoice == 1 && _filters.untappdStyleList.isEmpty) {
-      _filters.getStyles().then((_) { if (mounted) setState(() {}); });
+      _filters.getStyles().then((_) {
+        if (mounted) setState(() {});
+      });
     }
   }
 
@@ -116,9 +122,12 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
 
   List<String> get _filteredStyles => _searchQuery.isEmpty
       ? _allStyles
-      : _allStyles.where((s) => s.toLowerCase().contains(_searchQuery)).toList();
+      : _allStyles
+          .where((s) => s.toLowerCase().contains(_searchQuery))
+          .toList();
 
-  bool get _isLoading => _filters.styleChoice == 1 && _filters.untappdStyleList.isEmpty;
+  bool get _isLoading =>
+      _filters.styleChoice == 1 && _filters.untappdStyleList.isEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -143,10 +152,13 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
                     decoration: InputDecoration(
                       hintText: 'Søk etter stil...',
                       prefixIcon: const Icon(Icons.search, size: 20),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
-                    onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
+                    onChanged: (v) =>
+                        setState(() => _searchQuery = v.toLowerCase()),
                   ),
                 ],
               ),
@@ -163,13 +175,16 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
 
   Widget _buildList(List<String> styles, ColorScheme colors) {
     if (_isLoading) {
-      return const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
+      return const Center(
+          child: Padding(
+              padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
     }
     if (styles.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
-          child: Text('Ingen stiler funnet', style: TextStyle(color: colors.onSurfaceVariant)),
+          child: Text('Ingen stiler funnet',
+              style: TextStyle(color: colors.onSurfaceVariant)),
         ),
       );
     }
@@ -183,10 +198,14 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
         return ListTile(
           dense: true,
           title: Text(style),
-          trailing: isSelected ? Icon(Icons.check_circle, color: colors.primary) : null,
+          trailing: isSelected
+              ? Icon(Icons.check_circle, color: colors.primary)
+              : null,
           onTap: () {
             setState(() {
-              isSelected ? _filters.selectedStyles.remove(style) : _filters.selectedStyles.add(style);
+              isSelected
+                  ? _filters.selectedStyles.remove(style)
+                  : _filters.selectedStyles.add(style);
               _updateStyle();
             });
             widget.parentSetState(() {});
@@ -206,7 +225,8 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
               onPressed: () {
                 setState(() {
                   for (var style in filtered) {
-                    if (!_filters.selectedStyles.contains(style)) _filters.selectedStyles.add(style);
+                    if (!_filters.selectedStyles.contains(style))
+                      _filters.selectedStyles.add(style);
                   }
                   _updateStyle();
                 });
@@ -226,7 +246,9 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
               child: const Text('Nullstill'),
             ),
           const Spacer(),
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Ferdig')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Ferdig')),
         ],
       ),
     );
@@ -241,7 +263,9 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
       padding: const EdgeInsets.all(3),
       child: Row(
         children: [
-          Expanded(child: _buildToggleOption('Standard', _filters.styleChoice == 0, colors, () {
+          Expanded(
+              child: _buildToggleOption(
+                  'Standard', _filters.styleChoice == 0, colors, () {
             if (_filters.styleChoice != 0) {
               setState(() {
                 _filters.selectedStyles = [];
@@ -250,7 +274,9 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
               widget.parentSetState(() {});
             }
           })),
-          Expanded(child: _buildToggleOption('Untappd', _filters.styleChoice == 1, colors, () {
+          Expanded(
+              child: _buildToggleOption(
+                  'Untappd', _filters.styleChoice == 1, colors, () {
             if (_filters.styleChoice != 1) {
               setState(() {
                 _filters.selectedStyles = [];
@@ -265,7 +291,8 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
     );
   }
 
-  Widget _buildToggleOption(String label, bool isSelected, ColorScheme colors, VoidCallback onTap) {
+  Widget _buildToggleOption(
+      String label, bool isSelected, ColorScheme colors, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -281,7 +308,9 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            color: isSelected ? colors.onPrimaryContainer : colors.onSurfaceVariant,
+            color: isSelected
+                ? colors.onPrimaryContainer
+                : colors.onSurfaceVariant,
           ),
         ),
       ),

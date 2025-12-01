@@ -17,6 +17,7 @@ class SortFilter extends StatelessWidget {
 
     return FilterSection(
       title: 'Sortering',
+      icon: Icons.sort,
       child: SingleSelectDropdown<String>(
         items: sortList.keys.toList(),
         selectedItem: filters.sortIndex,

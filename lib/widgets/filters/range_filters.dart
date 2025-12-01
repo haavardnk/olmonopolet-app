@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 
 class RangeFilter extends StatelessWidget {
   final String title;
+  final IconData? icon;
   final String unit;
   final RangeValues values;
   final double min;
@@ -15,6 +17,7 @@ class RangeFilter extends StatelessWidget {
   const RangeFilter({
     super.key,
     required this.title,
+    this.icon,
     required this.unit,
     required this.values,
     required this.min,
@@ -28,7 +31,9 @@ class RangeFilter extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final isDefault = values.start == min && values.end == max;
     final startValue = values.start.round().toString();
-    final endValue = values.end == max ? '${values.end.round()}+' : values.end.round().toString();
+    final endValue = values.end == max
+        ? '${values.end.round()}+'
+        : values.end.round().toString();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -38,16 +43,35 @@ class RangeFilter extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+              Row(
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: 16.r, color: colors.primary),
+                    SizedBox(width: 6.w),
+                  ],
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                      color: colors.primary,
+                    ),
+                  ),
+                ],
+              ),
               Row(
                 children: [
                   Text('$startValue - $endValue $unit',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: colors.primary)),
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: colors.primary)),
                   if (!isDefault) ...[
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => onChanged(RangeValues(min, max)),
-                      child: Icon(Icons.refresh, size: 16, color: colors.primary),
+                      child:
+                          Icon(Icons.refresh, size: 16, color: colors.primary),
                     ),
                   ],
                 ],
@@ -57,10 +81,16 @@ class RangeFilter extends StatelessWidget {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
-              rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 8),
+              rangeThumbShape:
+                  const RoundRangeSliderThumbShape(enabledThumbRadius: 8),
               trackHeight: 3,
             ),
-            child: RangeSlider(values: values, min: min, max: max, divisions: divisions, onChanged: onChanged),
+            child: RangeSlider(
+                values: values,
+                min: min,
+                max: max,
+                divisions: divisions,
+                onChanged: onChanged),
           ),
         ],
       ),
@@ -97,6 +127,7 @@ class _PriceRangeFilterState extends State<PriceRangeFilter> {
       children: [
         RangeFilter(
           title: 'Pris',
+          icon: Icons.payments_outlined,
           unit: 'kr',
           values: _priceRange,
           min: 0,
@@ -110,6 +141,7 @@ class _PriceRangeFilterState extends State<PriceRangeFilter> {
         ),
         RangeFilter(
           title: 'Pris per liter',
+          icon: Icons.water_drop_outlined,
           unit: 'kr',
           values: _pricePerVolumeRange,
           min: 0,
@@ -150,6 +182,7 @@ class _AlcoholRangeFilterState extends State<AlcoholRangeFilter> {
 
     return RangeFilter(
       title: 'Alkohol',
+      icon: Icons.percent,
       unit: '%',
       values: _alcoholRange,
       min: 0,

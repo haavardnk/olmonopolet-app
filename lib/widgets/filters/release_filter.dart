@@ -25,10 +25,12 @@ class ReleaseFilter extends StatelessWidget {
 
         return FilterSection(
           title: 'Nyhetslansering',
+          icon: Icons.new_releases_outlined,
           resetLabel: selectedReleases.isNotEmpty ? 'Nullstill' : null,
           onReset: selectedReleases.isNotEmpty
               ? () => parentSetState(() {
-                    filters.releaseSelectedList = List<bool>.filled(filters.releaseNameList.length, false);
+                    filters.releaseSelectedList = List<bool>.filled(
+                        filters.releaseNameList.length, false);
                     filters.release = '';
                     filters.setFilters();
                   })
@@ -49,7 +51,9 @@ class ReleaseFilter extends StatelessWidget {
               return flt.releaseNameList;
             },
             onChanged: (sel) => parentSetState(() {
-              filters.releaseSelectedList = flt.releaseNameList.map((name) => sel.contains(name)).toList();
+              filters.releaseSelectedList = flt.releaseNameList
+                  .map((name) => sel.contains(name))
+                  .toList();
               filters.release = sel.join(',');
               filters.setFilters();
             }),

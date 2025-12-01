@@ -20,6 +20,7 @@ class CountryFilter extends StatelessWidget {
     return Consumer<Filter>(
       builder: (context, flt, _) => FilterSection(
         title: 'Land',
+        icon: Icons.public,
         resetLabel: filters.selectedCountries.isNotEmpty ? 'Nullstill' : null,
         onReset: filters.selectedCountries.isNotEmpty
             ? () => parentSetState(() {
@@ -30,7 +31,8 @@ class CountryFilter extends StatelessWidget {
         child: MultiSelectDropdown<Country>(
           items: flt.countryList,
           selectedItems: filters.selectedCountries
-              .map((name) => flt.countryList.firstWhere((c) => c.name == name, orElse: () => Country(name: name)))
+              .map((name) => flt.countryList.firstWhere((c) => c.name == name,
+                  orElse: () => Country(name: name)))
               .toList(),
           itemLabel: (c) => c.name,
           itemLeading: (c) => c.isoCode?.isNotEmpty == true
@@ -56,7 +58,8 @@ class CountryFilter extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(2),
-                      child: Flag.fromString(item.isoCode!, height: 14, width: 20),
+                      child:
+                          Flag.fromString(item.isoCode!, height: 14, width: 20),
                     ),
                   ),
                 Flexible(
@@ -70,7 +73,8 @@ class CountryFilter extends StatelessWidget {
             );
           },
           asyncItems: () async {
-            if (flt.countryList.isEmpty && !flt.countriesLoading) await flt.getCountries();
+            if (flt.countryList.isEmpty && !flt.countriesLoading)
+              await flt.getCountries();
             return flt.countryList;
           },
           onChanged: (sel) => parentSetState(() {

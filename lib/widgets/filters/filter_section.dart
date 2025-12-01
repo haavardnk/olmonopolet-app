@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FilterSection extends StatelessWidget {
   final String title;
+  final IconData? icon;
   final String? subtitle;
   final String? resetLabel;
   final VoidCallback? onReset;
@@ -11,6 +13,7 @@ class FilterSection extends StatelessWidget {
   const FilterSection({
     super.key,
     required this.title,
+    this.icon,
     this.subtitle,
     this.resetLabel,
     this.onReset,
@@ -33,10 +36,27 @@ class FilterSection extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    if (icon != null) ...[
+                      Icon(icon, size: 16.r, color: colors.primary),
+                      SizedBox(width: 6.w),
+                    ],
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                        color: colors.primary,
+                      ),
+                    ),
                     if (subtitle != null) ...[
-                      const SizedBox(width: 6),
-                      Text(subtitle!, style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant)),
+                      SizedBox(width: 6.w),
+                      Text(
+                        subtitle!,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -44,11 +64,14 @@ class FilterSection extends StatelessWidget {
               if (onReset != null && resetLabel != null)
                 GestureDetector(
                   onTap: onReset,
-                  child: Text(resetLabel!, style: TextStyle(fontSize: 12, color: colors.primary)),
+                  child: Text(
+                    resetLabel!,
+                    style: TextStyle(fontSize: 12.sp, color: colors.primary),
+                  ),
                 ),
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6.h),
           child,
         ],
       ),

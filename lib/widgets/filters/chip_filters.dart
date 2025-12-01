@@ -7,6 +7,7 @@ import 'filter_section.dart';
 
 class ChipFilter extends StatelessWidget {
   final String title;
+  final IconData? icon;
   final String? subtitle;
   final List<String> options;
   final List<bool> selectedList;
@@ -18,6 +19,7 @@ class ChipFilter extends StatelessWidget {
   const ChipFilter({
     super.key,
     required this.title,
+    this.icon,
     this.subtitle,
     required this.options,
     required this.selectedList,
@@ -34,6 +36,7 @@ class ChipFilter extends StatelessWidget {
 
     return FilterSection(
       title: title,
+      icon: icon,
       subtitle: subtitle,
       resetLabel: onToggleAll != null && hasSelection ? 'Nullstill' : null,
       onReset: onToggleAll,
@@ -47,16 +50,22 @@ class ChipFilter extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: isSelected ? colors.primaryContainer : colors.surfaceContainerHighest,
+                color: isSelected
+                    ? colors.primaryContainer
+                    : colors.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
-                border: isSelected ? Border.all(color: colors.primary, width: 1) : null,
+                border: isSelected
+                    ? Border.all(color: colors.primary, width: 1)
+                    : null,
               ),
               child: Text(
                 options[i],
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-                  color: isSelected ? colors.onPrimaryContainer : colors.onSurfaceVariant,
+                  color: isSelected
+                      ? colors.onPrimaryContainer
+                      : colors.onSurfaceVariant,
                 ),
               ),
             ),
@@ -79,12 +88,14 @@ class AllergensFilter extends StatelessWidget {
     return Consumer<Filter>(
       builder: (context, flt, _) => ChipFilter(
         title: 'Ekskluder allergener',
+        icon: Icons.no_food_outlined,
         options: excludeAllergensList.map((e) => e.keys.first).toList(),
         selectedList: filters.excludeAllergensSelectedList,
         onChanged: filters.setExcludeAllergensSelection,
         parentSetState: parentSetState,
         onToggleAll: () => parentSetState(() {
-          filters.excludeAllergensSelectedList = List<bool>.filled(excludeAllergensList.length, false);
+          filters.excludeAllergensSelectedList =
+              List<bool>.filled(excludeAllergensList.length, false);
           filters.setFilters();
         }),
       ),
@@ -104,12 +115,14 @@ class ProductSelectionFilter extends StatelessWidget {
     return Consumer<Filter>(
       builder: (context, flt, _) => ChipFilter(
         title: 'Produktutvalg',
+        icon: Icons.category_outlined,
         options: productSelectionList.map((e) => e.keys.first).toList(),
         selectedList: filters.productSelectionSelectedList,
         onChanged: filters.setProductSelection,
         parentSetState: parentSetState,
         onToggleAll: () => parentSetState(() {
-          filters.productSelectionSelectedList = List<bool>.filled(productSelectionList.length, false);
+          filters.productSelectionSelectedList =
+              List<bool>.filled(productSelectionList.length, false);
           filters.setFilters();
         }),
       ),
@@ -129,6 +142,7 @@ class DeliveryFilter extends StatelessWidget {
     return Consumer<Filter>(
       builder: (context, flt, _) => ChipFilter(
         title: 'Bestilling',
+        icon: Icons.local_shipping_outlined,
         subtitle: '(Ikke filtrer på butikklager)',
         options: deliveryList,
         selectedList: filters.deliverySelectedList,

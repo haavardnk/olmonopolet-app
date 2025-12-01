@@ -18,6 +18,7 @@ class StoreFilter extends StatelessWidget {
     return Consumer<Filter>(
       builder: (context, flt, _) => FilterSection(
         title: 'Butikklager',
+        icon: Icons.store_outlined,
         resetLabel: filters.selectedStores.isNotEmpty ? 'Nullstill' : null,
         onReset: filters.selectedStores.isNotEmpty
             ? () => parentSetState(() {
@@ -27,9 +28,13 @@ class StoreFilter extends StatelessWidget {
             : null,
         child: MultiSelectDropdown<Store>(
           items: flt.storeList,
-          selectedItems: flt.storeList.where((s) => filters.selectedStores.contains(s.name)).toList(),
+          selectedItems: flt.storeList
+              .where((s) => filters.selectedStores.contains(s.name))
+              .toList(),
           itemLabel: (s) => s.name,
-          itemSubtitle: (s) => s.distance != null ? '${s.distance!.toStringAsFixed(0)} km' : null,
+          itemSubtitle: (s) => s.distance != null
+              ? '${s.distance!.toStringAsFixed(0)} km'
+              : null,
           hintText: 'Alle butikker',
           searchHint: 'Søk etter butikk...',
           selectedLabel: (sel) => sel.isEmpty
@@ -38,7 +43,8 @@ class StoreFilter extends StatelessWidget {
                   ? sel.first.name
                   : '${sel.length} butikker valgt',
           asyncItems: () async {
-            if (flt.storeList.isEmpty && !flt.storesLoading) await flt.getStores();
+            if (flt.storeList.isEmpty && !flt.storesLoading)
+              await flt.getStores();
             return flt.storeList;
           },
           onChanged: (sel) => parentSetState(() {
