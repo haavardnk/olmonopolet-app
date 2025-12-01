@@ -311,7 +311,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: GestureDetector(
@@ -410,7 +410,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
@@ -491,7 +491,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Wrap(
@@ -567,7 +567,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
@@ -638,7 +638,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: GestureDetector(
@@ -687,7 +687,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(

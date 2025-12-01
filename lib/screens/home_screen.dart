@@ -56,8 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         screen: const ProductOverviewTab(),
         item: ItemConfig(
           icon: const Icon(Icons.liquor),
-          activeForegroundColor:
-              Theme.of(context).colorScheme.onSecondaryContainer,
+          activeForegroundColor: Theme.of(context).colorScheme.primary,
           inactiveForegroundColor:
               Theme.of(context).colorScheme.onSurfaceVariant,
           inactiveBackgroundColor:
@@ -69,8 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
         screen: const ReleaseTab(),
         item: ItemConfig(
           icon: const Icon(Icons.new_releases_outlined),
-          activeForegroundColor:
-              Theme.of(context).colorScheme.onSecondaryContainer,
+          activeForegroundColor: Theme.of(context).colorScheme.primary,
           inactiveForegroundColor:
               Theme.of(context).colorScheme.onSurfaceVariant,
           inactiveBackgroundColor:
@@ -82,8 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
         screen: const StockChangeTab(),
         item: ItemConfig(
           icon: const Icon(Icons.swap_vert),
-          activeForegroundColor:
-              Theme.of(context).colorScheme.onSecondaryContainer,
+          activeForegroundColor: Theme.of(context).colorScheme.primary,
           inactiveForegroundColor:
               Theme.of(context).colorScheme.onSurfaceVariant,
           inactiveBackgroundColor:
@@ -101,8 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Icon(Icons.receipt_long),
             ),
           ),
-          activeForegroundColor:
-              Theme.of(context).colorScheme.onSecondaryContainer,
+          activeForegroundColor: Theme.of(context).colorScheme.primary,
           inactiveForegroundColor:
               Theme.of(context).colorScheme.onSurfaceVariant,
           inactiveBackgroundColor:

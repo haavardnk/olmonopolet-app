@@ -46,10 +46,6 @@ class CartTab extends StatelessWidget {
                             (index) {
                               return Column(
                                 children: [
-                                  if (index != 0)
-                                    const Divider(
-                                      height: 1,
-                                    ),
                                   CartElement(
                                     index,
                                     boxImageSize,
@@ -83,12 +79,6 @@ class CartTab extends StatelessWidget {
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                border: Border(
-                  top: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                    width: 1,
-                  ),
-                ),
               ),
               child: Column(
                 children: [
@@ -155,12 +145,17 @@ class CartTab extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8.w),
-        IconButton.filledTonal(
+        IconButton(
           onPressed: () => cartData.clear(),
           icon: Icon(Icons.delete_sweep_outlined, size: 24.r),
           tooltip: 'Tøm handleliste',
           padding: EdgeInsets.all(10.r),
           constraints: const BoxConstraints(),
+          style: IconButton.styleFrom(
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
       ],
     );

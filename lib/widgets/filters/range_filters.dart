@@ -84,6 +84,16 @@ class RangeFilter extends StatelessWidget {
               rangeThumbShape:
                   const RoundRangeSliderThumbShape(enabledThumbRadius: 8),
               trackHeight: 3,
+              activeTrackColor: colors.brightness == Brightness.dark
+                  ? colors.primary
+                  : colors.secondary,
+              inactiveTrackColor: colors.outlineVariant,
+              thumbColor: colors.brightness == Brightness.dark
+                  ? colors.primary
+                  : colors.secondary,
+              overlayColor: colors.brightness == Brightness.dark
+                  ? colors.primary.withValues(alpha: 0.12)
+                  : colors.secondary.withValues(alpha: 0.12),
             ),
             child: RangeSlider(
                 values: values,

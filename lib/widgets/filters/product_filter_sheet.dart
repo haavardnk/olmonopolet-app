@@ -118,7 +118,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, Filter filters, ColorScheme colors) {
+  Widget _buildHeader(
+      BuildContext context, Filter filters, ColorScheme colors) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       child: Row(
@@ -128,7 +129,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
             onPressed: () => FilterSettingsDialog.show(context),
             icon: const Icon(Icons.settings_outlined, size: 20),
             label: const Text('Innstillinger'),
-            style: TextButton.styleFrom(foregroundColor: colors.onSurfaceVariant),
+            style:
+                TextButton.styleFrom(foregroundColor: colors.onSurfaceVariant),
           ),
           Row(
             children: [
@@ -141,8 +143,12 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
                 child: const Text('Nullstill alle'),
               ),
               const SizedBox(width: 8),
-              FilledButton.tonal(
+              FilledButton(
                 onPressed: () => Navigator.pop(context),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colors.surfaceContainerHighest,
+                  foregroundColor: colors.onSurface,
+                ),
                 child: const Text('Bruk'),
               ),
             ],
