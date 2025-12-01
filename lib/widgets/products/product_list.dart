@@ -123,9 +123,7 @@ class ProductListViewState extends State<ProductList> {
                   noItemsFoundIndicatorBuilder: (_) =>
                       const NoItemsFoundIndicator(),
                 ),
-                separatorBuilder: (context, index) => const Divider(
-                  height: 0,
-                ),
+                separatorBuilder: (context, index) => const SizedBox.shrink(),
               )
             : PagedGridView<int, Product>(
                 state: state,

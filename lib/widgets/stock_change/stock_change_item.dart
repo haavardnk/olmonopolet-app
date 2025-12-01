@@ -51,177 +51,184 @@ class _StockChangeItemState extends State<StockChangeItem> {
         Semantics(
           label: product.name,
           button: true,
-          child: InkWell(
-            onTap: () {
-              pushScreen(
-                context,
-                settings: RouteSettings(
-                    name: ProductDetailScreen.routeName,
-                    arguments: <String, dynamic>{
-                      'product': product,
-                      'herotag': heroTag,
-                    }),
-                screen: const ProductDetailScreen(),
-                pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                withNavBar: true,
-              );
-            },
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 10.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: colors.surfaceContainer,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: InkWell(
+              onTap: () {
+                pushScreen(
+                  context,
+                  settings: RouteSettings(
+                      name: ProductDetailScreen.routeName,
+                      arguments: <String, dynamic>{
+                        'product': product,
+                        'herotag': heroTag,
+                      }),
+                  screen: const ProductDetailScreen(),
+                  pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                  withNavBar: true,
+                );
+              },
+              borderRadius: BorderRadius.circular(12.r),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(12.r, 8.r, 12.r, 12.r),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 6.h),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8.r),
-                            child: Hero(
-                              tag: heroTag,
-                              child: displayImageUrl != null &&
-                                      displayImageUrl.isNotEmpty
-                                  ? FancyShimmerImage(
-                                      imageUrl: displayImageUrl,
-                                      height: imageSize,
-                                      width: imageSize,
-                                      boxFit: BoxFit.cover,
-                                      errorWidget: Image.asset(
+                    SizedBox(height: 6.h),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Hero(
+                                tag: heroTag,
+                                child: displayImageUrl != null &&
+                                        displayImageUrl.isNotEmpty
+                                    ? FancyShimmerImage(
+                                        imageUrl: displayImageUrl,
+                                        height: imageSize,
+                                        width: imageSize,
+                                        boxFit: BoxFit.cover,
+                                        errorWidget: Image.asset(
+                                          'assets/images/placeholder.png',
+                                          height: imageSize,
+                                          width: imageSize,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : Image.asset(
                                         'assets/images/placeholder.png',
                                         height: imageSize,
                                         width: imageSize,
                                         fit: BoxFit.cover,
                                       ),
-                                    )
-                                  : Image.asset(
-                                      'assets/images/placeholder.png',
-                                      height: imageSize,
-                                      width: imageSize,
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: _buildStockBadge(),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  'Kr ${product.price.toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.0,
-                                  ),
-                                ),
-                                SizedBox(width: 6.w),
-                                Text(
-                                  '·',
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    color: colors.onSurfaceVariant,
-                                  ),
-                                ),
-                                SizedBox(width: 6.w),
-                                Text(
-                                  '${product.pricePerVolume!.toStringAsFixed(0)} kr/l',
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    color: colors.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              product.style,
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: colors.onSurfaceVariant,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                            SizedBox(height: 4.h),
-                            Row(
-                              children: [
-                                createRatingBar(
-                                    rating: product.rating ?? 0,
-                                    size: 16.r,
-                                    color: Colors.amber),
-                                SizedBox(width: 4.w),
-                                Text(
-                                  product.rating?.toStringAsFixed(1) ?? '-',
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                if (product.checkins != null) ...[
-                                  SizedBox(width: 4.w),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: _buildStockBadge(),
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
                                   Text(
-                                    '(${NumberFormat.compact().format(product.checkins)})',
+                                    'Kr ${product.price.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.bold,
+                                      height: 1.0,
+                                    ),
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Text(
+                                    '·',
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      color: colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Text(
+                                    '${product.pricePerVolume!.toStringAsFixed(0)} kr/l',
                                     style: TextStyle(
                                       fontSize: 11.sp,
                                       color: colors.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
-                              ],
-                            ),
-                            SizedBox(height: 6.h),
-                            Wrap(
-                              spacing: 6.w,
-                              runSpacing: 4.h,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                buildInfoChip('${product.volume}L', context,
-                                    icon: Icons.water_drop_outlined),
-                                if (product.abv != null)
-                                  buildInfoChip(
-                                      '${product.abv!.toStringAsFixed(1)}%',
-                                      context,
-                                      icon: Icons.percent),
-                                if (product.country != null &&
-                                    product.country!.isNotEmpty)
-                                  buildInfoChipWithFlag(
-                                    product.country!,
-                                    product.countryCode,
-                                    context,
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                product.style,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: colors.onSurfaceVariant,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 4.h),
+                              Row(
+                                children: [
+                                  createRatingBar(
+                                      rating: product.rating ?? 0,
+                                      size: 16.r,
+                                      color: Colors.amber),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    product.rating?.toStringAsFixed(1) ?? '-',
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                              ],
-                            ),
-                          ],
+                                  if (product.checkins != null) ...[
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      '(${NumberFormat.compact().format(product.checkins)})',
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              SizedBox(height: 6.h),
+                              Wrap(
+                                spacing: 6.w,
+                                runSpacing: 4.h,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  buildInfoChip('${product.volume}L', context,
+                                      icon: Icons.water_drop_outlined),
+                                  if (product.abv != null)
+                                    buildInfoChip(
+                                        '${product.abv!.toStringAsFixed(1)}%',
+                                        context,
+                                        icon: Icons.percent),
+                                  if (product.country != null &&
+                                      product.country!.isNotEmpty)
+                                    buildInfoChipWithFlag(
+                                      product.country!,
+                                      product.countryCode,
+                                      context,
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-        const Divider(height: 1),
       ],
     );
   }

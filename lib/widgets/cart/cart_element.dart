@@ -81,15 +81,19 @@ class CartElementState extends State<CartElement> {
                   );
                 },
                 child: Container(
-                  height: imageSize + 42.h,
+                  margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
                   child: Opacity(
                     opacity: !widget.cartItem.inStock &&
                             widget.cartData.greyNoStock &&
                             widget.cartData.cartStoreId.isNotEmpty
                         ? 0.3
                         : 1,
-                    child: Container(
-                      padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 6.h),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(12.r, 8.r, 12.r, 12.r),
                       child: Stack(
                         children: [
                           Column(
@@ -277,7 +281,7 @@ class CartElementState extends State<CartElement> {
                             ],
                           ),
                           Positioned(
-                            top: 26.h,
+                            bottom: 0,
                             right: 0,
                             child: _buildQuantityControl(
                                 context, quantity, imageSize),

@@ -209,20 +209,21 @@ class _StockListContentState extends State<_StockListContent> {
       );
     }
 
-    return ListView.separated(
+    return ListView.builder(
       controller: widget.scrollController,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       itemCount: _stockList.length,
-      separatorBuilder: (context, _) => Divider(
-        height: 1,
-        color: Theme.of(context).colorScheme.outlineVariant,
-      ),
       itemBuilder: (context, index) {
         final stock = _stockList[index];
         return FadeIn(
           duration: Duration(milliseconds: 150 + (index * 30)),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 12.h),
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 4.h),
+            padding: EdgeInsets.fromLTRB(12.r, 10.r, 12.r, 10.r),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
             child: Row(
               children: [
                 Icon(

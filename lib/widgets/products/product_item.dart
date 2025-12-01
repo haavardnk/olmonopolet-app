@@ -45,147 +45,115 @@ class _ProductItemState extends State<ProductItem> {
     return Semantics(
       label: _product.name,
       button: true,
-      child: InkWell(
-        onTap: () {
-          pushScreen(
-            context,
-            settings: RouteSettings(
-                name: ProductDetailScreen.routeName,
-                arguments: <String, dynamic>{
-                  'product': _product,
-                  'herotag': heroTag
-                }),
-            screen: const ProductDetailScreen(),
-            pageTransitionAnimation: PageTransitionAnimation.cupertino,
-            withNavBar: true,
-          ).then((result) {
-            if (result != null && result is Product) {
-              setState(() {
-                _product = result;
-              });
-            }
-          });
-        },
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 10.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _product.name,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: InkWell(
+          onTap: () {
+            pushScreen(
+              context,
+              settings: RouteSettings(
+                  name: ProductDetailScreen.routeName,
+                  arguments: <String, dynamic>{
+                    'product': _product,
+                    'herotag': heroTag
+                  }),
+              screen: const ProductDetailScreen(),
+              pageTransitionAnimation: PageTransitionAnimation.cupertino,
+              withNavBar: true,
+            ).then((result) {
+              if (result != null && result is Product) {
+                setState(() {
+                  _product = result;
+                });
+              }
+            });
+          },
+          borderRadius: BorderRadius.circular(12.r),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(12.r, 8.r, 12.r, 12.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _product.name,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(height: 6.h),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8.r),
-                        child: Hero(
-                          tag: heroTag,
-                          child: displayImageUrl != null &&
-                                  displayImageUrl.isNotEmpty
-                              ? FancyShimmerImage(
-                                  imageUrl: displayImageUrl,
-                                  height: imageSize,
-                                  width: imageSize,
-                                  boxFit: BoxFit.cover,
-                                  errorWidget: Image.asset(
+                SizedBox(height: 6.h),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: Hero(
+                            tag: heroTag,
+                            child: displayImageUrl != null &&
+                                    displayImageUrl.isNotEmpty
+                                ? FancyShimmerImage(
+                                    imageUrl: displayImageUrl,
+                                    height: imageSize,
+                                    width: imageSize,
+                                    boxFit: BoxFit.cover,
+                                    errorWidget: Image.asset(
+                                      'assets/images/placeholder.png',
+                                      height: imageSize,
+                                      width: imageSize,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Image.asset(
                                     'assets/images/placeholder.png',
                                     height: imageSize,
                                     width: imageSize,
                                     fit: BoxFit.cover,
                                   ),
-                                )
-                              : Image.asset(
-                                  'assets/images/placeholder.png',
-                                  height: imageSize,
-                                  width: imageSize,
-                                  fit: BoxFit.cover,
-                                ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: _buildCartButton(context, cart),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Kr ${_product.price.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.bold,
-                                height: 1.0,
-                              ),
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(
-                              '·',
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(
-                              '${_product.pricePerVolume!.toStringAsFixed(0)} kr/l',
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          _product.style,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 4.h),
-                        Row(
-                          children: [
-                            createRatingBar(
-                                rating: _product.rating ?? 0,
-                                size: 16.r,
-                                color: Colors.amber),
-                            SizedBox(width: 4.w),
-                            Text(
-                              _product.rating?.toStringAsFixed(1) ?? '-',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            if (_product.checkins != null) ...[
-                              SizedBox(width: 4.w),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: _buildCartButton(context, cart),
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
                               Text(
-                                '(${NumberFormat.compact().format(_product.checkins)})',
+                                'Kr ${_product.price.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.0,
+                                ),
+                              ),
+                              SizedBox(width: 6.w),
+                              Text(
+                                '·',
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                              ),
+                              SizedBox(width: 6.w),
+                              Text(
+                                '${_product.pricePerVolume!.toStringAsFixed(0)} kr/l',
                                 style: TextStyle(
                                   fontSize: 11.sp,
                                   color: Theme.of(context)
@@ -194,47 +162,88 @@ class _ProductItemState extends State<ProductItem> {
                                 ),
                               ),
                             ],
-                          ],
-                        ),
-                        SizedBox(height: 6.h),
-                        Wrap(
-                          spacing: 6.w,
-                          runSpacing: 4.h,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            buildInfoChip('${_product.volume}L', context,
-                                icon: Icons.water_drop_outlined),
-                            if (_product.abv != null)
-                              buildInfoChip(
-                                  '${_product.abv!.toStringAsFixed(1)}%',
-                                  context,
-                                  icon: Icons.percent),
-                            if (_product.country != null &&
-                                _product.country!.isNotEmpty)
-                              buildInfoChipWithFlag(
-                                _product.country!,
-                                _product.countryCode,
-                                context,
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            _product.style,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            children: [
+                              createRatingBar(
+                                  rating: _product.rating ?? 0,
+                                  size: 16.r,
+                                  color: Colors.amber),
+                              SizedBox(width: 4.w),
+                              Text(
+                                _product.rating?.toStringAsFixed(1) ?? '-',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            if (_product.stock != null && _product.stock! > 0)
-                              buildInfoChip('${_product.stock} stk', context,
-                                  highlight: true,
-                                  icon: Icons.inventory_2_outlined),
-                            if (widget.release != null &&
-                                widget.release!.productSelections.length > 1)
-                              buildInfoChip(
-                                  productSelectionAbbreviationList[
-                                          _product.productSelection] ??
-                                      '',
-                                  context),
-                          ],
-                        ),
-                      ],
+                              if (_product.checkins != null) ...[
+                                SizedBox(width: 4.w),
+                                Text(
+                                  '(${NumberFormat.compact().format(_product.checkins)})',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          SizedBox(height: 6.h),
+                          Wrap(
+                            spacing: 6.w,
+                            runSpacing: 4.h,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              buildInfoChip('${_product.volume}L', context,
+                                  icon: Icons.water_drop_outlined),
+                              if (_product.abv != null)
+                                buildInfoChip(
+                                    '${_product.abv!.toStringAsFixed(1)}%',
+                                    context,
+                                    icon: Icons.percent),
+                              if (_product.country != null &&
+                                  _product.country!.isNotEmpty)
+                                buildInfoChipWithFlag(
+                                  _product.country!,
+                                  _product.countryCode,
+                                  context,
+                                ),
+                              if (_product.stock != null && _product.stock! > 0)
+                                buildInfoChip('${_product.stock} stk', context,
+                                    highlight: true,
+                                    icon: Icons.inventory_2_outlined),
+                              if (widget.release != null &&
+                                  widget.release!.productSelections.length > 1)
+                                buildInfoChip(
+                                    productSelectionAbbreviationList[
+                                            _product.productSelection] ??
+                                        '',
+                                    context),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -252,34 +261,12 @@ class _ProductItemState extends State<ProductItem> {
             HapticFeedback.lightImpact();
             cart.addItem(_product.id, _product);
             cart.updateCartItemsData();
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Lagt til i handlelisten!',
-                  textAlign: TextAlign.center,
-                ),
-                duration: Duration(seconds: 1),
-              ),
-            );
           },
           onLongPress: () {
             if (inCart) {
               HapticFeedback.mediumImpact();
               cart.removeSingleItem(_product.id);
               cart.updateCartItemsData();
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    cart.items.keys.contains(_product.id)
-                        ? 'Fjernet en fra handlelisten!'
-                        : 'Fjernet helt fra handlelisten!',
-                    textAlign: TextAlign.center,
-                  ),
-                  duration: const Duration(seconds: 1),
-                ),
-              );
             }
           },
           child: Container(
