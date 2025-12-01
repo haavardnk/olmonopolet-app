@@ -1,11 +1,27 @@
-# Beermonopoly App
+# Ølmonopolet App
 
-## Introduction
+Mobile app for Ølmonopolet - browse beers from Vinmonopolet enriched with Untappd ratings.
 
-![Beermonopoly Logo](https://i.imgur.com/MHce8RD.png)
+Requires [olmonopolet-api](https://github.com/haavardnk/olmonopolet-api) backend.
 
-This is the repository for Beermonopoly's iOS/Android App.
+## Setup
+
+```bash
+git clone https://github.com/haavardnk/olmonopolet-app.git
+cd olmonopolet-app
+flutter pub get
+```
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and update values as needed.
+
+### Run
+
+```bash
+flutter run
+```
 
 ## License
 
-The Beermonopoly app is licensed under the GPL-3.0 License. For more information we refer the reader to the [LICENCE file](https://github.com/haavardnk/beermonopoly-flutter/blob/main/LICENSE).
+LGPL-3.0 License - See [LICENSE](https://github.com/haavardnk/olmonopolet-app/blob/main/LICENSE) file for details.
