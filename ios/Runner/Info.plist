@@ -63,6 +63,8 @@
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-</dict>
+		<true/>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
+	</dict>
 </plist>
