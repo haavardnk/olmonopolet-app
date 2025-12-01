@@ -288,14 +288,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildHeader(
-      BuildContext context,
-      Product product,
-      Product? details,
-      String? displayImageUrl,
-      double imageSize,
-      ColorScheme colors) {
-    // Calculate price per unit if alcohol units available
+  Widget _buildHeader(BuildContext context, Product product, Product? details,
+      String? displayImageUrl, double imageSize, ColorScheme colors) {
     double? pricePerUnit;
     if (details?.alcoholUnits != null && details!.alcoholUnits! > 0) {
       pricePerUnit = product.price / details.alcoholUnits!;

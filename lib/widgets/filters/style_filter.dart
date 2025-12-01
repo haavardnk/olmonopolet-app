@@ -225,8 +225,9 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
               onPressed: () {
                 setState(() {
                   for (var style in filtered) {
-                    if (!_filters.selectedStyles.contains(style))
+                    if (!_filters.selectedStyles.contains(style)) {
                       _filters.selectedStyles.add(style);
+                    }
                   }
                   _updateStyle();
                 });

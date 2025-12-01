@@ -43,8 +43,9 @@ class StoreFilter extends StatelessWidget {
                   ? sel.first.name
                   : '${sel.length} butikker valgt',
           asyncItems: () async {
-            if (flt.storeList.isEmpty && !flt.storesLoading)
+            if (flt.storeList.isEmpty && !flt.storesLoading) {
               await flt.getStores();
+            }
             return flt.storeList;
           },
           onChanged: (sel) => parentSetState(() {

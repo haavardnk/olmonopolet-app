@@ -279,6 +279,35 @@ class ApiHelper {
     );
   }
 
+  static Future<List<Country>> getReleaseCountries(
+    http.Client client,
+    String releaseName,
+  ) async {
+    final encodedName = Uri.encodeComponent(releaseName);
+    final endpoint = 'release/$encodedName/countries/';
+    return _handleRequest(
+      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      parser: (json) =>
+          (json as List).map((item) => Country.fromJson(item)).toList(),
+      endpoint: endpoint,
+      expectResultsKey: false,
+    );
+  }
+
+  static Future<List<String>> getReleaseStyles(
+    http.Client client,
+    String releaseName,
+  ) async {
+    final encodedName = Uri.encodeComponent(releaseName);
+    final endpoint = 'release/$encodedName/styles/';
+    return _handleRequest(
+      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      parser: (json) => List<String>.from(json),
+      endpoint: endpoint,
+      expectResultsKey: false,
+    );
+  }
+
   static Uri _buildProductUrl(int page, Filter filter, int pageSize) {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
@@ -352,6 +381,34 @@ class ApiHelper {
 
     if (release.productSelections.length > 1) {
       params['product_selection'] = filter.releaseProductSelectionChoice;
+    }
+
+    if (filter.releasePriceLow.isNotEmpty) {
+      params['price_low'] = filter.releasePriceLow;
+    }
+    if (filter.releasePriceHigh.isNotEmpty) {
+      params['price_high'] = filter.releasePriceHigh;
+    }
+    if (filter.releaseAbvLow.isNotEmpty) {
+      params['abv_low'] = filter.releaseAbvLow;
+    }
+    if (filter.releaseAbvHigh.isNotEmpty) {
+      params['abv_high'] = filter.releaseAbvHigh;
+    }
+    if (filter.releaseStyle.isNotEmpty) {
+      params['style'] = filter.releaseStyle;
+    }
+    if (filter.releaseCountry.isNotEmpty) {
+      params['country'] = filter.releaseCountry;
+    }
+    if (filter.releaseExcludeAllergens.isNotEmpty) {
+      params['exclude_allergen'] = filter.releaseExcludeAllergens;
+    }
+    if (filter.releaseSearch.isNotEmpty) {
+      params['search'] = filter.releaseSearch;
+    }
+    if (filter.releaseChristmasBeerOnly) {
+      params['is_christmas_beer'] = 'true';
     }
 
     return Uri.parse('${_baseUrl}beers/').replace(queryParameters: params);

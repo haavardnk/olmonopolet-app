@@ -73,8 +73,9 @@ class CountryFilter extends StatelessWidget {
             );
           },
           asyncItems: () async {
-            if (flt.countryList.isEmpty && !flt.countriesLoading)
+            if (flt.countryList.isEmpty && !flt.countriesLoading) {
               await flt.getCountries();
+            }
             return flt.countryList;
           },
           onChanged: (sel) => parentSetState(() {

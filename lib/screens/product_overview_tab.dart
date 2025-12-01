@@ -7,9 +7,9 @@ import '../providers/filter.dart';
 import '../widgets/products/product_list.dart';
 import '../widgets/drawer/app_drawer.dart';
 import '../widgets/filters/product_filter_sheet.dart';
+import '../widgets/filters/product_release_filter_sheet.dart';
 import '../widgets/products/product_overview_search_bar.dart';
-import '../widgets/products/product_overview_release_sort.dart';
-import '../widgets/products/product_overview_release_product_selection.dart';
+import '../widgets/products/product_overview_release_search_bar.dart';
 import '../models/release.dart';
 
 class ProductOverviewTab extends StatefulWidget {
@@ -25,6 +25,7 @@ class ProductOverviewTab extends StatefulWidget {
 class _ProductOverviewTabState extends State<ProductOverviewTab> {
   Release? _release;
   bool _isLoading = false;
+  Filter? _filters;
 
   @override
   void initState() {
@@ -33,6 +34,40 @@ class _ProductOverviewTabState extends State<ProductOverviewTab> {
     if (_release == null && widget.releaseName != null) {
       _loadReleaseByName();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_filters == null) {
+      _filters = Provider.of<Filter>(context, listen: false);
+      if (_release != null || widget.releaseName != null) {
+        _filters!.resetReleaseFilters(notify: false);
+      }
+    }
+  }
+
+  @override
+  void didUpdateWidget(ProductOverviewTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.release?.name != widget.release?.name ||
+        oldWidget.releaseName != widget.releaseName) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _filters?.resetReleaseFilters();
+      });
+      _release = widget.release;
+      if (_release == null && widget.releaseName != null) {
+        _loadReleaseByName();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_release != null || widget.releaseName != null) {
+      _filters?.resetReleaseFilters(notify: false);
+    }
+    super.dispose();
   }
 
   void _loadReleaseByName() {
@@ -92,23 +127,17 @@ class _ProductOverviewTabState extends State<ProductOverviewTab> {
             actions: [
               release == null
                   ? const ProductFilterSheet()
-                  : ProductOverviewReleaseSort(release),
+                  : ProductReleaseFilterSheet(release: release),
             ],
-            bottom: release != null
-                ? (release.productSelections.length > 1)
-                    ? PreferredSize(
-                        preferredSize: const Size.fromHeight(kToolbarHeight),
-                        child: ProductOverviewReleaseProductSelection(
-                            release: release),
-                      )
-                    : null
-                : PreferredSize(
-                    preferredSize: Size.fromHeight(56.h),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
-                      child: const ProductOverviewSearchBar(),
-                    ),
-                  ),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(56.h),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
+                child: release != null
+                    ? const ProductOverviewReleaseSearchBar()
+                    : const ProductOverviewSearchBar(),
+              ),
+            ),
           ),
           drawer: release == null ? const AppDrawer() : null,
           body: ProductList(

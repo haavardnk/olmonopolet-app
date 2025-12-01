@@ -39,6 +39,21 @@ class Filter with ChangeNotifier {
   String sortIndex = 'Global rating - Høy til lav';
   String releaseSortIndex = 'Global rating - Høy til lav';
 
+  String releaseSearch = '';
+  String releaseCountry = '';
+  String releaseStyle = '';
+  String releasePriceHigh = '';
+  String releasePriceLow = '';
+  String releaseAbvHigh = '';
+  String releaseAbvLow = '';
+  String releaseExcludeAllergens = '';
+  bool releaseChristmasBeerOnly = false;
+  RangeValues releasePriceRange = const RangeValues(0, 500);
+  RangeValues releaseAlcoholRange = const RangeValues(0, 15);
+  List<String> releaseSelectedStyles = [];
+  List<String> releaseSelectedCountries = [];
+  List<bool> releaseExcludeAllergensSelectedList = List<bool>.filled(4, false);
+
   List<String> selectedStyles = [];
   List<String> selectedCountries = [];
   List<String> selectedStores = [];
@@ -393,6 +408,106 @@ class Filter with ChangeNotifier {
     }
     notifyListeners();
     saveFilters();
+  }
+
+  void setReleasePriceRange(RangeValues range) {
+    releasePriceRange = range;
+    if (releasePriceRange.end == 500) {
+      releasePriceHigh = '';
+      releasePriceLow = releasePriceRange.start.toString();
+    } else {
+      releasePriceHigh = releasePriceRange.end.toString();
+      releasePriceLow = releasePriceRange.start.toString();
+    }
+    notifyListeners();
+  }
+
+  void setReleaseAlcoholRange(RangeValues range) {
+    releaseAlcoholRange = range;
+    if (releaseAlcoholRange.end == 15) {
+      releaseAbvHigh = '';
+      releaseAbvLow = releaseAlcoholRange.start.toString();
+    } else {
+      releaseAbvHigh = releaseAlcoholRange.end.toString();
+      releaseAbvLow = releaseAlcoholRange.start.toString();
+    }
+    notifyListeners();
+  }
+
+  void setReleaseStyle([List<String>? currentStyleList]) {
+    if (releaseSelectedStyles.isEmpty) {
+      releaseStyle = '';
+    } else if (currentStyleList != null &&
+        releaseSelectedStyles.length == currentStyleList.length) {
+      releaseStyle = '';
+    } else {
+      releaseStyle = releaseSelectedStyles.join(',');
+    }
+    notifyListeners();
+  }
+
+  void setReleaseCountry() {
+    if (releaseSelectedCountries.isEmpty) {
+      releaseCountry = '';
+    } else {
+      String temporaryCountries = '';
+      for (var countryName in releaseSelectedCountries) {
+        if (temporaryCountries.isNotEmpty) {
+          temporaryCountries += ',';
+        }
+        temporaryCountries += countryName;
+      }
+      releaseCountry = temporaryCountries;
+    }
+    notifyListeners();
+  }
+
+  void setReleaseExcludeAllergensSelection(int index, bool boolean) {
+    releaseExcludeAllergensSelectedList[index] = boolean;
+    var temporarySelection = '';
+    releaseExcludeAllergensSelectedList.asMap().forEach(
+      (index, value) {
+        if (value) {
+          if (temporarySelection.isNotEmpty) {
+            temporarySelection += ',';
+          }
+          temporarySelection += excludeAllergensList[index].values.first;
+        }
+      },
+    );
+    releaseExcludeAllergens = temporarySelection;
+    notifyListeners();
+  }
+
+  void setReleaseChristmasBeerOnly(bool value) {
+    releaseChristmasBeerOnly = value;
+    notifyListeners();
+  }
+
+  void setReleaseSearch(String text) {
+    releaseSearch = text;
+    notifyListeners();
+  }
+
+  void resetReleaseFilters({bool notify = true}) {
+    releaseSearch = '';
+    releaseCountry = '';
+    releaseStyle = '';
+    releasePriceHigh = '';
+    releasePriceLow = '';
+    releaseAbvHigh = '';
+    releaseAbvLow = '';
+    releaseExcludeAllergens = '';
+    releaseChristmasBeerOnly = false;
+    releasePriceRange = const RangeValues(0, 500);
+    releaseAlcoholRange = const RangeValues(0, 15);
+    releaseSelectedStyles = [];
+    releaseSelectedCountries = [];
+    releaseExcludeAllergensSelectedList = List<bool>.filled(4, false);
+    releaseProductSelectionChoice = '';
+    releaseSortIndex = 'Global rating - Høy til lav';
+    releaseSortBy = '-rating';
+    if (notify) notifyListeners();
   }
 
   void resetFilters() {
