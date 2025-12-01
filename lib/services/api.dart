@@ -94,6 +94,20 @@ class ApiHelper {
     );
   }
 
+  static Future<Product> getProductById(
+    http.Client client,
+    int productId,
+  ) async {
+    final endpoint = 'beers/?beers=$productId&all_stock=true';
+    return _handleRequest(
+      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      parser: (json) => Product.fromJson(
+        (json as List).first as Map<String, dynamic>,
+      ),
+      endpoint: endpoint,
+    );
+  }
+
   static Future<List<StockInfo>> getProductStock(
     http.Client client,
     int productId,

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../assets/constants.dart';
 import '../../providers/filter.dart';
-import '../../screens/product_overview_tab.dart';
 import '../../models/release.dart';
 import '../common/info_chips.dart';
 
@@ -36,10 +35,9 @@ class ReleaseItem extends StatelessWidget {
             filters.releaseSortIndex = 'Global rating - Høy til lav';
           }
           filters.releaseProductSelectionChoice = '';
-          pushScreen(
-            context,
-            screen: ProductOverviewTab(release: release),
-            withNavBar: true,
+          context.go(
+            '/releases/${release.name.replaceAll(' ', '-')}',
+            extra: release,
           );
         },
         child: Padding(

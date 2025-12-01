@@ -320,7 +320,7 @@ void main() {
           }));
 
           expect(
-            () => ApiHelper.getProductsData(mockClient, '1,2,3'),
+            () => ApiHelper.getProductsByIds(mockClient, '1,2,3'),
             throwsA(
               isA<ApiException>(),
             ),
@@ -338,7 +338,7 @@ void main() {
           }));
 
           expect(
-            () => ApiHelper.getProductsData(mockClient, '1,2,3'),
+            () => ApiHelper.getProductsByIds(mockClient, '1,2,3'),
             throwsA(
               isA<NetworkException>(),
             ),

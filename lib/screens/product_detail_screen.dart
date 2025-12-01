@@ -19,8 +19,17 @@ import '../widgets/common/stock_popup.dart';
 import '../widgets/common/untappd_match_sheet.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({super.key});
+  const ProductDetailScreen({
+    super.key,
+    required this.productId,
+    this.product,
+    this.herotag,
+  });
   static const routeName = '/product-detail';
+
+  final int productId;
+  final Product? product;
+  final String? herotag;
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -28,14 +37,43 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Product? _loadedProduct;
+  Product? _initialProduct;
   List<StockInfo> _stockList = [];
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialProduct = widget.product;
+    if (_initialProduct == null) {
+      _loadProductById();
+    }
+  }
+
+  Future<void> _loadProductById() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final client = Provider.of<HttpClient>(context, listen: false);
+      final product =
+          await ApiHelper.getProductById(client.apiClient, widget.productId);
+      setState(() {
+        _initialProduct = product;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Kunne ikke laste produkt';
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final product = args['product'] as Product;
-    final herotag = args['herotag'] as String;
     final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
@@ -43,6 +81,49 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final tabletMode = 1.sw >= 600;
     final shortestSide = 1.sw < 1.sh ? 1.sw : 1.sh;
     final imageSize = shortestSide * (tabletMode ? 0.45 : 0.6);
+
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: const Text('Detaljer'),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null || _initialProduct == null) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: const Text('Detaljer'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48.r),
+              SizedBox(height: 16.h),
+              Text(_error ?? 'Produkt ikke funnet'),
+              SizedBox(height: 16.h),
+              ElevatedButton(
+                onPressed: _loadProductById,
+                child: const Text('Prøv igjen'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final product = _initialProduct!;
+    final herotag = widget.herotag ?? 'product-${product.id}';
 
     return PopScope(
       canPop: false,

@@ -1,31 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'product_overview_tab.dart';
-import 'release_tab.dart';
-import 'stock_change_tab.dart';
-import 'cart_tab.dart';
 import '../providers/filter.dart';
 import '../providers/cart.dart';
+import '../router/app_router.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.navigationShell,
+  });
   static const routeName = '/tabs';
+
+  final StatefulNavigationShell navigationShell;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PersistentTabController _controller = PersistentTabController();
+  @override
+  void initState() {
+    super.initState();
+    _setupInteractedMessage();
+  }
 
-  Future<void> setupInteractedMessage(
-      PersistentTabController controller) async {
+  Future<void> _setupInteractedMessage() async {
     void handleMessage(RemoteMessage message) {
-      if (message.data['route'] == '/releases') {
-        controller.jumpToTab(1);
+      final route = message.data['route'];
+      final productId = message.data['product_id'];
+      final releaseId = message.data['release_id'];
+
+      if (route != null) {
+        if (route == '/products' && productId != null) {
+          goRouter.go('/products/$productId');
+        } else if (route == '/releases' && releaseId != null) {
+          goRouter.go('/releases/$releaseId');
+        } else if (route == '/releases') {
+          goRouter.go('/releases');
+        } else if (route == '/stock') {
+          goRouter.go('/stock');
+        } else if (route == '/cart') {
+          goRouter.go('/cart');
+        } else {
+          goRouter.go(route);
+        }
       }
     }
 
@@ -39,9 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
   }
 
+  void _onTap(int index) {
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    setupInteractedMessage(_controller);
     Provider.of<Cart>(context, listen: false).fetchAndSetCart();
     final filters = Provider.of<Filter>(context, listen: false);
     if (!filters.storesLoading && filters.storeList.isEmpty) {
@@ -51,74 +78,69 @@ class _HomeScreenState extends State<HomeScreen> {
       filters.getReleases();
     }
 
-    List<PersistentTabConfig> tabs = [
-      PersistentTabConfig(
-        screen: const ProductOverviewTab(),
-        item: ItemConfig(
-          icon: const Icon(Icons.liquor),
-          activeForegroundColor: Theme.of(context).colorScheme.primary,
-          inactiveForegroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          inactiveBackgroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          title: 'Produkter',
-        ),
-      ),
-      PersistentTabConfig(
-        screen: const ReleaseTab(),
-        item: ItemConfig(
-          icon: const Icon(Icons.new_releases_outlined),
-          activeForegroundColor: Theme.of(context).colorScheme.primary,
-          inactiveForegroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          inactiveBackgroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          title: 'Lanseringer',
-        ),
-      ),
-      PersistentTabConfig(
-        screen: const StockChangeTab(),
-        item: ItemConfig(
-          icon: const Icon(Icons.swap_vert),
-          activeForegroundColor: Theme.of(context).colorScheme.primary,
-          inactiveForegroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          inactiveBackgroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          title: 'Lager inn/ut',
-        ),
-      ),
-      PersistentTabConfig(
-        screen: const CartTab(),
-        item: ItemConfig(
-          icon: Consumer<Cart>(
-            builder: (_, cart, __) => Badge(
-              label: Text(cart.itemCount.toString()),
-              isLabelVisible: cart.itemCount > 0,
-              child: const Icon(Icons.receipt_long),
-            ),
+    return Scaffold(
+      body: widget.navigationShell,
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          height: 64,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          indicatorShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          activeForegroundColor: Theme.of(context).colorScheme.primary,
-          inactiveForegroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          inactiveBackgroundColor:
-              Theme.of(context).colorScheme.onSurfaceVariant,
-          title: 'Handleliste',
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.primary,
+              );
+            }
+            return TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            );
+          }),
         ),
-      ),
-    ];
-
-    return PersistentTabView(
-      controller: _controller,
-      tabs: tabs,
-      resizeToAvoidBottomInset: true,
-      avoidBottomPadding: true,
-      navBarOverlap: const NavBarOverlap.none(),
-      backgroundColor: Theme.of(context).canvasColor,
-      navBarBuilder: (navBarConfig) => Style6BottomNavBar(
-        navBarConfig: navBarConfig,
-        navBarDecoration: NavBarDecoration(
-          color: Theme.of(context).canvasColor,
+        child: NavigationBar(
+          selectedIndex: widget.navigationShell.currentIndex,
+          onDestinationSelected: _onTap,
+          destinations: [
+            const NavigationDestination(
+              icon: Icon(Icons.liquor_outlined, size: 22),
+              selectedIcon: Icon(Icons.liquor, size: 22),
+              label: 'Produkter',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.new_releases_outlined, size: 22),
+              selectedIcon: Icon(Icons.new_releases, size: 22),
+              label: 'Lanseringer',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.swap_vert_outlined, size: 22),
+              selectedIcon: Icon(Icons.swap_vert, size: 22),
+              label: 'Lager',
+            ),
+            NavigationDestination(
+              icon: Consumer<Cart>(
+                builder: (_, cart, __) => Badge(
+                  label: Text(cart.itemCount.toString()),
+                  isLabelVisible: cart.itemCount > 0,
+                  child: const Icon(Icons.receipt_long_outlined, size: 22),
+                ),
+              ),
+              selectedIcon: Consumer<Cart>(
+                builder: (_, cart, __) => Badge(
+                  label: Text(cart.itemCount.toString()),
+                  isLabelVisible: cart.itemCount > 0,
+                  child: const Icon(Icons.receipt_long, size: 22),
+                ),
+              ),
+              label: 'Handleliste',
+            ),
+          ],
         ),
       ),
     );

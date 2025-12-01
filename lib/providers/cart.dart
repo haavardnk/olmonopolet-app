@@ -189,7 +189,8 @@ class Cart with ChangeNotifier {
     if (_items.isNotEmpty) {
       final productIds = _items.keys.toList().join(',');
       final updatedProducts =
-          await ApiHelper.getProductsData(_client, productIds);
+          await ApiHelper.getProductsByIds(_client, productIds);
+      if (updatedProducts == null) return;
       for (var product in updatedProducts) {
         _items[product.id] = CartItem(
           product: Product(

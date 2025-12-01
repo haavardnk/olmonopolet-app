@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../models/product.dart';
 import '../../models/release.dart';
 import '../../providers/cart.dart';
-import '../../screens/product_detail_screen.dart';
 import '../common/rating_widget.dart';
 import '../common/info_chips.dart';
 import '../../assets/constants.dart';
@@ -52,25 +51,19 @@ class _ProductItemState extends State<ProductItem> {
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: InkWell(
-          onTap: () {
-            pushScreen(
-              context,
-              settings: RouteSettings(
-                  name: ProductDetailScreen.routeName,
-                  arguments: <String, dynamic>{
-                    'product': _product,
-                    'herotag': heroTag
-                  }),
-              screen: const ProductDetailScreen(),
-              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-              withNavBar: true,
-            ).then((result) {
-              if (result != null && result is Product) {
-                setState(() {
-                  _product = result;
-                });
-              }
-            });
+          onTap: () async {
+            final basePath = widget.release != null
+                ? '/releases/${widget.release!.name.replaceAll(' ', '-')}'
+                : '/products';
+            final result = await context.push<Product>(
+              '$basePath/${_product.id}',
+              extra: _product,
+            );
+            if (result != null) {
+              setState(() {
+                _product = result;
+              });
+            }
           },
           borderRadius: BorderRadius.circular(12.r),
           child: Padding(

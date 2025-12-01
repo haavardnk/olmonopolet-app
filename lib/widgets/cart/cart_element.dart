@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../providers/cart.dart';
 import '../common/rating_widget.dart';
 import '../common/info_chips.dart';
 import '../common/stock_popup.dart';
-import '../../screens/product_detail_screen.dart';
 
 class CartElement extends StatefulWidget {
   final int index;
@@ -66,18 +65,9 @@ class CartElementState extends State<CartElement> {
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
-                  pushScreen(
-                    context,
-                    settings: RouteSettings(
-                      name: ProductDetailScreen.routeName,
-                      arguments: <String, dynamic>{
-                        'product': widget.cartItem.product,
-                        'herotag': heroTag
-                      },
-                    ),
-                    screen: const ProductDetailScreen(),
-                    pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                    withNavBar: true,
+                  context.push(
+                    '/cart/${widget.cartItem.product.id}',
+                    extra: widget.cartItem.product,
                   );
                 },
                 child: Container(

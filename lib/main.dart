@@ -10,12 +10,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import './screens/product_detail_screen.dart';
-import 'screens/home_screen.dart';
 import './providers/filter.dart';
 import './providers/cart.dart';
 import './providers/http_client.dart';
 import './assets/color_schemes.g.dart';
+import './router/app_router.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -138,47 +137,43 @@ class _MyAppState extends State<MyApp> {
           builder: (context, child) {
             Provider.of<Filter>(context, listen: false).loadFilters();
 
-            return MaterialApp(
-              localizationsDelegates: const [
-                DefaultMaterialLocalizations.delegate,
-                DefaultWidgetsLocalizations.delegate,
-              ],
-              debugShowCheckedModeBanner: false,
-              scrollBehavior: MyCustomScrollBehavior(),
-              title: 'Ølmonopolet',
-              theme: theme,
-              darkTheme: darkTheme,
-              home: RateMyAppBuilder(
-                builder: (context) => const HomeScreen(),
-                onInitialized: (context, rateMyApp) {
-                  if (rateMyApp.shouldOpenDialog) {
-                    rateMyApp.showStarRateDialog(
-                      context,
-                      title: 'Rate Ølmonopolet!',
-                      message:
-                          'Bruk et øyeblikk på å gi en rating til Ølmonopolet også, det hjelper veldig!',
-                      actionsBuilder: (context, stars) {
-                        return [
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () async {
-                              await rateMyApp.callEvent(
-                                  RateMyAppEventType.rateButtonPressed);
-                              Navigator.pop<RateMyAppDialogButton>(
-                                  context, RateMyAppDialogButton.rate);
-                            },
-                          ),
-                        ];
-                      },
-                      onDismissed: () => rateMyApp
-                          .callEvent(RateMyAppEventType.laterButtonPressed),
-                    );
-                  }
-                },
+            return RateMyAppBuilder(
+              builder: (context) => MaterialApp.router(
+                localizationsDelegates: const [
+                  DefaultMaterialLocalizations.delegate,
+                  DefaultWidgetsLocalizations.delegate,
+                ],
+                debugShowCheckedModeBanner: false,
+                scrollBehavior: MyCustomScrollBehavior(),
+                title: 'Ølmonopolet',
+                theme: theme,
+                darkTheme: darkTheme,
+                routerConfig: goRouter,
               ),
-              routes: {
-                ProductDetailScreen.routeName: (ctx) =>
-                    const ProductDetailScreen(),
+              onInitialized: (context, rateMyApp) {
+                if (rateMyApp.shouldOpenDialog) {
+                  rateMyApp.showStarRateDialog(
+                    context,
+                    title: 'Rate Ølmonopolet!',
+                    message:
+                        'Bruk et øyeblikk på å gi en rating til Ølmonopolet også, det hjelper veldig!',
+                    actionsBuilder: (context, stars) {
+                      return [
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () async {
+                            await rateMyApp.callEvent(
+                                RateMyAppEventType.rateButtonPressed);
+                            Navigator.pop<RateMyAppDialogButton>(
+                                context, RateMyAppDialogButton.rate);
+                          },
+                        ),
+                      ];
+                    },
+                    onDismissed: () => rateMyApp
+                        .callEvent(RateMyAppEventType.laterButtonPressed),
+                  );
+                }
               },
             );
           },
