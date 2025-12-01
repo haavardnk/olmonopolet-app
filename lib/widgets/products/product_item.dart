@@ -223,7 +223,7 @@ class _ProductItemState extends State<ProductItem> {
                             if (widget.release != null &&
                                 widget.release!.productSelections.length > 1)
                               buildInfoChip(
-                                  productSelectionAbrevationList[
+                                  productSelectionAbbreviationList[
                                           _product.productSelection] ??
                                       '',
                                   context),

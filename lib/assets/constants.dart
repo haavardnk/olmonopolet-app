@@ -58,13 +58,29 @@ const List<String> cartSortList = [
   'Pris per liter - Lav til høy',
 ];
 
-const Map<String, String> productSelectionAbrevationList = {
+const Map<String, String> productSelectionAbbreviationList = {
   'Basisutvalget': 'Basis',
   'Bestillingsutvalget': 'BU',
   'Partiutvalget': 'Parti',
   'Testutvalget': 'Test',
   'Tilleggsutvalget': 'TU',
-  'Spesialutvalg': 'Spesial'
+  'Spesialutvalg': 'Spesial',
+  'Spesialbestilling': 'Spesial',
+};
+
+// Longer abbreviations for release list items
+const Map<String, String> productSelectionReleaseAbbreviationList = {
+  'Basisutvalget': 'Basis',
+  'Bestillingsutvalget': 'Bestilling',
+  'Partiutvalget': 'Parti',
+  'Testutvalget': 'Test',
+  'Tilleggsutvalget': 'Tillegg',
+  'Spesialutvalg': 'Spesial',
+  'Spesialbestilling': 'Spesial',
+};
+
+const Map<String, String> productSelectionDisplayNameList = {
+  'Spesialutvalg': 'Spesialutvalget',
 };
 
 const List<Map<String, String>> productSelectionList = [

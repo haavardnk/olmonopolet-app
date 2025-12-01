@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
+import '../../assets/constants.dart';
 import '../../providers/filter.dart';
 import '../../screens/product_overview_tab.dart';
 import '../../models/release.dart';
@@ -139,28 +140,29 @@ class ReleaseItem extends StatelessWidget {
                           spacing: 6.w,
                           runSpacing: 4.h,
                           children: [
-                            for (var selection in release.productSelections)
-                              if (selection != "Spesialbestilling")
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w, vertical: 3.h),
-                                  decoration: BoxDecoration(
+                            for (var abbreviation in release.productSelections
+                                .map(_getSelectionAbbreviation)
+                                .toSet())
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w, vertical: 3.h),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(6.r),
+                                ),
+                                child: Text(
+                                  abbreviation,
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.w500,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .surfaceContainerHighest,
-                                    borderRadius: BorderRadius.circular(6.r),
-                                  ),
-                                  child: Text(
-                                    _getSelectionAbbreviation(selection),
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
+                                        .onSurfaceVariant,
                                   ),
                                 ),
+                              ),
                           ],
                         ),
                       ],
@@ -182,23 +184,7 @@ class ReleaseItem extends StatelessWidget {
   }
 
   String _getSelectionAbbreviation(String selection) {
-    switch (selection) {
-      case 'Basisutvalget':
-        return 'Basis';
-      case 'Bestillingsutvalget':
-        return 'Bestilling';
-      case 'Testutvalget':
-        return 'Test';
-      case 'Partiutvalget':
-        return 'Parti';
-      case 'Tilleggsutvalget':
-        return 'Tillegg';
-      case 'Spesialbestilling':
-        return 'Spesial';
-      case 'Spesialutvalg':
-        return 'Spesial';
-      default:
-        return selection.replaceAll('utvalget', '');
-    }
+    return productSelectionReleaseAbbreviationList[selection] ??
+        selection.replaceAll('utvalget', '');
   }
 }
