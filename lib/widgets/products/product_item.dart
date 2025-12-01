@@ -243,10 +243,6 @@ class _ProductItemState extends State<ProductItem> {
                                   _product.countryCode,
                                   context,
                                 ),
-                              if (_product.stock != null && _product.stock! > 0)
-                                buildInfoChip('${_product.stock} stk', context,
-                                    highlight: true,
-                                    icon: Icons.inventory_2_outlined),
                               if (widget.release != null &&
                                   widget.release!.productSelections.length > 1)
                                 buildInfoChip(
@@ -274,6 +270,7 @@ class _ProductItemState extends State<ProductItem> {
       builder: (_, cartData, __) {
         final inCart = cartData.items.keys.contains(_product.id);
         final quantity = inCart ? cartData.items[_product.id]!.quantity : 0;
+        final hasStock = _product.stock != null && _product.stock! > 0;
 
         return GestureDetector(
           onTap: () {
@@ -289,7 +286,6 @@ class _ProductItemState extends State<ProductItem> {
             }
           },
           child: Container(
-            padding: EdgeInsets.all(5.r),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.6),
               borderRadius: BorderRadius.only(
@@ -297,17 +293,39 @@ class _ProductItemState extends State<ProductItem> {
                 bottomRight: Radius.circular(8.r),
               ),
             ),
-            child: Badge(
-              isLabelVisible: inCart,
-              label: Text(
-                quantity.toString(),
-                style: TextStyle(fontSize: 9.sp),
-              ),
-              child: Icon(
-                inCart ? Icons.shopping_cart : Icons.add_shopping_cart_outlined,
-                size: 18.r,
-                color: Colors.white,
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (hasStock)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(5.r, 3.r, 5.r, 0),
+                    child: Text(
+                      '${_product.stock}',
+                      style: TextStyle(
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                Padding(
+                  padding: EdgeInsets.all(5.r),
+                  child: Badge(
+                    isLabelVisible: inCart,
+                    label: Text(
+                      quantity.toString(),
+                      style: TextStyle(fontSize: 9.sp),
+                    ),
+                    child: Icon(
+                      inCart
+                          ? Icons.shopping_cart
+                          : Icons.add_shopping_cart_outlined,
+                      size: 18.r,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
