@@ -36,9 +36,6 @@ class _ProductItemState extends State<ProductItem> {
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context, listen: false);
     final double imageSize = 85.r;
-    final heroTag = widget.release != null
-        ? 'release${_product.id}'
-        : 'products${_product.id}';
     final displayImageUrl = _product.labelHdUrl ?? _product.imageUrl;
 
     return Semantics(
@@ -88,29 +85,26 @@ class _ProductItemState extends State<ProductItem> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8.r),
-                          child: Hero(
-                            tag: heroTag,
-                            child: displayImageUrl != null &&
-                                    displayImageUrl.isNotEmpty
-                                ? FancyShimmerImage(
-                                    imageUrl: displayImageUrl,
-                                    height: imageSize,
-                                    width: imageSize,
-                                    boxFit: BoxFit.cover,
-                                    errorWidget: Image.asset(
-                                      'assets/images/placeholder.png',
-                                      height: imageSize,
-                                      width: imageSize,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Image.asset(
+                          child: displayImageUrl != null &&
+                                  displayImageUrl.isNotEmpty
+                              ? FancyShimmerImage(
+                                  imageUrl: displayImageUrl,
+                                  height: imageSize,
+                                  width: imageSize,
+                                  boxFit: BoxFit.cover,
+                                  errorWidget: Image.asset(
                                     'assets/images/placeholder.png',
                                     height: imageSize,
                                     width: imageSize,
                                     fit: BoxFit.cover,
                                   ),
-                          ),
+                                )
+                              : Image.asset(
+                                  'assets/images/placeholder.png',
+                                  height: imageSize,
+                                  width: imageSize,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                         Positioned(
                           bottom: 0,

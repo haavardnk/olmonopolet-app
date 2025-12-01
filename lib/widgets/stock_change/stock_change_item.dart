@@ -30,7 +30,6 @@ class _StockChangeItemState extends State<StockChangeItem> {
   Widget build(BuildContext context) {
     final product = widget.stockChange.product;
     final double imageSize = 85.r;
-    final heroTag = 'stock${product.id}';
     final displayImageUrl = product.labelHdUrl ?? product.imageUrl;
     final colors = Theme.of(context).colorScheme;
 
@@ -86,29 +85,26 @@ class _StockChangeItemState extends State<StockChangeItem> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
-                              child: Hero(
-                                tag: heroTag,
-                                child: displayImageUrl != null &&
-                                        displayImageUrl.isNotEmpty
-                                    ? FancyShimmerImage(
-                                        imageUrl: displayImageUrl,
-                                        height: imageSize,
-                                        width: imageSize,
-                                        boxFit: BoxFit.cover,
-                                        errorWidget: Image.asset(
-                                          'assets/images/placeholder.png',
-                                          height: imageSize,
-                                          width: imageSize,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : Image.asset(
+                              child: displayImageUrl != null &&
+                                      displayImageUrl.isNotEmpty
+                                  ? FancyShimmerImage(
+                                      imageUrl: displayImageUrl,
+                                      height: imageSize,
+                                      width: imageSize,
+                                      boxFit: BoxFit.cover,
+                                      errorWidget: Image.asset(
                                         'assets/images/placeholder.png',
                                         height: imageSize,
                                         width: imageSize,
                                         fit: BoxFit.cover,
                                       ),
-                              ),
+                                    )
+                                  : Image.asset(
+                                      'assets/images/placeholder.png',
+                                      height: imageSize,
+                                      width: imageSize,
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                             Positioned(
                               bottom: 0,

@@ -26,7 +26,6 @@ class CartElement extends StatefulWidget {
 class CartElementState extends State<CartElement> {
   @override
   Widget build(BuildContext context) {
-    final heroTag = 'cart${widget.cartItem.product.id}';
     final double imageSize = 85.r;
     int quantity = widget.cartItem.quantity;
 
@@ -107,31 +106,28 @@ class CartElementState extends State<CartElement> {
                                       ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(8.r),
-                                        child: Hero(
-                                          tag: heroTag,
-                                          child: widget.cartItem.product
-                                                      .imageUrl !=
-                                                  null
-                                              ? FancyShimmerImage(
-                                                  imageUrl: widget.cartItem
-                                                      .product.imageUrl!,
-                                                  height: imageSize,
-                                                  width: imageSize,
-                                                  boxFit: BoxFit.cover,
-                                                  errorWidget: Image.asset(
+                                        child:
+                                            widget.cartItem.product.imageUrl !=
+                                                    null
+                                                ? FancyShimmerImage(
+                                                    imageUrl: widget.cartItem
+                                                        .product.imageUrl!,
+                                                    height: imageSize,
+                                                    width: imageSize,
+                                                    boxFit: BoxFit.cover,
+                                                    errorWidget: Image.asset(
+                                                      'assets/images/placeholder.png',
+                                                      height: imageSize,
+                                                      width: imageSize,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                                : Image.asset(
                                                     'assets/images/placeholder.png',
                                                     height: imageSize,
                                                     width: imageSize,
                                                     fit: BoxFit.cover,
                                                   ),
-                                                )
-                                              : Image.asset(
-                                                  'assets/images/placeholder.png',
-                                                  height: imageSize,
-                                                  width: imageSize,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                        ),
                                       ),
                                       Positioned(
                                         bottom: 0,

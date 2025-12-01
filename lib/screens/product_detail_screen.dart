@@ -23,13 +23,11 @@ class ProductDetailScreen extends StatefulWidget {
     super.key,
     required this.productId,
     this.product,
-    this.herotag,
   });
   static const routeName = '/product-detail';
 
   final int productId;
   final Product? product;
-  final String? herotag;
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -123,7 +121,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     final product = _initialProduct!;
-    final herotag = widget.herotag ?? 'product-${product.id}';
 
     return PopScope(
       canPop: false,
@@ -150,7 +147,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             return CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: _buildHeader(context, product, details, herotag,
+                  child: _buildHeader(context, product, details,
                       displayImageUrl, imageSize, colors),
                 ),
                 if (snapshot.hasError)
@@ -295,7 +292,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       BuildContext context,
       Product product,
       Product? details,
-      String herotag,
       String? displayImageUrl,
       double imageSize,
       ColorScheme colors) {
@@ -312,13 +308,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           SizedBox(
             height: imageSize,
             width: double.infinity,
-            child: Hero(
-              tag: herotag,
-              child: displayImageUrl != null && displayImageUrl.isNotEmpty
-                  ? Image.network(displayImageUrl, fit: BoxFit.contain)
-                  : Image.asset('assets/images/placeholder.png',
-                      fit: BoxFit.contain),
-            ),
+            child: displayImageUrl != null && displayImageUrl.isNotEmpty
+                ? Image.network(displayImageUrl, fit: BoxFit.contain)
+                : Image.asset('assets/images/placeholder.png',
+                    fit: BoxFit.contain),
           ),
           SizedBox(height: 16.h),
           Padding(

@@ -33,9 +33,7 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
       height: 40,
       child: Material(
         borderRadius: BorderRadius.circular(20),
-        elevation: 3,
-        surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
-        shadowColor: Colors.transparent,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: TextFormField(
           controller: _search,
           maxLines: 1,
@@ -54,7 +52,7 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
             contentPadding: EdgeInsets.zero,
             prefixIcon: Icon(
               Icons.search,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             suffixIcon: (_search.text == '')
                 ? null
@@ -67,7 +65,7 @@ class _SearchBarState extends State<ProductOverviewSearchBar> {
                     },
                     child: Icon(
                       Icons.close,
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
             border: InputBorder.none,
