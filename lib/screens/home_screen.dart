@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import '../providers/filter.dart';
 import '../providers/cart.dart';
 import '../router/app_router.dart';
+import '../widgets/common/changelog_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -25,6 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _setupInteractedMessage();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showChangelogIfNeeded(context);
+    });
   }
 
   Future<void> _setupInteractedMessage() async {
