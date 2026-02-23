@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../providers/auth.dart';
 import '../../services/app_launcher.dart';
 import '../../utils/environment.dart';
 import '../../utils/date_utils.dart';
@@ -214,6 +217,13 @@ class _AppDrawerState extends State<AppDrawer> {
 
             SizedBox(height: 8.h),
 
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              child: _buildUserTile(context, colors),
+            ),
+
+            SizedBox(height: 4.h),
+
             // Menu items
             Expanded(
               child: Padding(
@@ -266,6 +276,50 @@ class _AppDrawerState extends State<AppDrawer> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildUserTile(BuildContext context, ColorScheme colors) {
+    final auth = context.watch<Auth>();
+
+    if (!auth.isSignedIn) {
+      return _buildMenuItem(
+        context,
+        icon: Icons.login,
+        label: 'Logg inn',
+        onTap: () {
+          Navigator.pop(context);
+          context.push('/sign-in');
+        },
+      );
+    }
+
+    return _buildMenuItem(
+      context,
+      icon: Icons.person_outline,
+      label: auth.displayName.isNotEmpty ? auth.displayName : 'Profil',
+      trailing: CircleAvatar(
+        radius: 14.r,
+        backgroundColor: colors.primaryContainer,
+        backgroundImage:
+            auth.photoUrl != null ? NetworkImage(auth.photoUrl!) : null,
+        child: auth.photoUrl == null
+            ? Text(
+                auth.displayName.isNotEmpty
+                    ? auth.displayName[0].toUpperCase()
+                    : '?',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  color: colors.onPrimaryContainer,
+                ),
+              )
+            : null,
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        context.push('/profile');
+      },
     );
   }
 

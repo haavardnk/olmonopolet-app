@@ -13,6 +13,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import './providers/filter.dart';
 import './providers/cart.dart';
 import './providers/http_client.dart';
+import './providers/auth.dart';
 import './assets/color_schemes.g.dart';
 import './router/app_router.dart';
 
@@ -117,6 +118,9 @@ class _MyAppState extends State<MyApp> {
       initial: AdaptiveThemeMode.system,
       builder: (theme, darkTheme) => MultiProvider(
         providers: [
+          ChangeNotifierProvider(
+            create: (ctx) => Auth(),
+          ),
           ChangeNotifierProvider(
             create: (ctx) => HttpClient(),
           ),

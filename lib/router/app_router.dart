@@ -7,6 +7,8 @@ import '../screens/release_tab.dart';
 import '../screens/stock_change_tab.dart';
 import '../screens/cart_tab.dart';
 import '../screens/product_detail_screen.dart';
+import '../screens/sign_in_screen.dart';
+import '../screens/profile_screen.dart';
 import '../models/product.dart';
 import '../models/release.dart';
 
@@ -124,6 +126,16 @@ final goRouter = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/sign-in',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const SignInScreen(),
+    ),
+    GoRoute(
+      path: '/profile',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const ProfileScreen(),
     ),
   ],
 );
