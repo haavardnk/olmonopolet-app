@@ -5,9 +5,11 @@ import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../models/product.dart';
 import '../../providers/cart.dart';
 import '../common/rating_widget.dart';
 import '../common/info_chips.dart';
+import '../common/tasted_badge.dart';
 import '../common/stock_popup.dart';
 
 class CartElement extends StatefulWidget {
@@ -63,11 +65,14 @@ class CartElementState extends State<CartElement> {
               button: true,
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  context.push(
+                onTap: () async {
+                  final result = await context.push<Product>(
                     '/cart/${widget.cartItem.product.id}',
                     extra: widget.cartItem.product,
                   );
+                  if (result != null) {
+                    widget.cartData.updateProduct(result);
+                  }
                 },
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
@@ -128,6 +133,13 @@ class CartElementState extends State<CartElement> {
                                                     width: imageSize,
                                                     fit: BoxFit.cover,
                                                   ),
+                                      ),
+                                      TastedBadge(
+                                        product: widget.cartItem.product,
+                                        onToggled: (updated) {
+                                          widget.cartData.updateProduct(updated);
+                                          setState(() {});
+                                        },
                                       ),
                                       Positioned(
                                         bottom: 0,

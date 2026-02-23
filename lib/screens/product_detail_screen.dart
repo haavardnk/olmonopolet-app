@@ -9,6 +9,7 @@ import 'package:flag/flag.dart';
 import 'package:http/http.dart' as http;
 
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 import '../providers/filter.dart';
 import '../providers/http_client.dart';
 import '../services/api.dart';
@@ -38,7 +39,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Product? _initialProduct;
   List<StockInfo> _stockList = [];
   bool _isLoading = false;
+  bool _tastedLoading = false;
   String? _error;
+  Future<Product>? _detailsFuture;
 
   @override
   void initState() {
@@ -49,6 +52,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_detailsFuture == null && _initialProduct != null) {
+      _startDetailsFuture();
+    }
+  }
+
+  void _startDetailsFuture() {
+    if (_initialProduct == null) return;
+    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
+    final auth = Provider.of<Auth>(context, listen: false);
+    _detailsFuture = _loadDetails(client, _initialProduct!, auth);
+  }
+
   Future<void> _loadProductById() async {
     setState(() {
       _isLoading = true;
@@ -56,10 +74,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
     try {
       final client = Provider.of<HttpClient>(context, listen: false);
-      final product =
-          await ApiHelper.getProductById(client.apiClient, widget.productId);
+      final auth = Provider.of<Auth>(context, listen: false);
+      final token = auth.isSignedIn ? await auth.getIdToken() : null;
+      final product = await ApiHelper.getProductById(
+        client.apiClient,
+        widget.productId,
+        token: token,
+      );
+      _initialProduct = product;
+      _startDetailsFuture();
       setState(() {
-        _initialProduct = product;
         _isLoading = false;
       });
     } catch (e) {
@@ -70,10 +94,44 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  Future<Product> _loadDetails(
+    http.Client client,
+    Product product,
+    Auth auth,
+  ) async {
+    final token = auth.isSignedIn ? await auth.getIdToken() : null;
+    return ApiHelper.getProductDetails(client, product, token: token);
+  }
+
+  Future<void> _toggleTasted(Product product) async {
+    final auth = Provider.of<Auth>(context, listen: false);
+    if (!auth.isSignedIn) return;
+    final token = await auth.getIdToken();
+    if (token == null) return;
+    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
+    setState(() => _tastedLoading = true);
+    try {
+      if (product.userTasted) {
+        await ApiHelper.unmarkTasted(client, product.id, token);
+      } else {
+        await ApiHelper.markTasted(client, product.id, token);
+      }
+      final updated = product.copyWith(userTasted: !product.userTasted);
+      setState(() {
+        _loadedProduct = updated;
+        _initialProduct = _initialProduct?.copyWith(userTasted: updated.userTasted);
+        _tastedLoading = false;
+      });
+    } catch (_) {
+      setState(() => _tastedLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
+    final auth = Provider.of<Auth>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
     final colors = Theme.of(context).colorScheme;
     final tabletMode = 1.sw >= 600;
@@ -128,18 +186,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         if (!didPop) Navigator.of(context).pop(_loadedProduct ?? product);
       },
       child: Scaffold(
-        appBar: _buildAppBar(context, client.apiClient, product),
+        appBar: _buildAppBar(context, client.apiClient, product, auth),
         floatingActionButton: _buildFab(context, cart, product),
         body: FutureBuilder<Product>(
-          future: ApiHelper.getProductDetails(client.apiClient, product),
+          future: _detailsFuture,
           builder: (context, snapshot) {
             final details = snapshot.data;
-            if (details != null) {
+            if (details != null && _loadedProduct == null) {
               _loadedProduct = details;
-              if (details.allStock != null && filters.storeList.isNotEmpty) {
-                _stockList =
-                    sortStockListByStores(details.allStock!, filters.storeList);
-              }
+            } else if (details != null && _loadedProduct != null) {
+              _loadedProduct = details.copyWith(
+                userTasted: _loadedProduct!.userTasted,
+              );
+            }
+            if (_loadedProduct?.allStock != null &&
+                filters.storeList.isNotEmpty) {
+              _stockList = sortStockListByStores(
+                  _loadedProduct!.allStock!, filters.storeList);
             }
             final displayImageUrl =
                 details?.labelHdUrl ?? product.labelHdUrl ?? product.imageUrl;
@@ -193,7 +256,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   AppBar _buildAppBar(
-      BuildContext context, http.Client client, Product product) {
+      BuildContext context, http.Client client, Product product, Auth auth) {
+    final currentProduct = _loadedProduct ?? product;
     return AppBar(
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
@@ -201,6 +265,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       title: const Text('Detaljer'),
       actions: [
+        if (auth.isSignedIn)
+          IconButton(
+            onPressed: _tastedLoading ? null : () => _toggleTasted(currentProduct),
+            icon: _tastedLoading
+                ? SizedBox(
+                    width: 20.r,
+                    height: 20.r,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(
+                    currentProduct.userTasted
+                        ? Icons.check_circle
+                        : Icons.check_circle_outline,
+                    color: currentProduct.userTasted
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+            tooltip: currentProduct.userTasted ? 'Fjern smakt' : 'Marker som smakt',
+          ),
         PopupMenuButton(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),

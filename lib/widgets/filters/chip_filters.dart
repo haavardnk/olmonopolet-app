@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../providers/auth.dart';
 import '../../providers/filter.dart';
 import '../../assets/constants.dart';
 import '../../utils/date_utils.dart';
@@ -203,6 +204,68 @@ class DeliveryFilter extends StatelessWidget {
         onChanged: filters.setDeliverySelection,
         parentSetState: parentSetState,
       ),
+    );
+  }
+}
+
+class TastedFilter extends StatelessWidget {
+  final StateSetter parentSetState;
+
+  const TastedFilter({super.key, required this.parentSetState});
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = Provider.of<Auth>(context);
+    if (!auth.isSignedIn) return const SizedBox.shrink();
+
+    final filters = Provider.of<Filter>(context, listen: false);
+    final colors = Theme.of(context).colorScheme;
+
+    return Consumer<Filter>(
+      builder: (context, flt, _) {
+        final value = flt.userTasted;
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 6.h),
+          child: Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                size: 18.sp,
+                color: colors.primary,
+              ),
+              SizedBox(width: 6.w),
+              Expanded(
+                child: Text(
+                  'Smakt',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                    color: colors.primary,
+                  ),
+                ),
+              ),
+              SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: '', label: Text('Alle')),
+                  ButtonSegment(value: 'true', label: Text('Ja')),
+                  ButtonSegment(value: 'false', label: Text('Nei')),
+                ],
+                selected: {value},
+                onSelectionChanged: (selected) {
+                  filters.setUserTasted(selected.first);
+                  parentSetState(() {});
+                },
+                style: ButtonStyle(
+                  visualDensity: VisualDensity.compact,
+                  textStyle: WidgetStatePropertyAll(
+                    TextStyle(fontSize: 11.sp),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

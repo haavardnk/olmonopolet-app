@@ -8,6 +8,7 @@ import '../../services/api.dart';
 import './product_item.dart';
 import '../../models/product.dart';
 import '../../models/release.dart';
+import '../../providers/auth.dart';
 import '../../providers/filter.dart';
 import '../../providers/http_client.dart';
 import './pagination_indicators/first_page_error_indicator.dart';
@@ -66,6 +67,8 @@ class ProductListViewState extends State<ProductList> {
   Future<List<Product>> _fetchPage(int pageKey) async {
     final filters = Provider.of<Filter>(context, listen: false).filters;
     final client = Provider.of<HttpClient>(context, listen: false).apiClient;
+    final auth = Provider.of<Auth>(context, listen: false);
+    final token = auth.isSignedIn ? await auth.getIdToken() : null;
     final newItems = await retry(
       () => ApiHelper.getProductList(
         client,
@@ -73,6 +76,7 @@ class ProductListViewState extends State<ProductList> {
         page: pageKey,
         pageSize: _pageSize,
         release: widget.release,
+        token: token,
       ),
     );
     if (newItems.isNotEmpty && newItems.length < _pageSize) {

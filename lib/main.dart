@@ -129,10 +129,10 @@ class _MyAppState extends State<MyApp> {
             update: (ctx, client, previousFilter) =>
                 previousFilter!..update(client.apiClient),
           ),
-          ChangeNotifierProxyProvider<HttpClient, Cart>(
+          ChangeNotifierProxyProvider2<HttpClient, Auth, Cart>(
             create: (ctx) => Cart(),
-            update: (ctx, client, previousCart) =>
-                previousCart!..update(client.apiClient),
+            update: (ctx, client, auth, previousCart) =>
+                previousCart!..update(client.apiClient, auth),
           ),
         ],
         child: ScreenUtilInit(

@@ -50,4 +50,14 @@ class StockChange extends Equatable {
   final DateTime? unstockedAt;
   final DateTime? stockUnstockAt;
   final Product product;
+
+  StockChange copyWith({Product? product}) => StockChange(
+        store: store,
+        quantity: quantity,
+        stockUpdated: stockUpdated,
+        stockedAt: stockedAt,
+        unstockedAt: unstockedAt,
+        stockUnstockAt: stockUnstockAt,
+        product: product ?? this.product,
+      );
 }

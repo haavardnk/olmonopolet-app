@@ -58,6 +58,7 @@ class Product extends Equatable {
     this.allStock,
     this.valueScore,
     this.isChristmasBeer = false,
+    this.userTasted = false,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
@@ -110,6 +111,7 @@ class Product extends Equatable {
             ? (json['value_score'] as num).toDouble()
             : null,
         isChristmasBeer: json['is_christmas_beer'] ?? false,
+        userTasted: json['user_tasted'] ?? false,
       );
 
   @override
@@ -174,4 +176,50 @@ class Product extends Equatable {
   final List<StockInfo>? allStock;
   final double? valueScore;
   final bool isChristmasBeer;
+  final bool userTasted;
+
+  Product copyWith({bool? userTasted}) => Product(
+        id: id,
+        name: name,
+        style: style,
+        price: price,
+        volume: volume,
+        pricePerVolume: pricePerVolume,
+        pricePerAlcoholUnit: pricePerAlcoholUnit,
+        stock: stock,
+        rating: rating,
+        checkins: checkins,
+        abv: abv,
+        imageUrl: imageUrl,
+        vmpUrl: vmpUrl,
+        untappdUrl: untappdUrl,
+        untappdId: untappdId,
+        country: country,
+        countryCode: countryCode,
+        productSelection: productSelection,
+        labelHdUrl: labelHdUrl,
+        ibu: ibu,
+        description: description,
+        brewery: brewery,
+        year: year,
+        color: color,
+        aroma: aroma,
+        taste: taste,
+        storable: storable,
+        foodPairing: foodPairing,
+        rawMaterials: rawMaterials,
+        fullness: fullness,
+        sweetness: sweetness,
+        freshness: freshness,
+        bitterness: bitterness,
+        sugar: sugar,
+        acid: acid,
+        method: method,
+        allergens: allergens,
+        alcoholUnits: alcoholUnits,
+        allStock: allStock,
+        valueScore: valueScore,
+        isChristmasBeer: isChristmasBeer,
+        userTasted: userTasted ?? this.userTasted,
+      );
 }

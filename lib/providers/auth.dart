@@ -71,6 +71,8 @@ class Auth with ChangeNotifier {
     await _authService.reauthenticateWithApple();
   }
 
+  Future<String?> getIdToken() => _user?.getIdToken() ?? Future.value(null);
+
   @override
   void dispose() {
     _authSubscription.cancel();

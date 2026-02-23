@@ -13,6 +13,13 @@ const List<ChangelogVersion> changelogVersions = [
         description: 'Du kan nå logge inn med Google, Apple eller e-post. '
             'Åpne menyen og trykk «Logg inn» for å komme i gang.',
       ),
+      ChangelogEntry(
+        icon: Icons.check_circle_outline,
+        title: 'Marker øl som smakt',
+        description:
+            'Trykk på haken på produktkortet eller i produktdetaljer for å markere en øl som smakt. '
+            'Filtrer på smakt/ikke smakt i filterpanelet.',
+      ),
     ],
   ),
 ];

@@ -29,6 +29,7 @@ class Filter with ChangeNotifier {
   String releaseProductSelectionChoice = '';
   int styleChoice = 0;
   bool christmasBeerOnly = false;
+  String userTasted = '';
 
   RangeValues priceRange = const RangeValues(0, 500);
   RangeValues pricePerVolumeRange = const RangeValues(0, 1000);
@@ -73,14 +74,15 @@ class Filter with ChangeNotifier {
   }
 
   List<Map<String, dynamic>> filterSaveSettings = [
+    {'name': 'sortBy', 'text': 'Sortering', 'save': false},
     {'name': 'store', 'text': 'Butikklager', 'save': true},
+    {'name': 'userTasted', 'text': 'Smakt', 'save': false},
     {'name': 'price', 'text': 'Pris', 'save': false},
     {'name': 'pricePerVolume', 'text': 'Pris per liter', 'save': false},
-    {'name': 'sortBy', 'text': 'Sortering', 'save': false},
+    {'name': 'alcohol', 'text': 'Alkohol', 'save': false},
     {'name': 'style', 'text': 'Stil', 'save': false},
     {'name': 'styleChoice', 'text': 'Stil utvalg', 'save': true},
     {'name': 'country', 'text': 'Land', 'save': false},
-    {'name': 'alcohol', 'text': 'Alkohol', 'save': false},
     {'name': 'productSelection', 'text': 'Produktutvalg', 'save': false},
     {'name': 'excludeAllergens', 'text': 'Allergener', 'save': false},
     {'name': 'delivery', 'text': 'Bestilling', 'save': false},
@@ -332,6 +334,12 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
+  void setUserTasted(String value) {
+    userTasted = value;
+    notifyListeners();
+    saveFilters();
+  }
+
   void setStyleChoice(int index) {
     styleChoice = index;
     selectedStyles = [];
@@ -522,6 +530,7 @@ class Filter with ChangeNotifier {
     sortBy = '-rating';
     release = '';
     christmasBeerOnly = false;
+    userTasted = '';
     notifyListeners();
     saveFilters();
   }
@@ -610,6 +619,9 @@ class Filter with ChangeNotifier {
                 .map((e) => e == true ? 'true' : 'false')
                 .toList());
       }
+      if (filter['name'] == 'userTasted' && filter['save'] == true) {
+        prefs.setString('userTasted', userTasted);
+      }
     }
   }
 
@@ -691,6 +703,9 @@ class Filter with ChangeNotifier {
         deliverySelectedList = tempList != null
             ? tempList.map((e) => e == "true").toList()
             : List<bool>.filled(2, false);
+      }
+      if (filter['name'] == 'userTasted' && filter['save'] == true) {
+        userTasted = prefs.getString('userTasted') ?? '';
       }
     }
     notifyListeners();

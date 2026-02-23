@@ -11,6 +11,7 @@ import '../../models/release.dart';
 import '../../providers/cart.dart';
 import '../common/rating_widget.dart';
 import '../common/info_chips.dart';
+import '../common/tasted_badge.dart';
 import '../../assets/constants.dart';
 
 class ProductItem extends StatefulWidget {
@@ -105,6 +106,10 @@ class _ProductItemState extends State<ProductItem> {
                                   width: imageSize,
                                   fit: BoxFit.cover,
                                 ),
+                        ),
+                        TastedBadge(
+                          product: _product,
+                          onToggled: (updated) => setState(() => _product = updated),
                         ),
                         Positioned(
                           bottom: 0,

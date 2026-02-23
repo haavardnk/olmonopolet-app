@@ -73,20 +73,29 @@ class ApiHelper {
     }
   }
 
+  static Map<String, String> _authHeaders(String? token) {
+    if (token == null) return {};
+    return {'Authorization': 'Bearer $token'};
+  }
+
   static Future<Product> getProductDetails(
     http.Client client,
-    Product product,
-  ) async {
+    Product product, {
+    String? token,
+  }) async {
     const fields =
         'vmp_id,vmp_name,style,sub_category,main_category,stock,price,volume,'
         'price_per_volume,price_per_alcohol_unit,rating,checkins,abv,label_sm_url,vmp_url,untpd_url,'
         'untpd_id,country,country_code,product_selection,label_hd_url,ibu,'
         'description,brewery,year,color,aroma,taste,storable,food_pairing,'
         'raw_materials,fullness,sweetness,freshness,bitterness,sugar,acid,'
-        'method,allergens,alcohol_units,all_stock,value_score,is_christmas_beer';
+        'method,allergens,alcohol_units,all_stock,value_score,is_christmas_beer,user_tasted';
     final endpoint = 'beers/?beers=${product.id}&fields=$fields&all_stock=true';
     return _handleRequest(
-      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      request: () => client.get(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _authHeaders(token),
+      ),
       parser: (json) => Product.fromJson(
         (json as List).first as Map<String, dynamic>,
       ),
@@ -96,11 +105,15 @@ class ApiHelper {
 
   static Future<Product> getProductById(
     http.Client client,
-    int productId,
-  ) async {
+    int productId, {
+    String? token,
+  }) async {
     final endpoint = 'beers/?beers=$productId&all_stock=true';
     return _handleRequest(
-      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      request: () => client.get(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _authHeaders(token),
+      ),
       parser: (json) => Product.fromJson(
         (json as List).first as Map<String, dynamic>,
       ),
@@ -145,10 +158,14 @@ class ApiHelper {
     required String store,
     required int page,
     required int pageSize,
+    String? token,
   }) async {
     final endpoint = 'stockchange/?store=$store&page=$page&page_size=$pageSize';
     return _handleRequest(
-      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      request: () => client.get(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _authHeaders(token),
+      ),
       parser: (json) =>
           (json as List).map((item) => StockChange.fromJson(item)).toList(),
       endpoint: endpoint,
@@ -161,31 +178,82 @@ class ApiHelper {
     required int page,
     required int pageSize,
     Release? release,
+    String? token,
   }) async {
     final url = release == null
         ? _buildProductUrl(page, filter, pageSize)
         : _buildReleaseProductUrl(page, filter, release, pageSize);
 
     return _handleRequest(
-      request: () => client.get(url),
+      request: () => client.get(url, headers: _authHeaders(token)),
       parser: (json) =>
           (json as List).map((item) => Product.fromJson(item)).toList(),
       endpoint: url.path,
     );
   }
 
+  static Future<void> markTasted(
+    http.Client client,
+    int productId,
+    String token,
+  ) async {
+    final endpoint = 'beers/$productId/mark_tasted/';
+    try {
+      final response = await client.post(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw ApiException(
+          message: 'Kunne ikke markere som smakt',
+          statusCode: response.statusCode,
+          endpoint: endpoint,
+        );
+      }
+    } on SocketException {
+      throw const NetworkException();
+    }
+  }
+
+  static Future<void> unmarkTasted(
+    http.Client client,
+    int productId,
+    String token,
+  ) async {
+    final endpoint = 'beers/$productId/mark_tasted/';
+    try {
+      final response = await client.delete(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw ApiException(
+          message: 'Kunne ikke fjerne smakt-markering',
+          statusCode: response.statusCode,
+          endpoint: endpoint,
+        );
+      }
+    } on SocketException {
+      throw const NetworkException();
+    }
+  }
+
   static Future<List<Product>?> getProductsByIds(
     http.Client client,
-    String productIds,
-  ) async {
+    String productIds, {
+    String? token,
+  }) async {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,'
-        'vmp_url,untpd_url,untpd_id,country,country_code,is_christmas_beer';
+        'vmp_url,untpd_url,untpd_id,country,country_code,is_christmas_beer,user_tasted';
     final endpoint = 'beers/?beers=$productIds&fields=$fields';
 
     return _handleRequest(
-      request: () => client.get(Uri.parse('$_baseUrl$endpoint')),
+      request: () => client.get(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _authHeaders(token),
+      ),
       parser: (json) =>
           (json as List).map((item) => Product.fromJson(item)).toList(),
       endpoint: endpoint,
@@ -312,7 +380,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,vmp_url,'
-        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer';
+        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer,user_tasted';
 
     final params = <String, String>{
       'fields': fields,
@@ -346,6 +414,9 @@ class ApiHelper {
     if (filter.christmasBeerOnly) {
       params['is_christmas_beer'] = 'true';
     }
+    if (filter.userTasted.isNotEmpty) {
+      params['user_tasted'] = filter.userTasted;
+    }
 
     return Uri.parse('${_baseUrl}beers/').replace(queryParameters: params);
   }
@@ -359,7 +430,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,vmp_url,'
-        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer';
+        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer,user_tasted';
 
     final params = <String, String>{
       'fields': fields,

@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 
+import '../../models/product.dart';
 import '../../models/stock_change.dart';
 import '../common/rating_widget.dart';
 import '../common/info_chips.dart';
+import '../common/tasted_badge.dart';
 
 class StockChangeItem extends StatefulWidget {
   const StockChangeItem({required this.stockChange, this.lastDate, super.key});
@@ -20,15 +22,18 @@ class StockChangeItem extends StatefulWidget {
 }
 
 class _StockChangeItemState extends State<StockChangeItem> {
+  late Product _product;
+
   @override
   void initState() {
-    initializeDateFormatting('nb_NO', null);
     super.initState();
+    initializeDateFormatting('nb_NO', null);
+    _product = widget.stockChange.product;
   }
 
   @override
   Widget build(BuildContext context) {
-    final product = widget.stockChange.product;
+    final product = _product;
     final double imageSize = 85.r;
     final displayImageUrl = product.labelHdUrl ?? product.imageUrl;
     final colors = Theme.of(context).colorScheme;
@@ -56,11 +61,16 @@ class _StockChangeItemState extends State<StockChangeItem> {
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: InkWell(
-              onTap: () {
-                context.push(
+              onTap: () async {
+                final result = await context.push<Product>(
                   '/stock/${product.id}',
                   extra: product,
                 );
+                if (result != null) {
+                  setState(() {
+                    _product = result;
+                  });
+                }
               },
               borderRadius: BorderRadius.circular(12.r),
               child: Padding(
@@ -106,6 +116,10 @@ class _StockChangeItemState extends State<StockChangeItem> {
                                       fit: BoxFit.cover,
                                     ),
                             ),
+                        TastedBadge(
+                          product: _product,
+                          onToggled: (updated) => setState(() => _product = updated),
+                        ),
                             Positioned(
                               bottom: 0,
                               right: 0,

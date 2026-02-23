@@ -6,6 +6,7 @@ import '../services/db.dart';
 import '../services/api.dart';
 import '../models/product.dart';
 import '../models/store.dart';
+import '../providers/auth.dart';
 
 class CartItem {
   final Product product;
@@ -21,9 +22,11 @@ class CartItem {
 
 class Cart with ChangeNotifier {
   late http.Client _client;
+  Auth? _auth;
 
-  void update(http.Client client) {
+  void update(http.Client client, Auth auth) {
     _client = client;
+    _auth = auth;
   }
 
   Map<int, CartItem> _items = {};
@@ -73,6 +76,19 @@ class Cart with ChangeNotifier {
     checkCartStockStatus();
     sortCart();
     updateDb(productId);
+  }
+
+  void updateProduct(Product product) {
+    if (!_items.containsKey(product.id)) return;
+    _items.update(
+      product.id,
+      (existing) => CartItem(
+        product: product,
+        quantity: existing.quantity,
+        inStock: existing.inStock,
+      ),
+    );
+    notifyListeners();
   }
 
   void removeItem(int productId) {
@@ -188,28 +204,15 @@ class Cart with ChangeNotifier {
   Future<void> updateCartItemsData() async {
     if (_items.isNotEmpty) {
       final productIds = _items.keys.toList().join(',');
+      final token = (_auth != null && _auth!.isSignedIn)
+          ? await _auth!.getIdToken()
+          : null;
       final updatedProducts =
-          await ApiHelper.getProductsByIds(_client, productIds);
+          await ApiHelper.getProductsByIds(_client, productIds, token: token);
       if (updatedProducts == null) return;
       for (var product in updatedProducts) {
         _items[product.id] = CartItem(
-          product: Product(
-              id: product.id,
-              name: product.name,
-              style: product.style,
-              price: product.price,
-              volume: product.volume,
-              pricePerVolume: product.pricePerVolume,
-              stock: product.stock,
-              rating: product.rating,
-              checkins: product.checkins,
-              abv: product.abv,
-              imageUrl: product.imageUrl,
-              vmpUrl: product.vmpUrl,
-              untappdUrl: product.untappdUrl,
-              untappdId: product.untappdId,
-              country: product.country,
-              countryCode: product.countryCode),
+          product: product,
           quantity: _items[product.id]!.quantity,
           inStock: _items[product.id]!.inStock,
         );

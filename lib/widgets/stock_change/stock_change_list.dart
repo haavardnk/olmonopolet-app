@@ -7,6 +7,7 @@ import 'package:retry/retry.dart';
 import './stock_change_item.dart';
 import '../../services/api.dart';
 import '../../models/stock_change.dart';
+import '../../providers/auth.dart';
 import '../../providers/filter.dart';
 import '../../providers/http_client.dart';
 import '../products/pagination_indicators/first_page_error_indicator.dart';
@@ -57,15 +58,17 @@ class StockChangeListViewState extends State<StockChangeList> {
   Future<List<StockChange>> _fetchPage(int pageKey) async {
     final filters = Provider.of<Filter>(context, listen: false).filters;
     final client = Provider.of<HttpClient>(context, listen: false).apiClient;
-    final newItems = await retry(
+    final auth = Provider.of<Auth>(context, listen: false);
+    final token = auth.isSignedIn ? await auth.getIdToken() : null;
+    return retry(
       () => ApiHelper.getStockChangeList(
         client,
         store: filters.stockChangeStoreId,
         page: pageKey,
         pageSize: _pageSize,
+        token: token,
       ),
     );
-    return newItems;
   }
 
   @override
