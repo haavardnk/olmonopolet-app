@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide SearchBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../providers/filter.dart';
 import '../widgets/products/product_list.dart';
@@ -11,6 +12,7 @@ import '../widgets/filters/product_release_filter_sheet.dart';
 import '../widgets/products/product_overview_search_bar.dart';
 import '../widgets/products/product_overview_release_search_bar.dart';
 import '../models/release.dart';
+import '../utils/environment.dart';
 
 class ProductOverviewTab extends StatefulWidget {
   final Release? release;
@@ -125,6 +127,18 @@ class _ProductOverviewTabState extends State<ProductOverviewTab> {
                   )
                 : Text(storeName),
             actions: [
+              if (release != null)
+                IconButton(
+                  icon: const Icon(Icons.share_outlined),
+                  onPressed: () {
+                    SharePlus.instance.share(
+                      ShareParams(
+                        uri: Uri.parse('${Environment.appBaseUrl}/release/${release.name.replaceAll(' ', '-')}'),
+                      ),
+                    );
+                  },
+                  tooltip: 'Del slipp',
+                ),
               release == null
                   ? const ProductFilterSheet()
                   : ProductReleaseFilterSheet(release: release),

@@ -3,6 +3,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../models/user_list.dart';
 import '../../providers/lists.dart';
+import '../../utils/environment.dart';
 import '../lists/list_form_dialog.dart';
 
 class ListActions {
@@ -55,7 +56,7 @@ class ListActions {
   }
 
   static void share(UserList list) {
-    final url = 'https://olmonopolet.app/lists/shared/${list.shareToken}';
-    Share.shareUri(Uri.parse(url));
+    final url = '${Environment.appBaseUrl}/lists/shared/${list.shareToken}';
+    SharePlus.instance.share(ShareParams(uri: Uri.parse(url)));
   }
 }

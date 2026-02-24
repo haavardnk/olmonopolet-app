@@ -36,7 +36,7 @@ class ReleaseItem extends StatelessWidget {
           }
           filters.releaseProductSelectionChoice = '';
           context.go(
-            '/releases/${release.name.replaceAll(' ', '-')}',
+            '/release/${release.name.replaceAll(' ', '-')}',
             extra: release,
           );
         },
@@ -175,11 +175,6 @@ class ReleaseItem extends StatelessWidget {
                     ],
                   ],
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                size: 24.r,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ],
           ),

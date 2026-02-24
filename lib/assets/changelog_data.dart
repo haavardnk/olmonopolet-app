@@ -10,7 +10,8 @@ const List<ChangelogVersion> changelogVersions = [
       ChangelogEntry(
         icon: Icons.person_outline,
         title: 'Logg inn med konto',
-        description: 'Du kan nå logge inn med Google, Apple eller e-post. '
+        description:
+            'Du kan nå logge inn med Google, Apple eller e-post. '
             'Åpne menyen og trykk «Logg inn» for å komme i gang.',
       ),
       ChangelogEntry(
@@ -26,6 +27,18 @@ const List<ChangelogVersion> changelogVersions = [
         description:
             'Opprett flere lister med ulike typer: standard, handleliste, kjeller og arrangement. '
             'Listene synkroniseres med kontoen din og kan deles via lenke.',
+      ),
+      ChangelogEntry(
+        icon: Icons.link,
+        title: 'Dyplinking',
+        description:
+            'Lenker til produkter, slipp og delte lister åpner nå direkte i appen.',
+      ),
+      ChangelogEntry(
+        icon: Icons.share_outlined,
+        title: 'Deling',
+        description:
+            'Del produkter, ølslipp og lister med venner direkte fra appen.',
       ),
       ChangelogEntry(
         icon: Icons.local_drink_outlined,

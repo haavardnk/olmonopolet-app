@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/product.dart';
 import '../../providers/http_client.dart';
 import '../../services/app_launcher.dart';
+import '../../utils/environment.dart';
 import './untappd_match_sheet.dart';
 
 class ProductActionMenu extends StatelessWidget {
@@ -44,18 +46,12 @@ class ProductActionMenu extends StatelessWidget {
           : null,
       itemBuilder: (_) => [
         PopupMenuItem(
-          value: 0,
+          value: 3,
           child: Row(
             children: [
-              const Icon(Icons.report_outlined),
+              const Icon(Icons.share_outlined),
               SizedBox(width: 12.w),
-              Expanded(
-                child: Text(
-                  product.rating != null
-                      ? 'Rapporter feil Untappd match'
-                      : 'Foreslå untappd match',
-                ),
-              ),
+              const Text('Del'),
             ],
           ),
         ),
@@ -79,6 +75,22 @@ class ProductActionMenu extends StatelessWidget {
             ],
           ),
         ),
+        PopupMenuItem(
+          value: 0,
+          child: Row(
+            children: [
+              const Icon(Icons.report_outlined),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  product.rating != null
+                      ? 'Rapporter feil Untappd match'
+                      : 'Foreslå untappd match',
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
       onSelected: (value) {
         if (value == 0) {
@@ -89,6 +101,12 @@ class ProductActionMenu extends StatelessWidget {
           AppLauncher.launchUntappd(product);
         } else if (value == 2 && product.vmpUrl != null) {
           launchUrl(Uri.parse(product.vmpUrl!));
+        } else if (value == 3) {
+          SharePlus.instance.share(
+            ShareParams(
+              uri: Uri.parse('${Environment.appBaseUrl}/products/${product.id}'),
+            ),
+          );
         }
       },
     );

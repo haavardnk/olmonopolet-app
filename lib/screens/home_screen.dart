@@ -40,10 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
       if (route != null) {
         if (route == '/products' && productId != null) {
           goRouter.go('/products/$productId');
-        } else if (route == '/releases' && releaseId != null) {
-          goRouter.go('/releases/$releaseId');
-        } else if (route == '/releases') {
-          goRouter.go('/releases');
+        } else if (route == '/release' && releaseId != null) {
+          goRouter.go('/release/$releaseId');
+        } else if (route == '/release') {
+          goRouter.go('/release');
         } else if (route == '/stock') {
           goRouter.go('/stock');
         } else if (route == '/cart') {

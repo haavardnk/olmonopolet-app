@@ -33,6 +33,7 @@ jobs:
         run: |
           cat <<EOF > .env
           API_BASE_URL=${{ secrets.API_BASE_URL }}
+          APP_BASE_URL=${{ secrets.APP_BASE_URL }}
           FACEBOOK_URL=${{ secrets.FACEBOOK_URL }}
           FACEBOOK_PAGE_ID=${{ secrets.FACEBOOK_PAGE_ID }}
           FEEDBACK_EMAIL=${{ secrets.FEEDBACK_EMAIL }}
@@ -96,6 +97,7 @@ jobs:
         run: |
           cat <<EOF > .env
           API_BASE_URL=${{ secrets.API_BASE_URL }}
+          APP_BASE_URL=${{ secrets.APP_BASE_URL }}
           FACEBOOK_URL=${{ secrets.FACEBOOK_URL }}
           FACEBOOK_PAGE_ID=${{ secrets.FACEBOOK_PAGE_ID }}
           FEEDBACK_EMAIL=${{ secrets.FEEDBACK_EMAIL }}

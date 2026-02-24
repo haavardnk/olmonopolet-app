@@ -19,6 +19,10 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final goRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: '/products',
+  redirect: (context, state) {
+    if (state.uri.path == '/') return '/products';
+    return null;
+  },
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
@@ -37,10 +41,7 @@ final goRouter = GoRouter(
                   builder: (context, state) {
                     final id = int.parse(state.pathParameters['id']!);
                     final product = state.extra as Product?;
-                    return ProductDetailScreen(
-                      productId: id,
-                      product: product,
-                    );
+                    return ProductDetailScreen(productId: id, product: product);
                   },
                 ),
               ],
@@ -50,14 +51,15 @@ final goRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/releases',
+              path: '/release',
               builder: (context, state) => const ReleaseTab(),
               routes: [
                 GoRoute(
                   path: ':name',
                   builder: (context, state) {
                     final name = Uri.decodeComponent(
-                        state.pathParameters['name']!.replaceAll('-', ' '));
+                      state.pathParameters['name']!.replaceAll('-', ' '),
+                    );
                     final release = state.extra as Release?;
                     return ProductOverviewTab(
                       release: release,
@@ -95,10 +97,7 @@ final goRouter = GoRouter(
                   builder: (context, state) {
                     final id = int.parse(state.pathParameters['id']!);
                     final product = state.extra as Product?;
-                    return ProductDetailScreen(
-                      productId: id,
-                      product: product,
-                    );
+                    return ProductDetailScreen(productId: id, product: product);
                   },
                 ),
               ],
@@ -131,8 +130,9 @@ final goRouter = GoRouter(
                       path: ':productId',
                       parentNavigatorKey: rootNavigatorKey,
                       builder: (context, state) {
-                        final productId =
-                            int.parse(state.pathParameters['productId']!);
+                        final productId = int.parse(
+                          state.pathParameters['productId']!,
+                        );
                         final product = state.extra as Product?;
                         return ProductDetailScreen(
                           productId: productId,

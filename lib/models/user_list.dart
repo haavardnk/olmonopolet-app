@@ -292,29 +292,32 @@ class SharedUserList extends Equatable {
     required this.createdAt,
   });
 
-  factory SharedUserList.fromJson(Map<String, dynamic> json) => SharedUserList(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        description: json['description'] as String?,
-        listType: ListType.fromApi(json['list_type'] as String),
-        userName: json['user_name'] as String?,
-        storeName: json['store_name'] as String?,
-        eventDate: json['event_date'] != null
-            ? DateTime.parse(json['event_date'] as String)
-            : null,
-        itemCount: json['item_count'] as int,
-        totalPrice: json['total_price'] != null
-            ? (json['total_price'] as num).toDouble()
-            : null,
-        stats: json['stats'] != null
-            ? ListStats.fromJson(json['stats'] as Map<String, dynamic>)
-            : null,
-        isPast: json['is_past'] as bool?,
-        items: (json['items'] as List)
-            .map((e) => ListItem.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        createdAt: DateTime.parse(json['created_at'] as String),
-      );
+  factory SharedUserList.fromJson(Map<String, dynamic> json) {
+    final items = (json['items'] as List)
+        .map((e) => ListItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+    return SharedUserList(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      listType: ListType.fromApi(json['list_type'] as String),
+      userName: json['user_name'] as String?,
+      storeName: json['store_name'] as String?,
+      eventDate: json['event_date'] != null
+          ? DateTime.parse(json['event_date'] as String)
+          : null,
+      itemCount: (json['item_count'] as int?) ?? items.length,
+      totalPrice: json['total_price'] != null
+          ? (json['total_price'] as num).toDouble()
+          : null,
+      stats: json['stats'] != null
+          ? ListStats.fromJson(json['stats'] as Map<String, dynamic>)
+          : null,
+      isPast: json['is_past'] as bool?,
+      items: items,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
 
   @override
   List<Object?> get props => [

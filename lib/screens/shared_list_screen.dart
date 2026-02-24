@@ -159,10 +159,9 @@ class _SharedListScreenState extends State<SharedListScreen> {
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (list.userName != null) ...[
-            _buildSharedByCard(list, colors),
+            _buildInfoCard(list, colors),
             SizedBox(height: 10.h),
           ],
           if (list.description != null && list.description!.isNotEmpty) ...[
@@ -175,12 +174,6 @@ class _SharedListScreenState extends State<SharedListScreen> {
             ),
             SizedBox(height: 10.h),
           ],
-          if (list.storeName != null) ...[
-            _buildStoreCard(list, colors),
-          ],
-          if (list.eventDate != null) ...[
-            _buildEventCard(list, colors),
-          ],
           if (list.listType == ListType.cellar && list.stats != null) ...[
             CellarStatsWidget(stats: list.stats!),
           ],
@@ -190,7 +183,9 @@ class _SharedListScreenState extends State<SharedListScreen> {
     );
   }
 
-  Widget _buildSharedByCard(SharedUserList list, ColorScheme colors) {
+  Widget _buildInfoCard(SharedUserList list, ColorScheme colors) {
+    final isPast = list.isPast == true;
+
     return Container(
       padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
@@ -200,176 +195,163 @@ class _SharedListScreenState extends State<SharedListScreen> {
           color: colors.secondary.withValues(alpha: 0.3),
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: colors.secondary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.person_outline,
-              size: 18.r,
-              color: colors.secondary,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.r),
+                decoration: BoxDecoration(
+                  color: colors.secondary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.person_outline,
+                  size: 18.r,
+                  color: colors.secondary,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Delt av ${list.userName}',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: colors.onSurface,
+                      ),
+                    ),
+                    SizedBox(height: 1.h),
+                    Text(
+                      '${list.itemCount} produkter',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          if (list.storeName != null && list.listType == ListType.shopping) ...[
+            Divider(
+              height: 20.h,
+              color: colors.secondary.withValues(alpha: 0.2),
+            ),
+            Row(
               children: [
-                Text(
-                  'Delt av ${list.userName}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: colors.onSurface,
+                Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color: colors.secondary.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.store,
+                    size: 18.r,
+                    color: colors.secondary,
                   ),
                 ),
-                SizedBox(height: 1.h),
-                Text(
-                  '${list.itemCount} produkter',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: colors.onSurfaceVariant,
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        list.storeName!,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSurface,
+                        ),
+                      ),
+                      SizedBox(height: 1.h),
+                      Text(
+                        'Valgt butikk',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStoreCard(SharedUserList list, ColorScheme colors) {
-    return Container(
-      padding: EdgeInsets.all(12.r),
-      decoration: BoxDecoration(
-        color: colors.primaryContainer.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: colors.primary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: colors.primary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
+          ],
+          if (list.eventDate != null) ...[
+            Divider(
+              height: 20.h,
+              color: colors.secondary.withValues(alpha: 0.2),
             ),
-            child: Icon(
-              Icons.store,
-              size: 18.r,
-              color: colors.primary,
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Text(
-                  list.storeName!,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: colors.onSurface,
-                  ),
-                ),
-                SizedBox(height: 1.h),
-                Text(
-                  'Valgt butikk',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEventCard(SharedUserList list, ColorScheme colors) {
-    final isPast = list.isPast == true;
-    final date = list.eventDate!;
-
-    return Container(
-      padding: EdgeInsets.all(12.r),
-      decoration: BoxDecoration(
-        color: isPast
-            ? colors.errorContainer.withValues(alpha: 0.2)
-            : colors.primaryContainer.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: isPast
-              ? colors.error.withValues(alpha: 0.2)
-              : colors.primary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: isPast
-                  ? colors.error.withValues(alpha: 0.15)
-                  : colors.primary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.event,
-              size: 18.r,
-              color: isPast ? colors.error : colors.primary,
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${date.day}. ${monthAbbreviations[date.month - 1]} ${date.year}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 1.h),
-                Text(
-                  isPast ? 'Arrangementet er passert' : 'Kommende arrangement',
-                  style: TextStyle(
-                    fontSize: 11.sp,
+                Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
                     color: isPast
-                        ? colors.error.withValues(alpha: 0.8)
-                        : colors.onSurfaceVariant,
+                        ? colors.error.withValues(alpha: 0.15)
+                        : colors.secondary.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.event,
+                    size: 18.r,
+                    color: isPast ? colors.error : colors.secondary,
                   ),
                 ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${list.eventDate!.day}. ${monthAbbreviations[list.eventDate!.month - 1]} ${list.eventDate!.year}',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSurface,
+                        ),
+                      ),
+                      SizedBox(height: 1.h),
+                      Text(
+                        isPast
+                            ? 'Arrangementet er passert'
+                            : 'Kommende arrangement',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: isPast
+                              ? colors.error.withValues(alpha: 0.8)
+                              : colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isPast)
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: colors.error.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Text(
+                      'Passert',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: colors.error,
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ),
-          if (isPast)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: colors.error.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(
-                'Passert',
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w600,
-                  color: colors.error,
-                ),
-              ),
-            ),
+          ],
         ],
       ),
     );
