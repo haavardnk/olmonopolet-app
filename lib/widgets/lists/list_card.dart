@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-
 import '../../models/user_list.dart';
-import '../../providers/filter.dart';
+import '../../utils/store_utils.dart';
 
 class ListCard extends StatelessWidget {
   final UserList list;
@@ -23,22 +21,13 @@ class ListCard extends StatelessWidget {
     required this.onShare,
   });
 
-  String? _getStoreName(BuildContext context) {
-    final storeId = list.selectedStoreId;
-    if (storeId == null || storeId.isEmpty) return null;
-    final filters = Provider.of<Filter>(context, listen: false);
-    for (final store in filters.storeList) {
-      if (store.id == storeId) return store.name;
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isPast = list.isPast == true;
-    final storeName =
-        list.listType == ListType.shopping ? _getStoreName(context) : null;
+    final storeName = list.listType == ListType.shopping
+        ? lookupStoreName(context, list.selectedStoreId)
+        : null;
 
     return Dismissible(
       key: Key('list-card-${list.id}'),

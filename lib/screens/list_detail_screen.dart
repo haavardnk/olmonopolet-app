@@ -3,17 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../models/product.dart';
 import '../models/user_list.dart';
 import '../providers/auth.dart';
 import '../providers/filter.dart';
 import '../providers/http_client.dart';
+import '../utils/store_utils.dart';
 import '../providers/lists.dart';
 import '../services/api.dart';
+import '../widgets/common/error_state.dart';
 import '../widgets/lists/cellar_stats.dart';
-import '../widgets/lists/list_form_dialog.dart';
+import '../widgets/lists/list_actions.dart';
 import '../widgets/lists/list_item_row.dart';
 import '../widgets/lists/shopping_total_bar.dart';
 import '../widgets/common/store_picker.dart';
@@ -63,8 +64,11 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       final client = Provider.of<HttpClient>(context, listen: false).apiClient;
       final auth = Provider.of<Auth>(context, listen: false);
       final token = auth.isSignedIn ? await auth.getIdToken() : null;
-      final products =
-          await ApiHelper.getProductsByIds(client, idsStr, token: token);
+      final products = await ApiHelper.getProductsByIds(
+        client,
+        idsStr,
+        token: token,
+      );
       if (products != null && mounted) {
         final map = <String, Product>{};
         for (final p in products) {
@@ -122,42 +126,13 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   }
 
   Future<void> _editList(UserList list) async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => ListFormDialog(existingList: list),
-    );
-    if (result == null || !mounted) return;
-
-    await _listsProvider.updateList(
-      list.id,
-      name: result['name'] as String,
-      description: result['description'] as String?,
-      listType: result['listType'] as ListType,
-      eventDate: result['eventDate'] as DateTime?,
-    );
+    if (!mounted) return;
+    await ListActions.edit(context, list, _listsProvider);
   }
 
   Future<void> _deleteList(UserList list) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Slett liste'),
-        content: Text('Er du sikker på at du vil slette "${list.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Avbryt'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Slett'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
-    final success = await _listsProvider.deleteList(list.id);
+    if (!mounted) return;
+    final success = await ListActions.delete(context, list, _listsProvider);
     if (success && mounted) context.pop();
   }
 
@@ -206,15 +181,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     return total;
   }
 
-  String? _getStoreName(String? storeId) {
-    if (storeId == null || storeId.isEmpty) return null;
-    final filters = Provider.of<Filter>(context, listen: false);
-    for (final store in filters.storeList) {
-      if (store.id == storeId) return store.name;
-    }
-    return null;
-  }
-
   int _inStockCount(UserList list) {
     final items = list.items ?? [];
     int count = 0;
@@ -249,19 +215,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         if (listsProvider.error != null && list == null) {
           return Scaffold(
             appBar: AppBar(title: const Text('Liste')),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(listsProvider.error!),
-                  SizedBox(height: 12.h),
-                  FilledButton(
-                    onPressed: _loadList,
-                    child: const Text('Prøv igjen'),
-                  ),
-                ],
-              ),
-            ),
+            body: ErrorState(message: listsProvider.error!, onRetry: _loadList),
           );
         }
 
@@ -293,11 +247,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       title: Text(list.name),
       actions: [
         IconButton(
-          onPressed: () {
-            final url =
-                'https://olmonopolet.app/lists/shared/${list.shareToken}';
-            Share.shareUri(Uri.parse(url));
-          },
+          onPressed: () => ListActions.share(list),
           icon: const Icon(Icons.share_outlined),
           tooltip: 'Del',
         ),
@@ -359,10 +309,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     padding: EdgeInsets.only(top: 4.h, bottom: 4.h),
                     buildDefaultDragHandles: false,
                     enterTransition: [
-                      FadeIn(duration: const Duration(milliseconds: 200))
+                      FadeIn(duration: const Duration(milliseconds: 200)),
                     ],
                     exitTransition: [
-                      FadeIn(duration: const Duration(milliseconds: 200))
+                      FadeIn(duration: const Duration(milliseconds: 200)),
                     ],
                     insertDuration: const Duration(milliseconds: 200),
                     removeDuration: const Duration(milliseconds: 200),
@@ -385,7 +335,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     itemBuilder: (context, index) {
                       final item = items[index];
                       final product = _products[item.productId];
-                      final bool? inStock = list.selectedStoreId != null &&
+                      final bool? inStock =
+                          list.selectedStoreId != null &&
                               list.selectedStoreId!.isNotEmpty &&
                               _stockChecked
                           ? _stockStatus.containsKey(item.productId)
@@ -399,16 +350,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                         dragIndex: index,
                         inStock: inStock,
                         stockCount: stockCount,
-                        onRemove: () => listsProvider.removeItemFromList(
-                          list.id,
-                          item.id,
-                        ),
-                        onQuantityChanged: (qty) =>
-                            listsProvider.updateListItem(
-                          list.id,
-                          item.id,
-                          quantity: qty,
-                        ),
+                        onRemove: () =>
+                            listsProvider.removeItemFromList(list.id, item.id),
+                        onQuantityChanged: (qty) => listsProvider
+                            .updateListItem(list.id, item.id, quantity: qty),
                         onYearChanged: (year) => listsProvider.updateListItem(
                           list.id,
                           item.id,
@@ -442,19 +387,12 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
           if (list.description != null && list.description!.isNotEmpty) ...[
             Text(
               list.description!,
-              style: TextStyle(
-                fontSize: 13.sp,
-                color: colors.onSurfaceVariant,
-              ),
+              style: TextStyle(fontSize: 13.sp, color: colors.onSurfaceVariant),
             ),
             SizedBox(height: 10.h),
           ],
-          if (isShopping) ...[
-            _buildStoreSelector(list, colors, hasStore),
-          ],
-          if (list.eventDate != null) ...[
-            _buildEventCard(list, colors),
-          ],
+          if (isShopping) ...[_buildStoreSelector(list, colors, hasStore)],
+          if (list.eventDate != null) ...[_buildEventCard(list, colors)],
           if (list.listType == ListType.cellar && list.items != null) ...[
             CellarStatsWidget(stats: _computeCellarStats(list.items!)),
           ],
@@ -464,12 +402,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     );
   }
 
-  Widget _buildStoreSelector(
-    UserList list,
-    ColorScheme colors,
-    bool hasStore,
-  ) {
-    final storeName = hasStore ? _getStoreName(list.selectedStoreId) : null;
+  Widget _buildStoreSelector(UserList list, ColorScheme colors, bool hasStore) {
+    final storeName = hasStore
+        ? lookupStoreName(context, list.selectedStoreId)
+        : null;
 
     return GestureDetector(
       onTap: () => _selectStore(list),
@@ -512,8 +448,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
-                      color:
-                          hasStore ? colors.onSurface : colors.onSurfaceVariant,
+                      color: hasStore
+                          ? colors.onSurface
+                          : colors.onSurfaceVariant,
                     ),
                   ),
                   SizedBox(height: 1.h),
@@ -676,10 +613,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
               SizedBox(height: 20.h),
               Text(
                 'Listen er tom',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 8.h),
               Text(

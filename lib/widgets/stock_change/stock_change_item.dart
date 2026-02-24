@@ -3,18 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/product.dart';
 import '../../models/stock_change.dart';
-import '../../providers/http_client.dart';
-import '../../services/app_launcher.dart';
+import '../common/product_action_menu.dart';
+import '../common/product_image.dart';
 import '../common/rating_widget.dart';
 import '../common/info_chips.dart';
 import '../common/tasted_badge.dart';
-import '../common/untappd_match_sheet.dart';
 import '../lists/add_to_list_button.dart';
 
 class StockChangeItem extends StatefulWidget {
@@ -99,28 +95,9 @@ class _StockChangeItemState extends State<StockChangeItem> {
                       children: [
                         Stack(
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8.r),
-                              child: displayImageUrl != null &&
-                                      displayImageUrl.isNotEmpty
-                                  ? FancyShimmerImage(
-                                      imageUrl: displayImageUrl,
-                                      height: imageSize,
-                                      width: imageSize,
-                                      boxFit: BoxFit.cover,
-                                      errorWidget: Image.asset(
-                                        'assets/images/placeholder.png',
-                                        height: imageSize,
-                                        width: imageSize,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : Image.asset(
-                                      'assets/images/placeholder.png',
-                                      height: imageSize,
-                                      width: imageSize,
-                                      fit: BoxFit.cover,
-                                    ),
+                            ProductImage(
+                              imageUrl: displayImageUrl,
+                              size: imageSize,
                             ),
                             Positioned(
                               bottom: 0,
@@ -247,80 +224,9 @@ class _StockChangeItemState extends State<StockChangeItem> {
                             SizedBox(height: 4.h),
                             AddToListButton(productId: _product.id),
                             SizedBox(height: 4.h),
-                            PopupMenuButton<int>(
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16.r),
-                              ),
-                              child: Container(
-                                padding: EdgeInsets.all(5.r),
-                                decoration: BoxDecoration(
-                                  color: colors.surfaceContainerHighest,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.more_horiz,
-                                  size: 16.r,
-                                  color: colors.onSurfaceVariant,
-                                ),
-                              ),
-                              itemBuilder: (_) => [
-                                PopupMenuItem(
-                                  value: 0,
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.report_outlined),
-                                      SizedBox(width: 12.w),
-                                      Expanded(
-                                        child: Text(
-                                          _product.rating != null
-                                              ? 'Rapporter feil Untappd match'
-                                              : 'Foreslå untappd match',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 1,
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.sports_bar_outlined),
-                                      SizedBox(width: 12.w),
-                                      const Text('Åpne i Untappd'),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 2,
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.open_in_browser),
-                                      SizedBox(width: 12.w),
-                                      const Text('Åpne i Vinmonopolet'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                              onSelected: (value) {
-                                if (value == 0) {
-                                  final client = Provider.of<HttpClient>(
-                                    context,
-                                    listen: false,
-                                  ).apiClient;
-                                  UntappdMatchSheet.show(
-                                    context,
-                                    client,
-                                    _product.id,
-                                  );
-                                } else if (value == 1) {
-                                  AppLauncher.launchUntappd(_product);
-                                } else if (value == 2 &&
-                                    _product.vmpUrl != null) {
-                                  launchUrl(Uri.parse(_product.vmpUrl!));
-                                }
-                              },
+                            ProductActionMenu(
+                              product: _product,
+                              compact: true,
                             ),
                           ],
                         ),

@@ -4,8 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/product.dart';
 import '../../providers/auth.dart';
-import '../../providers/http_client.dart';
-import '../../services/api.dart';
+import '../../utils/tasted_toggle.dart';
 
 class TastedBadge extends StatefulWidget {
   final Product product;
@@ -26,21 +25,10 @@ class _TastedBadgeState extends State<TastedBadge> {
 
   Future<void> _toggle() async {
     if (_loading) return;
-    final auth = Provider.of<Auth>(context, listen: false);
-    if (!auth.isSignedIn) return;
-    final token = await auth.getIdToken();
-    if (token == null) return;
-    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
     setState(() => _loading = true);
     try {
-      if (widget.product.userTasted) {
-        await ApiHelper.unmarkTasted(client, widget.product.id, token);
-      } else {
-        await ApiHelper.markTasted(client, widget.product.id, token);
-      }
-      widget.onToggled(
-        widget.product.copyWith(userTasted: !widget.product.userTasted),
-      );
+      final updated = await toggleTasted(context, widget.product);
+      if (updated != null) widget.onToggled(updated);
     } catch (_) {}
     if (mounted) setState(() => _loading = false);
   }

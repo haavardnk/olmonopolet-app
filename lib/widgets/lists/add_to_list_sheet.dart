@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/user_list.dart';
 import '../../providers/lists.dart';
+import '../common/drag_handle.dart';
 
 class AddToListSheet extends StatelessWidget {
   final int productId;
@@ -42,16 +43,7 @@ class AddToListSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Container(
-                  width: 40.w,
-                  height: 4.h,
-                  decoration: BoxDecoration(
-                    color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
+              const Center(child: DragHandle()),
               SizedBox(height: 12.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4.w),

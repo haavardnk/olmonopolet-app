@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../assets/constants.dart';
 import '../../models/release.dart';
 import '../../providers/filter.dart';
+import '../common/drag_handle.dart';
 
 class ProductOverviewReleaseProductSelection extends StatelessWidget {
   const ProductOverviewReleaseProductSelection({
@@ -85,15 +86,7 @@ class ProductOverviewReleaseProductSelection extends StatelessWidget {
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            margin: EdgeInsets.only(top: 12.h),
-            width: 40.w,
-            height: 4.h,
-            decoration: BoxDecoration(
-              color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(2.r),
-            ),
-          ),
+          const DragHandle(topMargin: true),
           Padding(
             padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 8.h),
             child: Row(

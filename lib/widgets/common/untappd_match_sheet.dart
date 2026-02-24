@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 
 import '../../services/api.dart';
+import 'drag_handle.dart';
 
 class UntappdMatchSheet extends StatefulWidget {
   final http.Client client;
@@ -102,15 +103,7 @@ class _UntappdMatchSheetState extends State<UntappdMatchSheet> {
   }
 
   Widget _buildHandle(ColorScheme colors) {
-    return Container(
-      margin: EdgeInsets.only(top: 12.h),
-      width: 40.w,
-      height: 4.h,
-      decoration: BoxDecoration(
-        color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(2.r),
-      ),
-    );
+    return const DragHandle(topMargin: true);
   }
 
   Widget _buildHeader(ColorScheme colors) {

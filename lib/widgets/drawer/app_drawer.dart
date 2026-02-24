@@ -9,6 +9,7 @@ import '../../providers/auth.dart';
 import '../../services/app_launcher.dart';
 import '../../utils/environment.dart';
 import '../../utils/date_utils.dart';
+import '../common/drag_handle.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -69,14 +70,7 @@ class _AppDrawerState extends State<AppDrawer> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2.r),
-              ),
-            ),
+            const DragHandle(),
             SizedBox(height: 20.h),
             Text(
               'Velg tema',

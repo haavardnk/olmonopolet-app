@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flag/flag.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../models/product.dart';
 import '../../models/user_list.dart';
 import '../common/rating_widget.dart';
+import '../common/product_image.dart';
 import '../common/info_chips.dart';
 
 class ListItemRow extends StatelessWidget {
@@ -416,28 +416,7 @@ class ListItemRow extends StatelessWidget {
 
   Widget _buildImage(double size) {
     final imageUrl = product?.imageUrl;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8.r),
-      child: imageUrl != null
-          ? FancyShimmerImage(
-              imageUrl: imageUrl,
-              height: size,
-              width: size,
-              boxFit: BoxFit.cover,
-              errorWidget: Image.asset(
-                'assets/images/placeholder.png',
-                height: size,
-                width: size,
-                fit: BoxFit.cover,
-              ),
-            )
-          : Image.asset(
-              'assets/images/placeholder.png',
-              height: size,
-              width: size,
-              fit: BoxFit.cover,
-            ),
-    );
+    return ProductImage(imageUrl: imageUrl, size: size);
   }
 
   Widget _buildQuantityControl(ColorScheme colors) {

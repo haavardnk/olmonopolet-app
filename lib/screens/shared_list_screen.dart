@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 
 import '../models/product.dart';
 import '../models/user_list.dart';
-import '../providers/auth.dart';
 import '../providers/http_client.dart';
-import '../services/api.dart';
 import '../services/list_api.dart';
+import '../utils/list_helpers.dart';
+import '../widgets/common/error_state.dart';
 import '../widgets/lists/cellar_stats.dart';
 import '../widgets/lists/list_item_row.dart';
 import '../widgets/lists/shopping_total_bar.dart';
@@ -58,21 +58,9 @@ class _SharedListScreenState extends State<SharedListScreen> {
   Future<void> _loadProducts() async {
     if (_list == null || _list!.items.isEmpty) return;
 
-    final productIds = _list!.items.map((i) => i.productId).toSet().toList();
-    final idsStr = productIds.join(',');
-
     try {
-      final client =
-          Provider.of<HttpClient>(context, listen: false).apiClient;
-      final auth = Provider.of<Auth>(context, listen: false);
-      final token = auth.isSignedIn ? await auth.getIdToken() : null;
-      final products =
-          await ApiHelper.getProductsByIds(client, idsStr, token: token);
-      if (products != null && mounted) {
-        final map = <String, Product>{};
-        for (final p in products) {
-          map[p.id.toString()] = p;
-        }
+      final map = await loadProductsForItems(context, _list!.items);
+      if (map != null && mounted) {
         setState(() => _products = map);
       }
     } catch (_) {}
@@ -80,15 +68,11 @@ class _SharedListScreenState extends State<SharedListScreen> {
 
   double _calculateTotal() {
     if (_list == null) return 0;
-    if (_list!.totalPrice != null) return _list!.totalPrice!;
-    double total = 0;
-    for (final item in _list!.items) {
-      final product = _products[item.productId];
-      if (product != null) {
-        total += product.price * item.quantity;
-      }
-    }
-    return total;
+    return calculateListTotal(
+      items: _list!.items,
+      products: _products,
+      precomputedTotal: _list!.totalPrice,
+    );
   }
 
   int _totalUnits() {
@@ -112,18 +96,9 @@ class _SharedListScreenState extends State<SharedListScreen> {
     if (_error != null || _list == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Delt liste')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(_error ?? 'Listen ble ikke funnet'),
-              SizedBox(height: 12.h),
-              FilledButton(
-                onPressed: _loadSharedList,
-                child: const Text('Prøv igjen'),
-              ),
-            ],
-          ),
+        body: ErrorState(
+          message: _error ?? 'Listen ble ikke funnet',
+          onRetry: _loadSharedList,
         ),
       );
     }

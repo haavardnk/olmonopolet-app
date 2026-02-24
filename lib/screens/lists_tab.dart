@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart' as p;
 
@@ -13,6 +12,7 @@ import '../providers/lists.dart';
 import '../widgets/drawer/app_drawer.dart';
 import '../widgets/lists/list_card.dart';
 import '../widgets/lists/list_form_dialog.dart';
+import '../widgets/lists/list_actions.dart';
 
 class ListsTab extends StatefulWidget {
   const ListsTab({super.key});
@@ -92,49 +92,19 @@ class _ListsTabState extends State<ListsTab> {
   }
 
   Future<void> _editList(UserList list) async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => ListFormDialog(existingList: list),
-    );
-    if (result == null || !mounted) return;
-
+    if (!mounted) return;
     final listsProvider = Provider.of<ListsProvider>(context, listen: false);
-    await listsProvider.updateList(
-      list.id,
-      name: result['name'] as String,
-      description: result['description'] as String?,
-      listType: result['listType'] as ListType,
-      eventDate: result['eventDate'] as DateTime?,
-    );
+    await ListActions.edit(context, list, listsProvider);
   }
 
   Future<void> _deleteList(UserList list) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Slett liste'),
-        content: Text('Er du sikker på at du vil slette "${list.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Avbryt'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Slett'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
+    if (!mounted) return;
     final listsProvider = Provider.of<ListsProvider>(context, listen: false);
-    await listsProvider.deleteList(list.id);
+    await ListActions.delete(context, list, listsProvider);
   }
 
   void _shareList(UserList list) {
-    final url = 'https://olmonopolet.app/lists/shared/${list.shareToken}';
-    Share.shareUri(Uri.parse(url));
+    ListActions.share(list);
   }
 
   @override

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'drag_handle.dart';
+
 import '../../assets/changelog_data.dart';
 import '../../models/changelog.dart';
 
@@ -43,14 +45,7 @@ class _ChangelogSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2.r),
-              ),
-            ),
+            const DragHandle(),
             SizedBox(height: 20.h),
             Icon(
               Icons.auto_awesome,

@@ -3,7 +3,6 @@ import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flag/flag.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,8 +15,10 @@ import '../services/app_launcher.dart';
 import '../models/product.dart';
 import '../widgets/common/rating_widget.dart';
 import '../widgets/common/stock_popup.dart';
-import '../widgets/common/untappd_match_sheet.dart';
+import '../widgets/common/product_action_menu.dart';
+import '../widgets/common/error_state.dart';
 import '../widgets/lists/add_to_list_sheet.dart';
+import '../utils/tasted_toggle.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
@@ -104,27 +105,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _toggleTasted(Product product) async {
-    final auth = Provider.of<Auth>(context, listen: false);
-    if (!auth.isSignedIn) return;
-    final token = await auth.getIdToken();
-    if (token == null) return;
-    final client = Provider.of<HttpClient>(context, listen: false).apiClient;
     setState(() => _tastedLoading = true);
     try {
-      if (product.userTasted) {
-        await ApiHelper.unmarkTasted(client, product.id, token);
-      } else {
-        await ApiHelper.markTasted(client, product.id, token);
+      final updated = await toggleTasted(context, product);
+      if (updated != null) {
+        setState(() {
+          _loadedProduct = updated;
+          _initialProduct = _initialProduct?.copyWith(userTasted: updated.userTasted);
+        });
       }
-      final updated = product.copyWith(userTasted: !product.userTasted);
-      setState(() {
-        _loadedProduct = updated;
-        _initialProduct = _initialProduct?.copyWith(userTasted: updated.userTasted);
-        _tastedLoading = false;
-      });
-    } catch (_) {
-      setState(() => _tastedLoading = false);
-    }
+    } catch (_) {}
+    if (mounted) setState(() => _tastedLoading = false);
   }
 
   @override
@@ -159,20 +150,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
           title: const Text('Detaljer'),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 48.r),
-              SizedBox(height: 16.h),
-              Text(_error ?? 'Produkt ikke funnet'),
-              SizedBox(height: 16.h),
-              ElevatedButton(
-                onPressed: _loadProductById,
-                child: const Text('Prøv igjen'),
-              ),
-            ],
-          ),
+        body: ErrorState(
+          message: _error ?? 'Produkt ikke funnet',
+          onRetry: _loadProductById,
         ),
       );
     }
@@ -305,58 +285,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             },
           ),
         ],
-        PopupMenuButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          itemBuilder: (_) => [
-            PopupMenuItem(
-              value: 0,
-              child: Row(
-                children: [
-                  const Icon(Icons.report_outlined),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Text(
-                      product.rating != null
-                          ? 'Rapporter feil Untappd match'
-                          : 'Foreslå untappd match',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 1,
-              child: Row(
-                children: [
-                  const Icon(Icons.sports_bar_outlined),
-                  SizedBox(width: 12.w),
-                  const Text('Åpne i Untappd'),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 2,
-              child: Row(
-                children: [
-                  const Icon(Icons.open_in_browser),
-                  SizedBox(width: 12.w),
-                  const Text('Åpne i Vinmonopolet'),
-                ],
-              ),
-            ),
-          ],
-          onSelected: (value) {
-            if (value == 0) {
-              UntappdMatchSheet.show(context, client, product.id);
-            } else if (value == 1) {
-              AppLauncher.launchUntappd(product);
-            } else if (value == 2 && product.vmpUrl != null) {
-              launchUrl(Uri.parse(product.vmpUrl!));
-            }
-          },
-        ),
+        ProductActionMenu(product: currentProduct),
       ],
     );
   }
@@ -843,16 +772,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildError() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 48.r),
-          SizedBox(height: 16.h),
-          const Text('Kunne ikke laste detaljer'),
-        ],
-      ),
-    );
+    return const ErrorState(message: 'Kunne ikke laste detaljer');
   }
 
   String _cleanText(String text) => text.replaceAll('.', '').trim();

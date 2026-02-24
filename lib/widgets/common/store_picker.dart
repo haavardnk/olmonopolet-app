@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../models/store.dart';
+import 'drag_handle.dart';
 
 final _clearSentinel = Store(id: '', name: '');
 
@@ -73,15 +74,7 @@ class _StorePickerContentState extends State<_StorePickerContent> {
 
     return Column(
       children: [
-        Container(
-          margin: EdgeInsets.only(top: 12.h),
-          width: 40.w,
-          height: 4.h,
-          decoration: BoxDecoration(
-            color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
+        const DragHandle(topMargin: true),
         Padding(
           padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
           child: Text(

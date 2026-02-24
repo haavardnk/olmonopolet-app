@@ -7,6 +7,7 @@ import '../../models/product.dart';
 import '../../providers/filter.dart';
 import '../../providers/http_client.dart';
 import '../../services/api.dart';
+import 'drag_handle.dart';
 
 List<StockInfo> sortStockListByStores(
     List<StockInfo> stockList, List storeList) {
@@ -52,18 +53,7 @@ void showStockPopup({
             ),
             child: Column(
               children: [
-                Container(
-                  margin: EdgeInsets.only(top: 12.h),
-                  width: 40.w,
-                  height: 4.h,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant
-                        .withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
-                ),
+                const DragHandle(topMargin: true),
                 Padding(
                   padding: EdgeInsets.all(16.r),
                   child: Row(
