@@ -91,6 +91,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
               PriceRangeFilter(parentSetState: setState),
               AlcoholRangeFilter(parentSetState: setState),
               const Divider(height: 16),
+              MainCategoryFilter(parentSetState: setState),
               StyleFilter(parentSetState: setState),
               CountryFilter(parentSetState: setState),
               ReleaseFilter(parentSetState: setState),

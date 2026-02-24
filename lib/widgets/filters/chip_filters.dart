@@ -185,6 +185,33 @@ class ChristmasBeerFilter extends StatelessWidget {
   }
 }
 
+class MainCategoryFilter extends StatelessWidget {
+  final StateSetter parentSetState;
+
+  const MainCategoryFilter({super.key, required this.parentSetState});
+
+  @override
+  Widget build(BuildContext context) {
+    final filters = Provider.of<Filter>(context, listen: false);
+
+    return Consumer<Filter>(
+      builder: (context, flt, _) => ChipFilter(
+        title: 'Kategori',
+        icon: Icons.local_drink_outlined,
+        options: mainCategoryList.map((e) => e.keys.first).toList(),
+        selectedList: filters.mainCategorySelectedList,
+        onChanged: filters.setMainCategory,
+        parentSetState: parentSetState,
+        onToggleAll: () => parentSetState(() {
+          filters.mainCategorySelectedList =
+              List<bool>.filled(mainCategoryList.length, false);
+          filters.setFilters();
+        }),
+      ),
+    );
+  }
+}
+
 class DeliveryFilter extends StatelessWidget {
   final StateSetter parentSetState;
 

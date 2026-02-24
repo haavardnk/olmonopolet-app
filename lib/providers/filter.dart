@@ -30,6 +30,7 @@ class Filter with ChangeNotifier {
   int styleChoice = 0;
   bool christmasBeerOnly = false;
   String userTasted = '';
+  String mainCategory = '';
 
   RangeValues priceRange = const RangeValues(0, 500);
   RangeValues pricePerVolumeRange = const RangeValues(0, 1000);
@@ -66,6 +67,7 @@ class Filter with ChangeNotifier {
   List<bool> productSelectionSelectedList = List<bool>.filled(5, false);
   List<bool> excludeAllergensSelectedList = List<bool>.filled(4, false);
   List<bool> deliverySelectedList = List<bool>.filled(2, false);
+  List<bool> mainCategorySelectedList = List<bool>.filled(3, false);
   List<bool> releaseSelectedList = [];
 
   late http.Client _client;
@@ -80,6 +82,7 @@ class Filter with ChangeNotifier {
     {'name': 'price', 'text': 'Pris', 'save': false},
     {'name': 'pricePerVolume', 'text': 'Pris per liter', 'save': false},
     {'name': 'alcohol', 'text': 'Alkohol', 'save': false},
+    {'name': 'mainCategory', 'text': 'Kategori', 'save': false},
     {'name': 'style', 'text': 'Stil', 'save': false},
     {'name': 'styleChoice', 'text': 'Stil utvalg', 'save': true},
     {'name': 'country', 'text': 'Land', 'save': false},
@@ -311,6 +314,24 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
+  void setMainCategory(int index, bool boolean) {
+    mainCategorySelectedList[index] = boolean;
+    var temp = '';
+    mainCategorySelectedList.asMap().forEach(
+      (index, value) {
+        if (value) {
+          if (temp.isNotEmpty) {
+            temp += ',';
+          }
+          temp += mainCategoryList[index].values.first;
+        }
+      },
+    );
+    mainCategory = temp;
+    notifyListeners();
+    saveFilters();
+  }
+
   void setRelease(int index, bool boolean) {
     releaseSelectedList[index] = boolean;
     var temporaryRelease = '';
@@ -509,6 +530,7 @@ class Filter with ChangeNotifier {
     productSelectionSelectedList = List<bool>.filled(5, false);
     excludeAllergensSelectedList = List<bool>.filled(4, false);
     deliverySelectedList = List<bool>.filled(2, false);
+    mainCategorySelectedList = List<bool>.filled(3, false);
     releaseSelectedList = List<bool>.filled(releaseList.length, false);
     priceRange = const RangeValues(0, 500);
     pricePerVolumeRange = const RangeValues(0, 1000);
@@ -531,6 +553,7 @@ class Filter with ChangeNotifier {
     release = '';
     christmasBeerOnly = false;
     userTasted = '';
+    mainCategory = '';
     notifyListeners();
     saveFilters();
   }
@@ -619,6 +642,14 @@ class Filter with ChangeNotifier {
                 .map((e) => e == true ? 'true' : 'false')
                 .toList());
       }
+      if (filter['name'] == 'mainCategory' && filter['save'] == true) {
+        prefs.setString('mainCategory', mainCategory);
+        prefs.setStringList(
+            'mainCategorySelectedList',
+            mainCategorySelectedList
+                .map((e) => e == true ? 'true' : 'false')
+                .toList());
+      }
       if (filter['name'] == 'userTasted' && filter['save'] == true) {
         prefs.setString('userTasted', userTasted);
       }
@@ -703,6 +734,13 @@ class Filter with ChangeNotifier {
         deliverySelectedList = tempList != null
             ? tempList.map((e) => e == "true").toList()
             : List<bool>.filled(2, false);
+      }
+      if (filter['name'] == 'mainCategory' && filter['save'] == true) {
+        mainCategory = prefs.getString('mainCategory') ?? '';
+        var tempList = prefs.getStringList('mainCategorySelectedList');
+        mainCategorySelectedList = tempList != null
+            ? tempList.map((e) => e == "true").toList()
+            : List<bool>.filled(3, false);
       }
       if (filter['name'] == 'userTasted' && filter['save'] == true) {
         userTasted = prefs.getString('userTasted') ?? '';

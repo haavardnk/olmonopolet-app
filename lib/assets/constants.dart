@@ -94,3 +94,9 @@ const List<String> styleChoiceList = [
 ];
 
 const List<String> deliveryList = ['Levering til butikk', 'Levering på posten'];
+
+const List<Map<String, String>> mainCategoryList = [
+  {'Øl': 'øl'},
+  {'Mjød': 'mjød'},
+  {'Sider': 'sider'},
+];

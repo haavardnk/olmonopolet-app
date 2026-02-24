@@ -4,7 +4,7 @@ import '../models/changelog.dart';
 
 const List<ChangelogVersion> changelogVersions = [
   ChangelogVersion(
-    version: '2.3.0',
+    version: '3.0.0',
     title: 'Hva er nytt?',
     entries: [
       ChangelogEntry(
@@ -19,6 +19,18 @@ const List<ChangelogVersion> changelogVersions = [
         description:
             'Trykk på haken på produktkortet eller i produktdetaljer for å markere en øl som smakt. '
             'Filtrer på smakt/ikke smakt i filterpanelet.',
+      ),
+      ChangelogEntry(
+        icon: Icons.list_alt,
+        title: 'Egendefinerte lister',
+        description:
+            'Opprett flere lister med ulike typer: standard, handleliste, kjeller og arrangement. '
+            'Listene synkroniseres med kontoen din og kan deles via lenke.',
+      ),
+      ChangelogEntry(
+        icon: Icons.local_drink_outlined,
+        title: 'Kategorifilter',
+        description: 'Filtrer produkter etter kategori: Øl, Mjød eller Sider.',
       ),
     ],
   ),

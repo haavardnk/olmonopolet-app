@@ -398,6 +398,7 @@ class ApiHelper {
       'search': filter.search,
       'release': filter.release,
       'exclude_allergen': filter.excludeAllergens,
+      'main_category': filter.mainCategory,
       'page': page.toString(),
       'page_size': pageSize.toString(),
     };
