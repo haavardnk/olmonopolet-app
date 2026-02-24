@@ -41,7 +41,8 @@ Widget buildInfoChip(String text, BuildContext context,
 }
 
 Widget buildInfoChipWithFlag(
-    String country, String? countryCode, BuildContext context) {
+    String country, String? countryCode, BuildContext context,
+    {bool showName = true}) {
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
     decoration: BoxDecoration(
@@ -60,16 +61,17 @@ Widget buildInfoChipWithFlag(
               width: 10.r * 4 / 3,
             ),
           ),
-          SizedBox(width: 4.w),
+          if (showName) SizedBox(width: 4.w),
         ],
-        Text(
-          country,
-          style: TextStyle(
-            fontSize: 10.sp,
-            fontWeight: FontWeight.w500,
-            color: Theme.of(context).colorScheme.onSurface,
+        if (showName)
+          Text(
+            country,
+            style: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
-        ),
       ],
     ),
   );

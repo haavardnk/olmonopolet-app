@@ -5,7 +5,9 @@ import '../screens/home_screen.dart';
 import '../screens/product_overview_tab.dart';
 import '../screens/release_tab.dart';
 import '../screens/stock_change_tab.dart';
-import '../screens/cart_tab.dart';
+import '../screens/lists_tab.dart';
+import '../screens/list_detail_screen.dart';
+import '../screens/shared_list_screen.dart';
 import '../screens/product_detail_screen.dart';
 import '../screens/sign_in_screen.dart';
 import '../screens/profile_screen.dart';
@@ -106,20 +108,39 @@ final goRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/cart',
-              builder: (context, state) => const CartTab(),
+              path: '/lists',
+              builder: (context, state) => const ListsTab(),
               routes: [
+                GoRoute(
+                  path: 'shared/:token',
+                  parentNavigatorKey: rootNavigatorKey,
+                  builder: (context, state) {
+                    final token = state.pathParameters['token']!;
+                    return SharedListScreen(shareToken: token);
+                  },
+                ),
                 GoRoute(
                   path: ':id',
                   parentNavigatorKey: rootNavigatorKey,
                   builder: (context, state) {
                     final id = int.parse(state.pathParameters['id']!);
-                    final product = state.extra as Product?;
-                    return ProductDetailScreen(
-                      productId: id,
-                      product: product,
-                    );
+                    return ListDetailScreen(listId: id);
                   },
+                  routes: [
+                    GoRoute(
+                      path: ':productId',
+                      parentNavigatorKey: rootNavigatorKey,
+                      builder: (context, state) {
+                        final productId =
+                            int.parse(state.pathParameters['productId']!);
+                        final product = state.extra as Product?;
+                        return ProductDetailScreen(
+                          productId: productId,
+                          product: product,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../providers/filter.dart';
-import '../providers/cart.dart';
+import '../providers/lists.dart';
 import '../router/app_router.dart';
 import '../widgets/common/changelog_sheet.dart';
 
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else if (route == '/stock') {
           goRouter.go('/stock');
         } else if (route == '/cart') {
-          goRouter.go('/cart');
+          goRouter.go('/lists');
         } else {
           goRouter.go(route);
         }
@@ -73,13 +73,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<Cart>(context, listen: false).fetchAndSetCart();
     final filters = Provider.of<Filter>(context, listen: false);
     if (!filters.storesLoading && filters.storeList.isEmpty) {
       filters.getStores();
     }
     if (!filters.releasesLoading && filters.releaseList.isEmpty) {
       filters.getReleases();
+    }
+    final listsProvider = Provider.of<ListsProvider>(context, listen: false);
+    if (listsProvider.isAuthenticated && !listsProvider.listsLoaded && !listsProvider.loading) {
+      listsProvider.fetchLists();
     }
 
     return Scaffold(
@@ -127,22 +130,10 @@ class _HomeScreenState extends State<HomeScreen> {
               selectedIcon: Icon(Icons.swap_vert, size: 22),
               label: 'Lager',
             ),
-            NavigationDestination(
-              icon: Consumer<Cart>(
-                builder: (_, cart, __) => Badge(
-                  label: Text(cart.itemCount.toString()),
-                  isLabelVisible: cart.itemCount > 0,
-                  child: const Icon(Icons.receipt_long_outlined, size: 22),
-                ),
-              ),
-              selectedIcon: Consumer<Cart>(
-                builder: (_, cart, __) => Badge(
-                  label: Text(cart.itemCount.toString()),
-                  isLabelVisible: cart.itemCount > 0,
-                  child: const Icon(Icons.receipt_long, size: 22),
-                ),
-              ),
-              label: 'Handleliste',
+            const NavigationDestination(
+              icon: Icon(Icons.list_alt_outlined, size: 22),
+              selectedIcon: Icon(Icons.list_alt, size: 22),
+              label: 'Lister',
             ),
           ],
         ),

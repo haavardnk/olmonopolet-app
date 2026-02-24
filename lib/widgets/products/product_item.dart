@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/product.dart';
 import '../../models/release.dart';
-import '../../providers/cart.dart';
+import '../../providers/http_client.dart';
+import '../../services/app_launcher.dart';
+import '../../widgets/lists/add_to_list_button.dart';
 import '../common/rating_widget.dart';
 import '../common/info_chips.dart';
 import '../common/tasted_badge.dart';
+import '../common/untappd_match_sheet.dart';
 import '../../assets/constants.dart';
 
 class ProductItem extends StatefulWidget {
@@ -35,7 +38,6 @@ class _ProductItemState extends State<ProductItem> {
 
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<Cart>(context, listen: false);
     final double imageSize = 85.r;
     final displayImageUrl = _product.labelHdUrl ?? _product.imageUrl;
 
@@ -82,12 +84,10 @@ class _ProductItemState extends State<ProductItem> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8.r),
-                          child: displayImageUrl != null &&
-                                  displayImageUrl.isNotEmpty
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child:
+                          displayImageUrl != null && displayImageUrl.isNotEmpty
                               ? FancyShimmerImage(
                                   imageUrl: displayImageUrl,
                                   height: imageSize,
@@ -106,17 +106,6 @@ class _ProductItemState extends State<ProductItem> {
                                   width: imageSize,
                                   fit: BoxFit.cover,
                                 ),
-                        ),
-                        TastedBadge(
-                          product: _product,
-                          onToggled: (updated) => setState(() => _product = updated),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: _buildCartButton(context, cart),
-                        ),
-                      ],
                     ),
                     SizedBox(width: 12.w),
                     Expanded(
@@ -260,6 +249,99 @@ class _ProductItemState extends State<ProductItem> {
                         ],
                       ),
                     ),
+                    SizedBox(width: 4.w),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TastedBadge(
+                          product: _product,
+                          onToggled: (updated) =>
+                              setState(() => _product = updated),
+                        ),
+                        SizedBox(height: 4.h),
+                        AddToListButton(productId: _product.id),
+                        SizedBox(height: 4.h),
+                        PopupMenuButton<int>(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                          child: Container(
+                            padding: EdgeInsets.all(5.r),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.more_horiz,
+                              size: 16.r,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                          ),
+                          itemBuilder: (_) => [
+                            PopupMenuItem(
+                              value: 0,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.report_outlined),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: Text(
+                                      _product.rating != null
+                                          ? 'Rapporter feil Untappd match'
+                                          : 'Foreslå untappd match',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 1,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.sports_bar_outlined),
+                                  SizedBox(width: 12.w),
+                                  const Text('Åpne i Untappd'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 2,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.open_in_browser),
+                                  SizedBox(width: 12.w),
+                                  const Text('Åpne i Vinmonopolet'),
+                                ],
+                              ),
+                            ),
+                          ],
+                          onSelected: (value) {
+                            if (value == 0) {
+                              final client = Provider.of<HttpClient>(
+                                context,
+                                listen: false,
+                              ).apiClient;
+                              UntappdMatchSheet.show(
+                                context,
+                                client,
+                                _product.id,
+                              );
+                            } else if (value == 1) {
+                              AppLauncher.launchUntappd(_product);
+                            } else if (value == 2 && _product.vmpUrl != null) {
+                              launchUrl(Uri.parse(_product.vmpUrl!));
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ],
@@ -267,74 +349,6 @@ class _ProductItemState extends State<ProductItem> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildCartButton(BuildContext context, Cart cart) {
-    return Consumer<Cart>(
-      builder: (_, cartData, __) {
-        final inCart = cartData.items.keys.contains(_product.id);
-        final quantity = inCart ? cartData.items[_product.id]!.quantity : 0;
-        final hasStock = _product.stock != null && _product.stock! > 0;
-
-        return GestureDetector(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            cart.addItem(_product.id, _product);
-            cart.updateCartItemsData();
-          },
-          onLongPress: () {
-            if (inCart) {
-              HapticFeedback.mediumImpact();
-              cart.removeSingleItem(_product.id);
-              cart.updateCartItemsData();
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8.r),
-                bottomRight: Radius.circular(8.r),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (hasStock)
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.r, 3.r, 5.r, 0),
-                    child: Text(
-                      '${_product.stock}',
-                      style: TextStyle(
-                        fontSize: 9.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                Padding(
-                  padding: EdgeInsets.all(5.r),
-                  child: Badge(
-                    isLabelVisible: inCart,
-                    label: Text(
-                      quantity.toString(),
-                      style: TextStyle(fontSize: 9.sp),
-                    ),
-                    child: Icon(
-                      inCart
-                          ? Icons.shopping_cart
-                          : Icons.add_shopping_cart_outlined,
-                      size: 18.r,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

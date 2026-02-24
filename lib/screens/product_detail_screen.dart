@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -8,16 +7,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flag/flag.dart';
 import 'package:http/http.dart' as http;
 
-import '../providers/cart.dart';
 import '../providers/auth.dart';
 import '../providers/filter.dart';
 import '../providers/http_client.dart';
+import '../providers/lists.dart';
 import '../services/api.dart';
 import '../services/app_launcher.dart';
 import '../models/product.dart';
 import '../widgets/common/rating_widget.dart';
 import '../widgets/common/stock_popup.dart';
 import '../widgets/common/untappd_match_sheet.dart';
+import '../widgets/lists/add_to_list_sheet.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
@@ -129,7 +129,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<Cart>(context, listen: false);
     final client = Provider.of<HttpClient>(context, listen: false);
     final auth = Provider.of<Auth>(context, listen: false);
     final filters = Provider.of<Filter>(context, listen: false);
@@ -187,7 +186,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       },
       child: Scaffold(
         appBar: _buildAppBar(context, client.apiClient, product, auth),
-        floatingActionButton: _buildFab(context, cart, product),
         body: FutureBuilder<Product>(
           future: _detailsFuture,
           builder: (context, snapshot) {
@@ -265,7 +263,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       title: const Text('Detaljer'),
       actions: [
-        if (auth.isSignedIn)
+        if (auth.isSignedIn) ...[
           IconButton(
             onPressed: _tastedLoading ? null : () => _toggleTasted(currentProduct),
             icon: _tastedLoading
@@ -284,6 +282,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
             tooltip: currentProduct.userTasted ? 'Fjern smakt' : 'Marker som smakt',
           ),
+          Consumer<ListsProvider>(
+            builder: (context, listsProvider, _) {
+              final count = listsProvider
+                  .getListsContainingProduct(currentProduct.id)
+                  .length;
+              return IconButton(
+                onPressed: () =>
+                    AddToListSheet.show(context, currentProduct.id),
+                icon: Badge(
+                  isLabelVisible: count > 0,
+                  offset: const Offset(6, -6),
+                  label: Text('$count', style: TextStyle(fontSize: 10.sp)),
+                  child: Icon(
+                    count > 0
+                        ? Icons.playlist_add_check
+                        : Icons.playlist_add,
+                  ),
+                ),
+                tooltip: 'Legg til i liste',
+              );
+            },
+          ),
+        ],
         PopupMenuButton(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
@@ -340,36 +361,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildFab(BuildContext context, Cart cart, Product product) {
-    return Consumer<Cart>(
-      builder: (context, _, __) {
-        final inCart = cart.items.keys.contains(product.id);
-        final quantity = inCart ? cart.items[product.id]!.quantity : 0;
 
-        return GestureDetector(
-          onLongPress: () {
-            if (inCart) {
-              HapticFeedback.mediumImpact();
-              cart.removeSingleItem(product.id);
-              cart.updateCartItemsData();
-            }
-          },
-          child: FloatingActionButton.small(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              cart.addItem(product.id, product);
-              cart.updateCartItemsData();
-            },
-            child: Badge(
-              isLabelVisible: inCart,
-              label: Text('$quantity'),
-              child: const Icon(Icons.add_shopping_cart),
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildHeader(BuildContext context, Product product, Product? details,
       String? displayImageUrl, double imageSize, ColorScheme colors) {

@@ -53,37 +53,29 @@ class _TastedBadgeState extends State<TastedBadge> {
     final colors = Theme.of(context).colorScheme;
     final tasted = widget.product.userTasted;
 
-    return Positioned(
-      top: 0,
-      left: 0,
-      child: GestureDetector(
-        onTap: _toggle,
-        child: Container(
-          padding: EdgeInsets.all(4.r),
-          decoration: BoxDecoration(
-            color: tasted
-                ? colors.primary
-                : colors.surfaceContainerHighest.withValues(alpha: 0.85),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(8.r),
-              bottomRight: Radius.circular(8.r),
-            ),
-          ),
-          child: _loading
-              ? SizedBox(
-                  width: 18.r,
-                  height: 18.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: tasted ? colors.onPrimary : colors.onSurfaceVariant,
-                  ),
-                )
-              : Icon(
-                  tasted ? Icons.check : Icons.check_circle_outline,
-                  size: 18.r,
+    return GestureDetector(
+      onTap: _toggle,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.all(5.r),
+        decoration: BoxDecoration(
+          color: tasted ? colors.primary : colors.surfaceContainerHighest,
+          shape: BoxShape.circle,
+        ),
+        child: _loading
+            ? SizedBox(
+                width: 16.r,
+                height: 16.r,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
                   color: tasted ? colors.onPrimary : colors.onSurfaceVariant,
                 ),
-        ),
+              )
+            : Icon(
+                tasted ? Icons.check : Icons.check_circle_outline,
+                size: 16.r,
+                color: tasted ? colors.onPrimary : colors.onSurfaceVariant,
+              ),
       ),
     );
   }

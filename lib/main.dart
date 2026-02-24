@@ -11,7 +11,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import './providers/filter.dart';
-import './providers/cart.dart';
+import './providers/lists.dart';
 import './providers/http_client.dart';
 import './providers/auth.dart';
 import './assets/color_schemes.g.dart';
@@ -129,10 +129,10 @@ class _MyAppState extends State<MyApp> {
             update: (ctx, client, previousFilter) =>
                 previousFilter!..update(client.apiClient),
           ),
-          ChangeNotifierProxyProvider2<HttpClient, Auth, Cart>(
-            create: (ctx) => Cart(),
-            update: (ctx, client, auth, previousCart) =>
-                previousCart!..update(client.apiClient, auth),
+          ChangeNotifierProxyProvider2<HttpClient, Auth, ListsProvider>(
+            create: (ctx) => ListsProvider(),
+            update: (ctx, client, auth, previousLists) =>
+                previousLists!..update(client.apiClient, auth),
           ),
         ],
         child: ScreenUtilInit(
