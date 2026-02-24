@@ -46,10 +46,17 @@ class StockChangeListViewState extends State<StockChangeList> {
     if (!_listenerAdded) {
       _listenerAdded = true;
       Provider.of<Filter>(context, listen: false).addListener(_onFilterChanged);
+      Provider.of<Auth>(context, listen: false).addListener(_onAuthChanged);
     }
   }
 
   void _onFilterChanged() {
+    if (mounted) {
+      _pagingController.refresh();
+    }
+  }
+
+  void _onAuthChanged() {
     if (mounted) {
       _pagingController.refresh();
     }
@@ -153,6 +160,8 @@ class StockChangeListViewState extends State<StockChangeList> {
     try {
       Provider.of<Filter>(context, listen: false)
           .removeListener(_onFilterChanged);
+      Provider.of<Auth>(context, listen: false)
+          .removeListener(_onAuthChanged);
     } catch (_) {}
     _pagingController.dispose();
     super.dispose();
