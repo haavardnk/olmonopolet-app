@@ -92,6 +92,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     requestNotificationPermission();
+    AppLifecycleListener(
+      onResume: () => FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.cancelAll(),
+    );
   }
 
   @override
