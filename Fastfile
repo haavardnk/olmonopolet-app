@@ -30,8 +30,10 @@ lane :build_flutter_app do |options|
   pubspec_version_number = get_version_from_pubspec()
 
   type = options[:type]
-  build_number = options[:build_number] || get_build_number(options[:store])
-  version_number = options[:version_number] || pubspec_version_number
+  build_number_option = normalize_optional(options[:build_number])
+  version_number_option = normalize_optional(options[:version_number])
+  build_number = build_number_option || get_build_number(options[:store])
+  version_number = version_number_option || pubspec_version_number
   no_codesign = options[:no_codesign] || false
   config_only = options[:config_only] || false
   commit = last_git_commit
@@ -118,4 +120,75 @@ def get_version_from_pubspec
   end
 
   return version_number
+end
+
+def blank_value?(value)
+  return true if value.nil?
+
+  if value.is_a?(String)
+    return value.strip.empty?
+  end
+
+  false
+end
+
+def normalize_optional(value)
+  return nil if blank_value?(value)
+
+  value
+end
+
+def bump_patch_version(version_number)
+  version_parts = version_number.to_s.split('.').map(&:to_i)
+  return nil unless version_parts.length == 3
+
+  major = version_parts[0]
+  minor = version_parts[1]
+  patch = version_parts[2] + 1
+  "#{major}.#{minor}.#{patch}"
+end
+
+def choose_version_number(requested_version_number, pubspec_version_number, latest_store_version)
+  normalized_requested_version_number = normalize_optional(requested_version_number)
+  return normalized_requested_version_number if normalized_requested_version_number
+
+  selected_version_number = pubspec_version_number
+  normalized_latest_store_version = normalize_optional(latest_store_version)
+  return selected_version_number unless normalized_latest_store_version
+
+  begin
+    pubspec_version = Gem::Version.new(pubspec_version_number)
+    latest_store = Gem::Version.new(normalized_latest_store_version)
+    return selected_version_number if pubspec_version > latest_store
+
+    bumped_version_number = bump_patch_version(normalized_latest_store_version)
+    return selected_version_number unless bumped_version_number
+
+    bumped_version_number
+  rescue ArgumentError
+    selected_version_number
+  end
+end
+
+def semantic_version_from_ref(value)
+  normalized_value = normalize_optional(value)
+  return nil unless normalized_value
+
+  match = normalized_value.match(%r{(?:refs/tags/)?v?(\d+\.\d+\.\d+)$})
+  return nil unless match
+
+  match[1]
+end
+
+def get_version_from_ci_tag
+  from_ref_name = semantic_version_from_ref(ENV["GITHUB_REF_NAME"])
+  return from_ref_name if from_ref_name
+
+  from_ref = semantic_version_from_ref(ENV["GITHUB_REF"])
+  return from_ref if from_ref
+
+  from_ci_commit_tag = semantic_version_from_ref(ENV["CI_COMMIT_TAG"])
+  return from_ci_commit_tag if from_ci_commit_tag
+
+  nil
 end

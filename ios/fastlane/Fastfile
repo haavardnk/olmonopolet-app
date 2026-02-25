@@ -18,13 +18,16 @@ platform :ios do
   # Build iOS app
   lane :build_ipa do |options|
     authenticate_apple_store
+
+    normalized_build_number = normalize_optional(options[:build_number])
+    normalized_version_number = normalize_optional(options[:version_number])
     
     build_flutter_app(
       type: "ipa",
       no_codesign: options[:no_codesign] || false,
       config_only: options[:config_only] || false,
-      build_number: options[:build_number] || get_build_number('appstore'),
-      version_number: options[:version_number] || get_version_from_pubspec(),
+      build_number: normalized_build_number || get_build_number('appstore'),
+      version_number: normalized_version_number || get_version_from_pubspec(),
       store: "appstore"
     )
   end
@@ -43,11 +46,33 @@ platform :ios do
 
     authenticate_apple_store
 
-    build_number = options.fetch(:build_number, get_build_number('appstore'))
-    version_number = options.fetch(:version_number, get_version_from_pubspec())
+    requested_build_number = normalize_optional(options[:build_number])
+    build_number = requested_build_number || get_build_number('appstore')
+
+    latest_store_version = nil
+    if defined?(SharedValues::LATEST_VERSION)
+      latest_store_version = Actions.lane_context[SharedValues::LATEST_VERSION]
+    end
+
+    pubspec_version_number = get_version_from_pubspec()
+    ci_tag_version_number = get_version_from_ci_tag()
+    requested_version_number = normalize_optional(options[:version_number]) || ci_tag_version_number
+    version_number = choose_version_number(
+      requested_version_number,
+      pubspec_version_number,
+      latest_store_version
+    )
+
+    if normalize_optional(options[:version_number]).nil? && !ci_tag_version_number.nil?
+      UI.message("No explicit version_number provided. Using tag version #{ci_tag_version_number}.")
+    end
+
+    if requested_version_number.nil? && !normalize_optional(latest_store_version).nil? && version_number != pubspec_version_number
+      UI.message("No explicit version_number provided. Using #{version_number} (pubspec: #{pubspec_version_number}, App Store latest: #{latest_store_version}).")
+    end
 
     # Verify version number is correct
-    if !is_ci && (!options[:version_number])
+    if !is_ci && requested_version_number.nil?
       continue = UI.confirm("Deploying version #{version_number} (from pubspec.yaml) to App Store. Continue?")
 
       unless continue
