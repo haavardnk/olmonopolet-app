@@ -74,10 +74,7 @@ class _AppDrawerState extends State<AppDrawer> {
             SizedBox(height: 20.h),
             Text(
               'Velg tema',
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 16.h),
             _buildThemeOption(
@@ -140,9 +137,7 @@ class _AppDrawerState extends State<AppDrawer> {
         ),
       ),
       trailing: isSelected ? Icon(Icons.check, color: colors.primary) : null,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       onTap: onTap,
     );
   }
@@ -191,10 +186,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       ),
                       if (isHolidaySeason()) ...[
                         SizedBox(width: 8.w),
-                        Text(
-                          '🎄',
-                          style: TextStyle(fontSize: 20.sp),
-                        ),
+                        Text('🎄', style: TextStyle(fontSize: 20.sp)),
                       ],
                     ],
                   ),
@@ -295,8 +287,9 @@ class _AppDrawerState extends State<AppDrawer> {
       trailing: CircleAvatar(
         radius: 14.r,
         backgroundColor: colors.primaryContainer,
-        backgroundImage:
-            auth.photoUrl != null ? NetworkImage(auth.photoUrl!) : null,
+        backgroundImage: auth.photoUrl != null
+            ? NetworkImage(auth.photoUrl!)
+            : null,
         child: auth.photoUrl == null
             ? Text(
                 auth.displayName.isNotEmpty
@@ -342,11 +335,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   color: colors.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(
-                  icon,
-                  size: 20.r,
-                  color: colors.onSurfaceVariant,
-                ),
+                child: Icon(icon, size: 20.r, color: colors.onSurfaceVariant),
               ),
               SizedBox(width: 14.w),
               Expanded(

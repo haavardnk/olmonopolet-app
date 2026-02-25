@@ -2,8 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/auth.dart';
+import '../utils/environment.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -67,6 +69,24 @@ class ProfileScreen extends StatelessWidget {
               ),
 
               SizedBox(height: 32.h),
+              _buildSectionHeader('Importer', colors),
+              SizedBox(height: 8.h),
+              _buildActionTile(
+                icon: Icons.upload_file_outlined,
+                label: 'Importer Untappd-innsjekkinger',
+                colors: colors,
+                onTap: () async {
+                  final auth = context.read<Auth>();
+                  String? token;
+                  try {
+                    token = await auth.getIdToken(forceRefresh: true);
+                  } catch (_) {}
+                  final base = '${Environment.appBaseUrl}/import-tasted/';
+                  final url = token != null ? '$base?token=$token' : base;
+                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                },
+              ),
+              SizedBox(height: 32.h),
               _buildSectionHeader('Konto', colors),
               SizedBox(height: 8.h),
 
@@ -74,7 +94,7 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.logout,
                 label: 'Logg ut',
                 colors: colors,
-                onTap: () => _handleSignOut(context),
+                onTap: () async => _handleSignOut(context),
               ),
               SizedBox(height: 8.h),
               _buildActionTile(
@@ -82,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                 label: 'Slett konto',
                 colors: colors,
                 destructive: true,
-                onTap: () => _handleDeleteAccount(context),
+                onTap: () async => _handleDeleteAccount(context),
               ),
             ],
           ),
@@ -180,7 +200,7 @@ class ProfileScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required ColorScheme colors,
-    required VoidCallback onTap,
+    required Future<void> Function() onTap,
     bool destructive = false,
   }) {
     final color = destructive ? colors.error : colors.onSurface;
