@@ -21,7 +21,7 @@ class ListActions {
     await listsProvider.updateList(
       list.id,
       name: result['name'] as String,
-      description: result['description'] as String?,
+      description: result['description'] as String,
       listType: result['listType'] as ListType,
       eventDate: result['eventDate'] as DateTime?,
     );

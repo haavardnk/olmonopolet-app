@@ -226,9 +226,7 @@ class _ListFormDialogState extends State<ListFormDialog> {
 
     Navigator.of(context).pop({
       'name': _nameController.text.trim(),
-      'description': _descriptionController.text.trim().isEmpty
-          ? null
-          : _descriptionController.text.trim(),
+      'description': _descriptionController.text.trim(),
       'listType': _selectedType,
       'eventDate': _eventDate,
     });
