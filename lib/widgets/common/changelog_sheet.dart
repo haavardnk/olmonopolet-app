@@ -40,51 +40,63 @@ class _ChangelogSheet extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 24.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const DragHandle(),
-            SizedBox(height: 20.h),
-            Icon(
-              Icons.auto_awesome,
-              size: 32.r,
-              color: colors.primary,
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              version.title,
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.75,
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 24.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const DragHandle(),
+              SizedBox(height: 20.h),
+              Icon(
+                Icons.auto_awesome,
+                size: 32.r,
+                color: colors.primary,
               ),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              'Versjon ${version.version}',
-              style: TextStyle(
-                fontSize: 13.sp,
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-            SizedBox(height: 20.h),
-            ...version.entries.map((entry) => _buildEntry(entry, colors)),
-            SizedBox(height: 16.h),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () => Navigator.pop(context),
-                style: FilledButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
+              SizedBox(height: 12.h),
+              Text(
+                version.title,
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
                 ),
-                child: const Text('Flott!'),
               ),
-            ),
-          ],
+              SizedBox(height: 4.h),
+              Text(
+                'Versjon ${version.version}',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: version.entries
+                      .map((entry) => _buildEntry(entry, colors))
+                      .toList(),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: FilledButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: const Text('Flott!'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

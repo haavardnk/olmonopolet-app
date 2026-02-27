@@ -69,11 +69,11 @@ class ProfileScreen extends StatelessWidget {
               ),
 
               SizedBox(height: 32.h),
-              _buildSectionHeader('Importer', colors),
+              _buildSectionHeader('Untappd', colors),
               SizedBox(height: 8.h),
               _buildActionTile(
                 icon: Icons.upload_file_outlined,
-                label: 'Importer Untappd-innsjekkinger',
+                label: 'Importer innsjekkinger',
                 colors: colors,
                 onTap: () async {
                   final auth = context.read<Auth>();
@@ -81,7 +81,23 @@ class ProfileScreen extends StatelessWidget {
                   try {
                     token = await auth.getIdToken(forceRefresh: true);
                   } catch (_) {}
-                  final base = '${Environment.appBaseUrl}/import-tasted/';
+                  final base = '${Environment.appBaseUrl}/profile/import-tasted/';
+                  final url = token != null ? '$base?token=$token' : base;
+                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                },
+              ),
+              SizedBox(height: 8.h),
+              _buildActionTile(
+                icon: Icons.rss_feed,
+                label: 'RSS-synkronisering',
+                colors: colors,
+                onTap: () async {
+                  final auth = context.read<Auth>();
+                  String? token;
+                  try {
+                    token = await auth.getIdToken(forceRefresh: true);
+                  } catch (_) {}
+                  final base = '${Environment.appBaseUrl}/profile/rss';
                   final url = token != null ? '$base?token=$token' : base;
                   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                 },

@@ -4,7 +4,7 @@ import '../models/changelog.dart';
 
 const List<ChangelogVersion> changelogVersions = [
   ChangelogVersion(
-    version: '3.0.0',
+    version: '3.0.1',
     title: 'Hva er nytt?',
     entries: [
       ChangelogEntry(
@@ -20,6 +20,19 @@ const List<ChangelogVersion> changelogVersions = [
         description:
             'Trykk på haken på produktkortet eller i produktdetaljer for å markere en øl som smakt. '
             'Filtrer på smakt/ikke smakt i filterpanelet.',
+      ),
+      ChangelogEntry(
+        icon: Icons.upload_file_outlined,
+        title: 'Importer Untappd-data',
+        description:
+            'Importer Untappd CSV- eller JSON-eksport under Untappd-seksjonen i profilen din.',
+      ),
+      ChangelogEntry(
+        icon: Icons.rss_feed,
+        title: 'Untappd RSS-synkronisering',
+        description:
+            'Koble Untappd-kontoen din via RSS for å synkronisere de siste innsjekkingene dine. '
+            'Sett det opp under Untappd-seksjonen i profilen din.',
       ),
       ChangelogEntry(
         icon: Icons.list_alt,
