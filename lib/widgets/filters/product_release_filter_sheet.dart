@@ -112,6 +112,7 @@ class _ReleaseFilterSheetContentState
               _ReleasePriceRangeFilter(parentSetState: setState),
               _ReleaseAlcoholRangeFilter(parentSetState: setState),
               const Divider(height: 16),
+              _ReleaseMainCategoryFilter(parentSetState: setState),
               _ReleaseStyleFilter(
                 parentSetState: setState,
                 release: widget.release,
@@ -750,6 +751,71 @@ class _ReleaseCountryFilter extends StatelessWidget {
           onChanged: (sel) => parentSetState(() {
             filters.releaseSelectedCountries = sel.map((c) => c.name).toList();
             filters.setReleaseCountry();
+          }),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReleaseMainCategoryFilter extends StatelessWidget {
+  final StateSetter parentSetState;
+
+  const _ReleaseMainCategoryFilter({required this.parentSetState});
+
+  @override
+  Widget build(BuildContext context) {
+    final filters = Provider.of<Filter>(context, listen: false);
+    final colors = Theme.of(context).colorScheme;
+
+    return Consumer<Filter>(
+      builder: (context, flt, _) => FilterSection(
+        title: 'Kategori',
+        icon: Icons.local_drink_outlined,
+        resetLabel: filters.releaseMainCategorySelectedList.contains(true)
+            ? 'Nullstill'
+            : null,
+        onReset: filters.releaseMainCategorySelectedList.contains(true)
+            ? () => parentSetState(() {
+                  filters.releaseMainCategorySelectedList =
+                      List<bool>.filled(mainCategoryList.length, false);
+                  filters.releaseMainCategory = '';
+                  filters.setFilters();
+                })
+            : null,
+        child: Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: List.generate(mainCategoryList.length, (i) {
+            final isSelected = flt.releaseMainCategorySelectedList[i];
+            return GestureDetector(
+              onTap: () => parentSetState(
+                  () => filters.setReleaseMainCategory(i, !isSelected)),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? colors.primaryContainer
+                      : colors.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(16),
+                  border: isSelected
+                      ? Border.all(color: colors.primary, width: 1)
+                      : null,
+                ),
+                child: Text(
+                  mainCategoryList[i].keys.first,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                        isSelected ? FontWeight.w500 : FontWeight.normal,
+                    color: isSelected
+                        ? colors.onPrimaryContainer
+                        : colors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            );
           }),
         ),
       ),

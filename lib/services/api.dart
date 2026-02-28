@@ -463,6 +463,9 @@ class ApiHelper {
     if (filter.releaseCountry.isNotEmpty) {
       params['country'] = filter.releaseCountry;
     }
+    if (filter.releaseMainCategory.isNotEmpty) {
+      params['main_category'] = filter.releaseMainCategory;
+    }
     if (filter.releaseExcludeAllergens.isNotEmpty) {
       params['exclude_allergen'] = filter.releaseExcludeAllergens;
     }
