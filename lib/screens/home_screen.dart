@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:app_badge_plus/app_badge_plus.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../providers/filter.dart';
 import '../providers/lists.dart';
@@ -33,6 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _setupInteractedMessage() async {
     void handleMessage(RemoteMessage message) {
+      FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.cancelAll();
+      AppBadgePlus.updateBadge(0);
+
       final route = message.data['route'];
       final productId = message.data['product_id'];
       final releaseId = message.data['release_id'];

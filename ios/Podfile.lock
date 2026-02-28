@@ -1,4 +1,6 @@
 PODS:
+  - app_badge_plus (1.2.7):
+    - Flutter
   - AppAuth (1.7.6):
     - AppAuth/Core (= 1.7.6)
     - AppAuth/ExternalUserAgent (= 1.7.6)
@@ -196,6 +198,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - app_badge_plus (from `.symlinks/plugins/app_badge_plus/ios`)
   - cupertino_http (from `.symlinks/plugins/cupertino_http/darwin`)
   - external_app_launcher (from `.symlinks/plugins/external_app_launcher/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
@@ -240,6 +243,8 @@ SPEC REPOS:
     - RecaptchaInterop
 
 EXTERNAL SOURCES:
+  app_badge_plus:
+    :path: ".symlinks/plugins/app_badge_plus/ios"
   cupertino_http:
     :path: ".symlinks/plugins/cupertino_http/darwin"
   external_app_launcher:
@@ -276,6 +281,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
+  app_badge_plus: f2c3391ddd4a207254871e3d6fe41d879fea1d1a
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   cupertino_http: 94ac07f5ff090b8effa6c5e2c47871d48ab7c86c
