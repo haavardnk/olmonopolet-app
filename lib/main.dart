@@ -7,6 +7,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -92,12 +93,20 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     requestNotificationPermission();
+    _clearBadge();
     AppLifecycleListener(
-      onResume: () => FlutterLocalNotificationsPlugin()
-          .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.cancelAll(),
+      onResume: () {
+        FlutterLocalNotificationsPlugin()
+            .resolvePlatformSpecificImplementation<
+                IOSFlutterLocalNotificationsPlugin>()
+            ?.cancelAll();
+        _clearBadge();
+      },
     );
+  }
+
+  void _clearBadge() {
+    AppBadgePlus.updateBadge(0);
   }
 
   @override
