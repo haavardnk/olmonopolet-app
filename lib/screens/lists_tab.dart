@@ -76,10 +76,7 @@ class _ListsTabState extends State<ListsTab> {
   }
 
   Future<void> _createList() async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => const ListFormDialog(),
-    );
+    final result = await showListFormSheet(context);
     if (result == null || !mounted) return;
 
     final listsProvider = Provider.of<ListsProvider>(context, listen: false);

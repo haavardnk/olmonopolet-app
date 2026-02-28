@@ -12,10 +12,7 @@ class ListActions {
     UserList list,
     ListsProvider listsProvider,
   ) async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => ListFormDialog(existingList: list),
-    );
+    final result = await showListFormSheet(context, existingList: list);
     if (result == null) return false;
 
     await listsProvider.updateList(

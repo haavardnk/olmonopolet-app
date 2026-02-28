@@ -2,17 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../models/user_list.dart';
+import '../common/drag_handle.dart';
 
-class ListFormDialog extends StatefulWidget {
-  final UserList? existingList;
-
-  const ListFormDialog({super.key, this.existingList});
-
-  @override
-  State<ListFormDialog> createState() => _ListFormDialogState();
+Future<Map<String, dynamic>?> showListFormSheet(
+  BuildContext context, {
+  UserList? existingList,
+}) {
+  return showModalBottomSheet<Map<String, dynamic>>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+    ),
+    builder: (_) => _ListFormSheet(existingList: existingList),
+  );
 }
 
-class _ListFormDialogState extends State<ListFormDialog> {
+class _ListFormSheet extends StatefulWidget {
+  final UserList? existingList;
+
+  const _ListFormSheet({this.existingList});
+
+  @override
+  State<_ListFormSheet> createState() => _ListFormSheetState();
+}
+
+class _ListFormSheetState extends State<_ListFormSheet> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
@@ -37,136 +53,231 @@ class _ListFormDialogState extends State<ListFormDialog> {
     super.dispose();
   }
 
+  bool get _isEditing => widget.existingList != null;
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final isEditing = widget.existingList != null;
 
-    return Dialog(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 400.w),
-        child: Padding(
-          padding: EdgeInsets.all(24.r),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  isEditing ? 'Rediger liste' : 'Ny liste',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Navn',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Navn er påkrevd';
-                    }
-                    return null;
-                  },
-                  autofocus: true,
-                ),
-                SizedBox(height: 12.h),
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: InputDecoration(
-                    labelText: 'Beskrivelse (valgfritt)',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                  maxLines: 2,
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  'Type',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                _buildTypeGrid(colors),
-                if (_selectedType == ListType.event) ...[
-                  SizedBox(height: 12.h),
-                  _buildDatePicker(context, colors),
-                ],
-                SizedBox(height: 24.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Avbryt'),
-                    ),
-                    SizedBox(width: 8.w),
-                    FilledButton(
-                      onPressed: _submit,
-                      child: Text(isEditing ? 'Lagre' : 'Opprett'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const DragHandle(topMargin: true),
+            _buildHeader(colors),
+            _buildForm(colors),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTypeGrid(ColorScheme colors) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 8.h,
-      crossAxisSpacing: 8.w,
-      childAspectRatio: 2.5,
+  Widget _buildHeader(ColorScheme colors) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 0),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.r),
+            decoration: BoxDecoration(
+              color: colors.primaryContainer,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(
+              _isEditing ? Icons.edit_outlined : Icons.playlist_add,
+              color: colors.onPrimaryContainer,
+              size: 24.r,
+            ),
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isEditing ? 'Rediger liste' : 'Ny liste',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  _isEditing
+                      ? 'Endre navn, type eller beskrivelse'
+                      : 'Opprett en ny liste',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildForm(ColorScheme colors) {
+    return Padding(
+      padding: EdgeInsets.all(20.r),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              controller: _nameController,
+              autofocus: true,
+              style: TextStyle(fontSize: 14.sp),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: colors.surfaceContainerHighest,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide.none,
+                ),
+                hintText: 'Navn på listen',
+                hintStyle: TextStyle(
+                  color: colors.onSurfaceVariant,
+                  fontSize: 14.sp,
+                ),
+                prefixIcon: Icon(
+                  Icons.label_outline,
+                  color: colors.onSurfaceVariant,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Navn er påkrevd';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 12.h),
+            TextFormField(
+              controller: _descriptionController,
+              style: TextStyle(fontSize: 14.sp),
+              maxLines: 2,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: colors.surfaceContainerHighest,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide.none,
+                ),
+                hintText: 'Beskrivelse (valgfritt)',
+                hintStyle: TextStyle(
+                  color: colors.onSurfaceVariant,
+                  fontSize: 14.sp,
+                ),
+                prefixIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 20.h),
+                  child: Icon(
+                    Icons.notes_outlined,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'Type',
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w500,
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            _buildTypeRow(colors),
+            if (_selectedType == ListType.event) ...[
+              SizedBox(height: 12.h),
+              _buildDatePicker(colors),
+            ],
+            SizedBox(height: 20.h),
+            SizedBox(
+              width: double.infinity,
+              height: 48.h,
+              child: FilledButton(
+                onPressed: _submit,
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                child: Text(
+                  _isEditing ? 'Lagre endringer' : 'Opprett liste',
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 8.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeRow(ColorScheme colors) {
+    return Row(
       children: ListType.values.map((type) {
         final isSelected = _selectedType == type;
-        return _buildTypeOption(type, isSelected, colors);
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 3.w),
+            child: _buildTypeChip(type, isSelected, colors),
+          ),
+        );
       }).toList(),
     );
   }
 
-  Widget _buildTypeOption(ListType type, bool isSelected, ColorScheme colors) {
+  Widget _buildTypeChip(ListType type, bool isSelected, ColorScheme colors) {
     return GestureDetector(
       onTap: () => setState(() => _selectedType = type),
       child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10.h),
         decoration: BoxDecoration(
-          color: isSelected ? colors.primaryContainer : colors.surfaceContainer,
+          color: isSelected
+              ? colors.primaryContainer
+              : colors.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(10.r),
           border: isSelected
               ? Border.all(color: colors.primary, width: 2)
-              : Border.all(color: colors.outlineVariant),
+              : null,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               type.icon,
-              size: 18.r,
+              size: 20.r,
               color: isSelected
                   ? colors.onPrimaryContainer
                   : colors.onSurfaceVariant,
             ),
-            SizedBox(width: 6.w),
+            SizedBox(height: 4.h),
             Text(
               type.label,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 11.sp,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: isSelected
                     ? colors.onPrimaryContainer
@@ -179,7 +290,7 @@ class _ListFormDialogState extends State<ListFormDialog> {
     );
   }
 
-  Widget _buildDatePicker(BuildContext context, ColorScheme colors) {
+  Widget _buildDatePicker(ColorScheme colors) {
     return InkWell(
       onTap: () async {
         final picked = await showDatePicker(
@@ -196,7 +307,7 @@ class _ListFormDialogState extends State<ListFormDialog> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
         decoration: BoxDecoration(
-          border: Border.all(color: colors.outline),
+          color: colors.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
