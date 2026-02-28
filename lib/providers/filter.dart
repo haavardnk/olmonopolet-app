@@ -50,6 +50,8 @@ class Filter with ChangeNotifier {
   bool releaseChristmasBeerOnly = false;
   RangeValues releasePriceRange = const RangeValues(0, 500);
   RangeValues releaseAlcoholRange = const RangeValues(0, 15);
+  String releaseMainCategory = '';
+  List<bool> releaseMainCategorySelectedList = List<bool>.filled(3, false);
   List<String> releaseSelectedStyles = [];
   List<String> releaseSelectedCountries = [];
   List<bool> releaseExcludeAllergensSelectedList = List<bool>.filled(4, false);
@@ -477,6 +479,23 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
+  void setReleaseMainCategory(int index, bool boolean) {
+    releaseMainCategorySelectedList[index] = boolean;
+    var temp = '';
+    releaseMainCategorySelectedList.asMap().forEach(
+      (index, value) {
+        if (value) {
+          if (temp.isNotEmpty) {
+            temp += ',';
+          }
+          temp += mainCategoryList[index].values.first;
+        }
+      },
+    );
+    releaseMainCategory = temp;
+    notifyListeners();
+  }
+
   void setReleaseExcludeAllergensSelection(int index, bool boolean) {
     releaseExcludeAllergensSelectedList[index] = boolean;
     var temporarySelection = '';
@@ -519,6 +538,8 @@ class Filter with ChangeNotifier {
     releaseSelectedStyles = [];
     releaseSelectedCountries = [];
     releaseExcludeAllergensSelectedList = List<bool>.filled(4, false);
+    releaseMainCategory = '';
+    releaseMainCategorySelectedList = List<bool>.filled(3, false);
     releaseProductSelectionChoice = '';
     releaseSortIndex = 'Global rating - Høy til lav';
     releaseSortBy = '-rating';
