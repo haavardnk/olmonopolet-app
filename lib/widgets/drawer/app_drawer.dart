@@ -347,7 +347,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
                 ),
               ),
-              if (trailing != null) trailing,
+              ?trailing,
               if (trailing == null)
                 Icon(
                   Icons.chevron_right,

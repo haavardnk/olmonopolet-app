@@ -24,9 +24,11 @@ class _StockChangeTabState extends State<StockChangeTab> {
         title: Consumer<Filter>(
           builder: (context, filter, _) => FittedBox(
             fit: BoxFit.contain,
-            child: Text(filters.stockChangeStoreId.isNotEmpty
-                ? filter.stockChangeSelectedStore
-                : 'Lagerendringer'),
+            child: Text(
+              filters.stockChangeStoreId.isNotEmpty
+                  ? filter.stockChangeSelectedStore
+                  : 'Lagerendringer',
+            ),
           ),
         ),
         actions: [
@@ -34,16 +36,13 @@ class _StockChangeTabState extends State<StockChangeTab> {
             onPressed: () {
               showStockChangeStoreDialog(context, filters);
             },
-            icon: const Icon(
-              Icons.store,
-              semanticLabel: "Velg butikk",
-            ),
+            icon: const Icon(Icons.store, semanticLabel: "Velg butikk"),
           ),
         ],
       ),
       drawer: const AppDrawer(),
       body: Consumer<Filter>(
-        builder: (context, _, __) {
+        builder: (context, _, _) {
           return filters.stockChangeStoreId.isNotEmpty
               ? const StockChangeList()
               : Center(

@@ -148,7 +148,10 @@ class _ReleaseFilterSheetContentState
   }
 
   Widget _buildHeader(
-      BuildContext context, Filter filters, ColorScheme colors) {
+    BuildContext context,
+    Filter filters,
+    ColorScheme colors,
+  ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       child: Row(
@@ -158,8 +161,9 @@ class _ReleaseFilterSheetContentState
             onPressed: () => _showSortSettingsInfo(context),
             icon: const Icon(Icons.info_outline, size: 20),
             label: const Text('Lanseringsfiltre'),
-            style:
-                TextButton.styleFrom(foregroundColor: colors.onSurfaceVariant),
+            style: TextButton.styleFrom(
+              foregroundColor: colors.onSurfaceVariant,
+            ),
           ),
           Row(
             children: [
@@ -300,10 +304,7 @@ class _ReleaseChristmasBeerFilter extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 6.h),
         child: Row(
           children: [
-            Text(
-              '🎄',
-              style: TextStyle(fontSize: 16.sp),
-            ),
+            Text('🎄', style: TextStyle(fontSize: 16.sp)),
             SizedBox(width: 6.w),
             Expanded(
               child: Text(
@@ -390,8 +391,10 @@ class _ReleaseAlcoholRangeFilterState
   @override
   void initState() {
     super.initState();
-    _alcoholRange =
-        Provider.of<Filter>(context, listen: false).releaseAlcoholRange;
+    _alcoholRange = Provider.of<Filter>(
+      context,
+      listen: false,
+    ).releaseAlcoholRange;
   }
 
   @override
@@ -435,13 +438,14 @@ class _ReleaseStyleFilter extends StatelessWidget {
       builder: (context, flt, _) => FilterSection(
         title: 'Stil',
         icon: Icons.local_bar_outlined,
-        resetLabel:
-            filters.releaseSelectedStyles.isNotEmpty ? 'Nullstill' : null,
+        resetLabel: filters.releaseSelectedStyles.isNotEmpty
+            ? 'Nullstill'
+            : null,
         onReset: filters.releaseSelectedStyles.isNotEmpty
             ? () => parentSetState(() {
-                  filters.releaseSelectedStyles = [];
-                  filters.setReleaseStyle();
-                })
+                filters.releaseSelectedStyles = [];
+                filters.setReleaseStyle();
+              })
             : null,
         child: InkWell(
           onTap: () => _showStyleDialog(context, filters),
@@ -459,8 +463,8 @@ class _ReleaseStyleFilter extends StatelessWidget {
                     filters.releaseSelectedStyles.isEmpty
                         ? 'Alle stiler'
                         : filters.releaseSelectedStyles.length == 1
-                            ? filters.releaseSelectedStyles.first
-                            : '${filters.releaseSelectedStyles.length} stiler valgt',
+                        ? filters.releaseSelectedStyles.first
+                        : '${filters.releaseSelectedStyles.length} stiler valgt',
                     style: TextStyle(
                       fontSize: 13,
                       color: filters.releaseSelectedStyles.isNotEmpty
@@ -469,8 +473,11 @@ class _ReleaseStyleFilter extends StatelessWidget {
                     ),
                   ),
                 ),
-                Icon(Icons.expand_more,
-                    size: 20, color: colors.onSurfaceVariant),
+                Icon(
+                  Icons.expand_more,
+                  size: 20,
+                  color: colors.onSurfaceVariant,
+                ),
               ],
             ),
           ),
@@ -533,8 +540,10 @@ class _ReleaseStyleDialogContentState
 
   Future<void> _loadStyles() async {
     try {
-      final styles =
-          await ApiHelper.getReleaseStyles(widget.client, widget.release.name);
+      final styles = await ApiHelper.getReleaseStyles(
+        widget.client,
+        widget.release.name,
+      );
       if (mounted) {
         setState(() {
           _styles = styles;
@@ -572,9 +581,12 @@ class _ReleaseStyleDialogContentState
                   hintText: 'Søk etter stil...',
                   prefixIcon: const Icon(Icons.search, size: 20),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
                 onChanged: (v) =>
                     setState(() => _searchQuery = v.toLowerCase()),
@@ -593,15 +605,20 @@ class _ReleaseStyleDialogContentState
   Widget _buildList(List<String> styles, ColorScheme colors) {
     if (_isLoading) {
       return const Center(
-          child: Padding(
-              padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
     if (styles.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
-          child: Text('Ingen stiler funnet',
-              style: TextStyle(color: colors.onSurfaceVariant)),
+          child: Text(
+            'Ingen stiler funnet',
+            style: TextStyle(color: colors.onSurfaceVariant),
+          ),
         ),
       );
     }
@@ -665,8 +682,9 @@ class _ReleaseStyleDialogContentState
             ),
           const Spacer(),
           FilledButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Ferdig')),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Ferdig'),
+          ),
         ],
       ),
     );
@@ -693,13 +711,14 @@ class _ReleaseCountryFilter extends StatelessWidget {
       builder: (context, flt, _) => FilterSection(
         title: 'Land',
         icon: Icons.public,
-        resetLabel:
-            filters.releaseSelectedCountries.isNotEmpty ? 'Nullstill' : null,
+        resetLabel: filters.releaseSelectedCountries.isNotEmpty
+            ? 'Nullstill'
+            : null,
         onReset: filters.releaseSelectedCountries.isNotEmpty
             ? () => parentSetState(() {
-                  filters.releaseSelectedCountries = [];
-                  filters.setReleaseCountry();
-                })
+                filters.releaseSelectedCountries = [];
+                filters.setReleaseCountry();
+              })
             : null,
         child: MultiSelectDropdown<Country>(
           items: const [],
@@ -718,8 +737,8 @@ class _ReleaseCountryFilter extends StatelessWidget {
           selectedLabel: (sel) => sel.isEmpty
               ? 'Alle land'
               : sel.length == 1
-                  ? sel.first.name
-                  : '${sel.length} land valgt',
+              ? sel.first.name
+              : '${sel.length} land valgt',
           selectedDisplayBuilder: (context, sel) {
             if (sel.isEmpty || sel.length > 1) return null;
             final item = sel.first;
@@ -730,8 +749,11 @@ class _ReleaseCountryFilter extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(2),
-                      child:
-                          Flag.fromString(item.isoCode!, height: 14, width: 20),
+                      child: Flag.fromString(
+                        item.isoCode!,
+                        height: 14,
+                        width: 20,
+                      ),
                     ),
                   ),
                 Flexible(
@@ -745,8 +767,7 @@ class _ReleaseCountryFilter extends StatelessWidget {
             );
           },
           asyncItems: () async {
-            return await ApiHelper.getReleaseCountries(
-                this.client, release.name);
+            return await ApiHelper.getReleaseCountries(client, release.name);
           },
           onChanged: (sel) => parentSetState(() {
             filters.releaseSelectedCountries = sel.map((c) => c.name).toList();
@@ -777,11 +798,13 @@ class _ReleaseMainCategoryFilter extends StatelessWidget {
             : null,
         onReset: filters.releaseMainCategorySelectedList.contains(true)
             ? () => parentSetState(() {
-                  filters.releaseMainCategorySelectedList =
-                      List<bool>.filled(mainCategoryList.length, false);
-                  filters.releaseMainCategory = '';
-                  filters.setFilters();
-                })
+                filters.releaseMainCategorySelectedList = List<bool>.filled(
+                  mainCategoryList.length,
+                  false,
+                );
+                filters.releaseMainCategory = '';
+                filters.setFilters();
+              })
             : null,
         child: Wrap(
           spacing: 6,
@@ -790,10 +813,13 @@ class _ReleaseMainCategoryFilter extends StatelessWidget {
             final isSelected = flt.releaseMainCategorySelectedList[i];
             return GestureDetector(
               onTap: () => parentSetState(
-                  () => filters.setReleaseMainCategory(i, !isSelected)),
+                () => filters.setReleaseMainCategory(i, !isSelected),
+              ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? colors.primaryContainer
@@ -807,8 +833,9 @@ class _ReleaseMainCategoryFilter extends StatelessWidget {
                   mainCategoryList[i].keys.first,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight:
-                        isSelected ? FontWeight.w500 : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.w500
+                        : FontWeight.normal,
                     color: isSelected
                         ? colors.onPrimaryContainer
                         : colors.onSurfaceVariant,
@@ -843,11 +870,13 @@ class _ReleaseAllergensFilter extends StatelessWidget {
             : null,
         onReset: filters.releaseExcludeAllergensSelectedList.contains(true)
             ? () => parentSetState(() {
-                  filters.releaseExcludeAllergensSelectedList =
-                      List<bool>.filled(excludeAllergensList.length, false);
-                  filters.releaseExcludeAllergens = '';
-                  filters.setFilters();
-                })
+                filters.releaseExcludeAllergensSelectedList = List<bool>.filled(
+                  excludeAllergensList.length,
+                  false,
+                );
+                filters.releaseExcludeAllergens = '';
+                filters.setFilters();
+              })
             : null,
         child: Wrap(
           spacing: 6,
@@ -855,11 +884,15 @@ class _ReleaseAllergensFilter extends StatelessWidget {
           children: List.generate(excludeAllergensList.length, (i) {
             final isSelected = flt.releaseExcludeAllergensSelectedList[i];
             return GestureDetector(
-              onTap: () => parentSetState(() =>
-                  filters.setReleaseExcludeAllergensSelection(i, !isSelected)),
+              onTap: () => parentSetState(
+                () =>
+                    filters.setReleaseExcludeAllergensSelection(i, !isSelected),
+              ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? colors.primaryContainer
@@ -873,8 +906,9 @@ class _ReleaseAllergensFilter extends StatelessWidget {
                   excludeAllergensList[i].keys.first,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight:
-                        isSelected ? FontWeight.w500 : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.w500
+                        : FontWeight.normal,
                     color: isSelected
                         ? colors.onPrimaryContainer
                         : colors.onSurfaceVariant,

@@ -21,10 +21,7 @@ class _ReleaseSortState extends State<ProductOverviewReleaseSort> {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () => _showSortSheet(context),
-      icon: const Icon(
-        Icons.sort,
-        semanticLabel: "Sortering",
-      ),
+      icon: const Icon(Icons.sort, semanticLabel: "Sortering"),
     );
   }
 
@@ -70,7 +67,7 @@ class _ReleaseSortState extends State<ProductOverviewReleaseSort> {
                   ),
                   const Spacer(),
                   Consumer<Filter>(
-                    builder: (context, _, __) => Row(
+                    builder: (context, _, _) => Row(
                       children: [
                         Text(
                           'Husk valg',
