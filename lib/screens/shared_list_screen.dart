@@ -7,6 +7,7 @@ import '../models/user_list.dart';
 import '../providers/http_client.dart';
 import '../services/list_api.dart';
 import '../utils/list_helpers.dart';
+import '../utils/crash_reporter.dart';
 import '../widgets/common/error_state.dart';
 import '../widgets/lists/cellar_stats.dart';
 import '../widgets/lists/list_item_row.dart';
@@ -46,7 +47,8 @@ class _SharedListScreenState extends State<SharedListScreen> {
       if (!mounted) return;
       setState(() => _list = list);
       await _loadProducts();
-    } catch (_) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) {
         setState(() => _error = 'Kunne ikke laste listen');
       }
@@ -63,7 +65,9 @@ class _SharedListScreenState extends State<SharedListScreen> {
       if (map != null && mounted) {
         setState(() => _products = map);
       }
-    } catch (_) {}
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
+    }
   }
 
   double _calculateTotal() {

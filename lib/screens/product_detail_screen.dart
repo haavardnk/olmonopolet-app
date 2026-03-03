@@ -19,6 +19,7 @@ import '../widgets/common/product_action_menu.dart';
 import '../widgets/common/error_state.dart';
 import '../widgets/lists/add_to_list_sheet.dart';
 import '../utils/tasted_toggle.dart';
+import '../utils/crash_reporter.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
@@ -87,7 +88,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       setState(() {
         _isLoading = false;
       });
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       setState(() {
         _error = 'Kunne ikke laste produkt';
         _isLoading = false;
@@ -114,7 +116,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           _initialProduct = _initialProduct?.copyWith(userTasted: updated.userTasted);
         });
       }
-    } catch (_) {}
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
+    }
     if (mounted) setState(() => _tastedLoading = false);
   }
 
@@ -302,7 +306,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             height: imageSize,
             width: double.infinity,
             child: displayImageUrl != null && displayImageUrl.isNotEmpty
-                ? Image.network(displayImageUrl, fit: BoxFit.contain)
+                ? Image.network(
+                    displayImageUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, e, st) => Image.asset(
+                      'assets/images/placeholder.png',
+                      fit: BoxFit.contain,
+                    ),
+                  )
                 : Image.asset('assets/images/placeholder.png',
                     fit: BoxFit.contain),
           ),

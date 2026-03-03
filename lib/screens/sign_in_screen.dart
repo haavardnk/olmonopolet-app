@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
+import '../utils/crash_reporter.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -54,7 +55,8 @@ class _SignInScreenState extends State<SignInScreen> {
       if (mounted) Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _mapAuthError(e.code));
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       setState(() => _errorMessage = _mapAuthError(
           e is FirebaseException ? e.code : 'unknown'));
     } finally {
@@ -71,7 +73,8 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       await context.read<Auth>().signInWithGoogle();
       if (mounted) Navigator.of(context).pop();
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) {
         setState(() => _errorMessage = _mapAuthError(
             e is FirebaseAuthException ? e.code : 'unknown'));
@@ -90,7 +93,8 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       await context.read<Auth>().signInWithApple();
       if (mounted) Navigator.of(context).pop();
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) {
         setState(() => _errorMessage = _mapAuthError(
             e is FirebaseAuthException ? e.code : 'unknown'));
@@ -119,7 +123,8 @@ class _SignInScreenState extends State<SignInScreen> {
       }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _mapAuthError(e.code));
-    } catch (_) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       setState(() => _errorMessage = 'Kunne ikke sende e-post.');
     }
   }

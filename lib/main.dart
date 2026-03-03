@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +23,7 @@ import './router/app_router.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
+  FirebaseCrashlytics.instance.log('Background message ${message.messageId}');
 }
 
 void main() async {
@@ -29,6 +31,16 @@ void main() async {
   await dotenv.load(fileName: '.env');
 
   await Firebase.initializeApp();
+
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+    !kDebugMode,
+  );
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack);
+    return true;
+  };
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -43,7 +55,8 @@ void main() async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin
+      >()
       ?.createNotificationChannel(channel);
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -58,9 +71,9 @@ void main() async {
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+  };
 }
 
 class MyApp extends StatefulWidget {
@@ -80,13 +93,11 @@ class _MyAppState extends State<MyApp> {
   );
 
   Future<void> requestNotificationPermission() async {
-    NotificationSettings settings =
-        await FirebaseMessaging.instance.requestPermission(
+    await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
-    print('User granted permission: ${settings.authorizationStatus}');
   }
 
   @override
@@ -98,7 +109,8 @@ class _MyAppState extends State<MyApp> {
       onResume: () {
         FlutterLocalNotificationsPlugin()
             .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin>()
+              IOSFlutterLocalNotificationsPlugin
+            >()
             ?.cancelAll();
         _clearBadge();
       },
@@ -133,12 +145,8 @@ class _MyAppState extends State<MyApp> {
       initial: AdaptiveThemeMode.system,
       builder: (theme, darkTheme) => MultiProvider(
         providers: [
-          ChangeNotifierProvider(
-            create: (ctx) => Auth(),
-          ),
-          ChangeNotifierProvider(
-            create: (ctx) => HttpClient(),
-          ),
+          ChangeNotifierProvider(create: (ctx) => Auth()),
+          ChangeNotifierProvider(create: (ctx) => HttpClient()),
           ChangeNotifierProxyProvider<HttpClient, Filter>(
             create: (ctx) => Filter(),
             update: (ctx, client, previousFilter) =>
@@ -182,15 +190,19 @@ class _MyAppState extends State<MyApp> {
                           child: const Text('OK'),
                           onPressed: () async {
                             await rateMyApp.callEvent(
-                                RateMyAppEventType.rateButtonPressed);
+                              RateMyAppEventType.rateButtonPressed,
+                            );
                             Navigator.pop<RateMyAppDialogButton>(
-                                context, RateMyAppDialogButton.rate);
+                              context,
+                              RateMyAppDialogButton.rate,
+                            );
                           },
                         ),
                       ];
                     },
-                    onDismissed: () => rateMyApp
-                        .callEvent(RateMyAppEventType.laterButtonPressed),
+                    onDismissed: () => rateMyApp.callEvent(
+                      RateMyAppEventType.laterButtonPressed,
+                    ),
                   );
                 }
               },

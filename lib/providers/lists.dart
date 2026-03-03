@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import '../models/user_list.dart';
 import '../services/list_api.dart';
 import '../providers/auth.dart';
+import '../utils/crash_reporter.dart';
 
 class ListsProvider with ChangeNotifier {
   late http.Client _client;
@@ -69,7 +70,8 @@ class ListsProvider with ChangeNotifier {
       _lists.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
       _listsLoaded = true;
       _error = null;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       _error = 'Kunne ikke laste lister';
     }
 
@@ -88,7 +90,8 @@ class ListsProvider with ChangeNotifier {
     try {
       _activeList = await ListApi.fetchList(_client, token, listId);
       _error = null;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       _error = 'Kunne ikke laste listen';
     }
 
@@ -118,7 +121,8 @@ class ListsProvider with ChangeNotifier {
       _lists.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
       notifyListeners();
       return newList;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       _error = 'Kunne ikke opprette listen';
       notifyListeners();
       return null;
@@ -156,7 +160,8 @@ class ListsProvider with ChangeNotifier {
       }
       notifyListeners();
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       _error = 'Kunne ikke oppdatere listen';
       notifyListeners();
       return false;
@@ -175,7 +180,8 @@ class ListsProvider with ChangeNotifier {
       }
       notifyListeners();
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       _error = 'Kunne ikke slette listen';
       notifyListeners();
       return false;
@@ -194,7 +200,8 @@ class ListsProvider with ChangeNotifier {
 
     try {
       await ListApi.reorderLists(_client, token, listIds);
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       _lists = oldLists;
       notifyListeners();
     }
@@ -236,7 +243,8 @@ class ListsProvider with ChangeNotifier {
         notifyListeners();
       }
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (listIndex >= 0) {
         _lists[listIndex] = _lists[listIndex].copyWith(
           productIds: _lists[listIndex].productIds
@@ -282,7 +290,8 @@ class ListsProvider with ChangeNotifier {
     try {
       await ListApi.removeItem(_client, token, listId, itemId);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (removedItem != null && removedIndex != null) {
         if (_activeList?.id == listId && _activeList?.items != null) {
           final restored = [..._activeList!.items!]
@@ -329,7 +338,8 @@ class ListsProvider with ChangeNotifier {
         notifyListeners();
       }
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       return false;
     }
   }
@@ -348,7 +358,8 @@ class ListsProvider with ChangeNotifier {
 
       try {
         await ListApi.reorderItems(_client, token, listId, itemIds);
-      } catch (e) {
+      } catch (e, st) {
+        CrashReporter.recordError(e, st);
         _activeList = _activeList!.copyWith(items: oldItems);
         notifyListeners();
       }
@@ -413,7 +424,8 @@ class ListsProvider with ChangeNotifier {
       final db = await sql.openDatabase(cartDbPath);
       cartItems = await db.query('cart');
       await db.close();
-    } catch (_) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       await prefs.setBool('cartMigrated', true);
       return;
     }
@@ -432,7 +444,8 @@ class ListsProvider with ChangeNotifier {
         name: 'Handleliste',
         listType: ListType.shopping,
       );
-    } catch (_) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       return;
     }
 
@@ -452,7 +465,9 @@ class ListsProvider with ChangeNotifier {
           productId: productId,
           quantity: quantity,
         );
-      } catch (_) {}
+      } catch (e, st) {
+        CrashReporter.recordError(e, st);
+      }
     }
 
     await fetchListDetail(newList.id);

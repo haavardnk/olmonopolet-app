@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 
 import '../../services/api.dart';
+import '../../utils/crash_reporter.dart';
 import 'drag_handle.dart';
 
 class UntappdMatchSheet extends StatefulWidget {
@@ -68,7 +69,8 @@ class _UntappdMatchSheetState extends State<UntappdMatchSheet> {
           ),
         );
       }
-    } catch (error) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(

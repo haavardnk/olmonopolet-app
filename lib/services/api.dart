@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import '../utils/crash_reporter.dart';
 import '../models/product.dart';
 import '../models/store.dart';
 import '../models/release.dart';
@@ -30,8 +31,11 @@ class ApiHelper {
         expectResultsKey: expectResultsKey,
       );
     } on SocketException {
+      CrashReporter.log('NetworkException on $endpoint');
       throw const NetworkException();
-    } on FormatException catch (e) {
+    } on FormatException catch (e, st) {
+      CrashReporter.log('FormatException on $endpoint: ${e.message}');
+      CrashReporter.recordError(e, st, reason: 'FormatException on $endpoint');
       throw ApiException(
         message: 'Ugyldig responsformat: ${e.message}',
         endpoint: endpoint,
@@ -211,6 +215,7 @@ class ApiHelper {
         );
       }
     } on SocketException {
+      CrashReporter.log('NetworkException on $endpoint');
       throw const NetworkException();
     }
   }
@@ -234,6 +239,7 @@ class ApiHelper {
         );
       }
     } on SocketException {
+      CrashReporter.log('NetworkException on $endpoint');
       throw const NetworkException();
     }
   }
@@ -286,6 +292,7 @@ class ApiHelper {
         );
       }
     } on SocketException {
+      CrashReporter.log('NetworkException on $endpoint');
       throw const NetworkException();
     }
   }

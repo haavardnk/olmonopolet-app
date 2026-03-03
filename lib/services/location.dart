@@ -1,12 +1,8 @@
 import 'package:geolocator/geolocator.dart';
 
 import '../models/store.dart';
+import '../utils/crash_reporter.dart';
 
-/// Determine the current position of the device.
-///
-/// When the location services are not enabled or permissions
-/// are denied the `Future` will return an error.
-///
 class LocationHelper {
   static Future<Position> determinePosition() async {
     bool serviceEnabled;
@@ -44,8 +40,8 @@ class LocationHelper {
               1000;
         }
       }
-    } catch (error) {
-      print(error);
+    } catch (error, st) {
+      CrashReporter.recordError(error, st, reason: 'Location error');
     }
     return list;
   }

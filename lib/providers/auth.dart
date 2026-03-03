@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../utils/crash_reporter.dart';
 
 class Auth with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -13,11 +14,17 @@ class Auth with ChangeNotifier {
 
   Auth() {
     _user = _authService.currentUser;
-    _authSubscription = _authService.authStateChanges.listen((user) {
-      _user = user;
-      _initialized = true;
-      notifyListeners();
-    });
+    _authSubscription = _authService.authStateChanges.listen(
+      (user) {
+        _user = user;
+        _initialized = true;
+        CrashReporter.setUserId(user?.uid);
+        notifyListeners();
+      },
+      onError: (Object e, StackTrace st) {
+        CrashReporter.recordError(e, st, reason: 'authStateChanges stream');
+      },
+    );
   }
 
   User? get user => _user;

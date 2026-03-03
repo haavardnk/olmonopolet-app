@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/auth.dart';
+import '../utils/crash_reporter.dart';
 import '../utils/environment.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -80,7 +81,9 @@ class ProfileScreen extends StatelessWidget {
                   String? token;
                   try {
                     token = await auth.getIdToken(forceRefresh: true);
-                  } catch (_) {}
+                  } catch (e, st) {
+                    CrashReporter.recordError(e, st);
+                  }
                   final base = '${Environment.appBaseUrl}/profile/import-tasted/';
                   final url = token != null ? '$base?token=$token' : base;
                   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
@@ -96,7 +99,9 @@ class ProfileScreen extends StatelessWidget {
                   String? token;
                   try {
                     token = await auth.getIdToken(forceRefresh: true);
-                  } catch (_) {}
+                  } catch (e, st) {
+                    CrashReporter.recordError(e, st);
+                  }
                   final base = '${Environment.appBaseUrl}/profile/rss';
                   final url = token != null ? '$base?token=$token' : base;
                   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
@@ -133,6 +138,9 @@ class ProfileScreen extends StatelessWidget {
         radius: 48.r,
         backgroundImage: NetworkImage(auth.photoUrl!),
         backgroundColor: colors.primaryContainer,
+        onBackgroundImageError: (e, st) {
+          CrashReporter.recordError(e, st, reason: 'Profile avatar load');
+        },
       );
     }
 
@@ -294,11 +302,13 @@ class ProfileScreen extends StatelessWidget {
               try {
                 await context.read<Auth>().deleteAccount();
                 if (context.mounted) Navigator.of(context).pop();
-              } on FirebaseAuthException catch (_) {
+              } on FirebaseAuthException catch (e, st) {
+                CrashReporter.recordError(e, st);
                 if (context.mounted) {
                   _showReauthDialog(context);
                 }
-              } catch (_) {
+              } catch (e, st) {
+                CrashReporter.recordError(e, st);
                 if (context.mounted) {
                   _showReauthDialog(context);
                 }
@@ -333,7 +343,9 @@ class ProfileScreen extends StatelessWidget {
                   await auth.reauthenticateWithGoogle();
                   await auth.deleteAccount();
                   if (context.mounted) Navigator.of(context).pop();
-                } catch (_) {}
+                } catch (e, st) {
+                  CrashReporter.recordError(e, st);
+                }
               },
               child: const Text('Google'),
             ),
@@ -345,7 +357,9 @@ class ProfileScreen extends StatelessWidget {
                   await auth.reauthenticateWithApple();
                   await auth.deleteAccount();
                   if (context.mounted) Navigator.of(context).pop();
-                } catch (_) {}
+                } catch (e, st) {
+                  CrashReporter.recordError(e, st);
+                }
               },
               child: const Text('Apple'),
             ),

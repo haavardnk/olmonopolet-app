@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import '../utils/crash_reporter.dart';
 import '../utils/exceptions.dart';
 
 T handleApiResponse<T>({
@@ -22,8 +23,12 @@ T handleApiResponse<T>({
   }
 
   if (customErrors.containsKey(statusCode)) {
-    throw customErrors[statusCode]!;
+    final error = customErrors[statusCode]!;
+    CrashReporter.log('API $statusCode on $endpoint');
+    throw error;
   }
+
+  CrashReporter.log('API $statusCode on $endpoint');
 
   switch (statusCode) {
     case 401:
@@ -62,8 +67,11 @@ Future<T> handleApiRequest<T>({
       customErrors: customErrors,
     );
   } on SocketException {
+    CrashReporter.log('NetworkException on $endpoint');
     throw const NetworkException();
-  } on FormatException catch (e) {
+  } on FormatException catch (e, st) {
+    CrashReporter.log('FormatException on $endpoint: ${e.message}');
+    CrashReporter.recordError(e, st, reason: 'FormatException on $endpoint');
     throw ApiException(
       message: 'Ugyldig responsformat: ${e.message}',
       endpoint: endpoint,

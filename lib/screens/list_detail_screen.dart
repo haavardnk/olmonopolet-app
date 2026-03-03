@@ -12,6 +12,7 @@ import '../providers/http_client.dart';
 import '../utils/store_utils.dart';
 import '../providers/lists.dart';
 import '../services/api.dart';
+import '../utils/crash_reporter.dart';
 import '../widgets/common/error_state.dart';
 import '../widgets/lists/cellar_stats.dart';
 import '../widgets/lists/list_actions.dart';
@@ -79,7 +80,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
           _productsLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) setState(() => _productsLoading = false);
     }
 
@@ -118,7 +120,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         _stockStatus = status;
         _stockChecked = true;
       });
-    } catch (_) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) {
         setState(() => _stockChecked = true);
       }

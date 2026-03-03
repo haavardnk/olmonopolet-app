@@ -10,6 +10,7 @@ import '../../models/release.dart';
 import '../../models/country.dart';
 import '../../assets/constants.dart';
 import '../../services/api.dart';
+import '../../utils/crash_reporter.dart';
 import '../../utils/date_utils.dart';
 import 'filter_section.dart';
 import 'multi_select_dropdown.dart';
@@ -550,7 +551,8 @@ class _ReleaseStyleDialogContentState
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) {
         setState(() => _isLoading = false);
       }

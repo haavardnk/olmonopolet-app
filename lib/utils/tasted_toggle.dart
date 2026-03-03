@@ -6,6 +6,7 @@ import '../providers/auth.dart';
 import '../providers/http_client.dart';
 import '../services/api.dart';
 import '../models/product.dart';
+import '../utils/crash_reporter.dart';
 
 Future<Product?> toggleTasted(BuildContext context, Product product) async {
   final auth = Provider.of<Auth>(context, listen: false);
@@ -14,10 +15,15 @@ Future<Product?> toggleTasted(BuildContext context, Product product) async {
   if (token == null) return null;
   final http.Client client =
       Provider.of<HttpClient>(context, listen: false).apiClient;
-  if (product.userTasted) {
-    await ApiHelper.unmarkTasted(client, product.id, token);
-  } else {
-    await ApiHelper.markTasted(client, product.id, token);
+  try {
+    if (product.userTasted) {
+      await ApiHelper.unmarkTasted(client, product.id, token);
+    } else {
+      await ApiHelper.markTasted(client, product.id, token);
+    }
+    return product.copyWith(userTasted: !product.userTasted);
+  } catch (e, st) {
+    CrashReporter.recordError(e, st, reason: 'toggleTasted failed');
+    rethrow;
   }
-  return product.copyWith(userTasted: !product.userTasted);
 }

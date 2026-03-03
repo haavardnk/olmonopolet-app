@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../providers/filter.dart';
 import '../providers/lists.dart';
 import '../router/app_router.dart';
+import '../utils/crash_reporter.dart';
 import '../widgets/common/changelog_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -69,7 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
       handleMessage(initialMessage);
     }
 
-    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      handleMessage,
+      onError: (Object e, StackTrace st) {
+        CrashReporter.recordError(e, st, reason: 'onMessageOpenedApp stream');
+      },
+    );
   }
 
   void _onTap(int index) {

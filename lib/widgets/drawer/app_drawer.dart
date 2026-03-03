@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/auth.dart';
 import '../../services/app_launcher.dart';
+import '../../utils/crash_reporter.dart';
 import '../../utils/environment.dart';
 import '../../utils/date_utils.dart';
 import '../common/drag_handle.dart';
@@ -289,6 +290,14 @@ class _AppDrawerState extends State<AppDrawer> {
         backgroundColor: colors.primaryContainer,
         backgroundImage: auth.photoUrl != null
             ? NetworkImage(auth.photoUrl!)
+            : null,
+        onBackgroundImageError: auth.photoUrl != null
+            ? (e, st) {
+                CrashReporter.recordError(
+                  e, st,
+                  reason: 'Drawer avatar load',
+                );
+              }
             : null,
         child: auth.photoUrl == null
             ? Text(

@@ -13,6 +13,7 @@ import '../widgets/drawer/app_drawer.dart';
 import '../widgets/lists/list_card.dart';
 import '../widgets/lists/list_form_dialog.dart';
 import '../widgets/lists/list_actions.dart';
+import '../utils/crash_reporter.dart';
 
 class ListsTab extends StatefulWidget {
   const ListsTab({super.key});
@@ -70,7 +71,8 @@ class _ListsTabState extends State<ListsTab> {
       final rows = await db.query('cart');
       await db.close();
       if (mounted) setState(() => _localCartCount = rows.length);
-    } catch (_) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       if (mounted) setState(() => _localCartCount = 0);
     }
   }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
 import '../../assets/constants.dart';
+import '../../utils/crash_reporter.dart';
 import 'filter_section.dart';
 
 class StyleFilter extends StatelessWidget {
@@ -104,6 +105,8 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
     if (_filters.styleChoice == 1 && _filters.untappdStyleList.isEmpty) {
       _filters.getStyles().then((_) {
         if (mounted) setState(() {});
+      }).catchError((Object e, StackTrace st) {
+        CrashReporter.recordError(e, st, reason: 'getStyles failed');
       });
     }
   }

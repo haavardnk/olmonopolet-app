@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/product.dart';
+import '../../utils/crash_reporter.dart';
 import '../../providers/auth.dart';
 import '../../utils/tasted_toggle.dart';
 
@@ -29,7 +30,9 @@ class _TastedBadgeState extends State<TastedBadge> {
     try {
       final updated = await toggleTasted(context, widget.product);
       if (updated != null) widget.onToggled(updated);
-    } catch (_) {}
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
+    }
     if (mounted) setState(() => _loading = false);
   }
 

@@ -8,6 +8,7 @@ import '../models/country.dart';
 import '../services/api.dart';
 import '../services/location.dart';
 import '../assets/constants.dart';
+import '../utils/crash_reporter.dart';
 
 class Filter with ChangeNotifier {
   String search = '';
@@ -113,7 +114,8 @@ class Filter with ChangeNotifier {
       storesLoading = false;
       notifyListeners();
       return storeList;
-    } catch (error) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       storesLoading = false;
       notifyListeners();
       return storeList;
@@ -134,7 +136,8 @@ class Filter with ChangeNotifier {
       releasesLoading = false;
       notifyListeners();
       return releaseNameList;
-    } catch (error) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       releasesLoading = false;
       notifyListeners();
       return releaseNameList;
@@ -153,7 +156,8 @@ class Filter with ChangeNotifier {
       releasesLoading = false;
       notifyListeners();
       return releaseList;
-    } catch (error) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       releasesLoading = false;
       notifyListeners();
       return releaseList;
@@ -172,7 +176,8 @@ class Filter with ChangeNotifier {
       countriesLoading = false;
       notifyListeners();
       return countryList;
-    } catch (error) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       countriesLoading = false;
       notifyListeners();
       return countryList;
@@ -191,7 +196,8 @@ class Filter with ChangeNotifier {
       stylesLoading = false;
       notifyListeners();
       return untappdStyleList;
-    } catch (error) {
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
       stylesLoading = false;
       notifyListeners();
       return untappdStyleList;

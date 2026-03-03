@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/crash_reporter.dart';
+
 const _kBorderRadius = 10.0;
 const _kDialogRadius = 16.0;
 const _kDialogMaxWidth = 400.0;
@@ -142,6 +144,9 @@ class _MultiSelectDialogContentState<T>
   void _loadAsyncItems() {
     widget.asyncItems!().then((items) {
       if (mounted) setState(() { _items = items; _isLoading = false; });
+    }).catchError((Object e, StackTrace st) {
+      CrashReporter.recordError(e, st, reason: 'asyncItems load failed');
+      if (mounted) setState(() => _isLoading = false);
     });
   }
 
