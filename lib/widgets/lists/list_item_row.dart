@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../models/product.dart';
 import '../../models/user_list.dart';
+import '../common/drag_handle.dart';
 import '../common/rating_widget.dart';
 import '../common/product_image.dart';
 import '../common/info_chips.dart';
@@ -183,42 +184,11 @@ class ListItemRow extends StatelessWidget {
                     ],
                   ),
                   if (listType == ListType.cellar) ...[
-                    SizedBox(height: 6.h),
-                    GestureDetector(
-                      onTap: onYearChanged != null
-                          ? () => _showYearDialog(context, colors)
-                          : null,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            size: 14.r,
-                            color: colors.onSurfaceVariant,
-                          ),
-                          SizedBox(width: 4.w),
-                          Expanded(
-                            child: Text(
-                              item.year != null
-                                  ? 'Årgang  ${item.year}'
-                                  : 'Årgang  –',
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color: colors.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          if (onYearChanged != null)
-                            Icon(
-                              Icons.edit_outlined,
-                              size: 14.r,
-                              color: colors.onSurfaceVariant
-                                  .withValues(alpha: 0.5),
-                            ),
-                        ],
-                      ),
-                    ),
+                    SizedBox(height: 8.h),
+                    _buildVintageChip(context, colors),
                   ],
-                  _buildNotesSection(context, colors),
+                  SizedBox(height: 8.h),
+                  _buildNotesChip(context, colors),
                 ],
               ),
             ),
@@ -262,39 +232,50 @@ class ListItemRow extends StatelessWidget {
     );
   }
 
-  Widget _buildNotesSection(BuildContext context, ColorScheme colors) {
-    final hasNotes = item.notes != null && item.notes!.isNotEmpty;
-
+  Widget _buildEditableChip({
+    required BuildContext context,
+    required ColorScheme colors,
+    required IconData icon,
+    required String text,
+    required bool hasValue,
+    required bool editable,
+    required VoidCallback? onTap,
+    int? maxLines,
+  }) {
     return GestureDetector(
-      onTap: onNotesChanged != null
-          ? () => _showNotesDialog(context, colors)
-          : null,
-      child: Padding(
-        padding: EdgeInsets.only(top: 6.h),
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
         child: Row(
           children: [
             Icon(
-              hasNotes ? Icons.description_outlined : Icons.note_add_outlined,
+              icon,
               size: 14.r,
-              color: colors.onSurfaceVariant,
+              color: hasValue ? colors.primary : colors.onSurfaceVariant,
             ),
-            SizedBox(width: 4.w),
+            SizedBox(width: 6.w),
             Expanded(
               child: Text(
-                hasNotes ? item.notes! : 'Notater',
+                text,
                 style: TextStyle(
-                  fontSize: 11.sp,
-                  color: colors.onSurfaceVariant,
+                  fontSize: 12.sp,
+                  color: hasValue
+                      ? colors.onSurface
+                      : colors.onSurfaceVariant,
                 ),
-                maxLines: 2,
+                maxLines: maxLines ?? 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (onNotesChanged != null)
+            if (editable)
               Icon(
-                Icons.edit_outlined,
-                size: 14.r,
-                color: colors.onSurfaceVariant.withValues(alpha: 0.5),
+                Icons.chevron_right,
+                size: 16.r,
+                color: colors.onSurfaceVariant.withValues(alpha: 0.6),
               ),
           ],
         ),
@@ -302,80 +283,201 @@ class ListItemRow extends StatelessWidget {
     );
   }
 
-  void _showYearDialog(BuildContext context, ColorScheme colors) {
-    final controller = TextEditingController(
-      text: item.year?.toString() ?? '',
-    );
-    showDialog(
+  Widget _buildVintageChip(BuildContext context, ColorScheme colors) {
+    final hasYear = item.year != null;
+    return _buildEditableChip(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Årgang'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(4),
-          ],
-          decoration: InputDecoration(
-            hintText: 'F.eks. 2024',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
+      colors: colors,
+      icon: Icons.calendar_today_outlined,
+      text: hasYear ? 'Årgang ${item.year}' : 'Legg til årgang',
+      hasValue: hasYear,
+      editable: onYearChanged != null,
+      onTap: onYearChanged != null
+          ? () => _showYearSheet(context, colors)
+          : null,
+    );
+  }
+
+  Widget _buildNotesChip(BuildContext context, ColorScheme colors) {
+    final hasNotes = item.notes != null && item.notes!.isNotEmpty;
+    return _buildEditableChip(
+      context: context,
+      colors: colors,
+      icon: hasNotes ? Icons.description_outlined : Icons.note_add_outlined,
+      text: hasNotes ? item.notes! : 'Legg til notat',
+      hasValue: hasNotes,
+      editable: onNotesChanged != null,
+      maxLines: 2,
+      onTap: onNotesChanged != null
+          ? () => _showNotesSheet(context, colors)
+          : null,
+    );
+  }
+
+  void _showEditSheet({
+    required BuildContext context,
+    required ColorScheme colors,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String hintText,
+    required TextEditingController controller,
+    required ValueChanged<String> onSave,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: colors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const DragHandle(topMargin: true),
+              Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10.r),
+                      decoration: BoxDecoration(
+                        color: colors.primaryContainer,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: colors.onPrimaryContainer,
+                        size: 24.r,
+                      ),
+                    ),
+                    SizedBox(width: 14.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20.r),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      maxLines: maxLines,
+                      keyboardType: keyboardType,
+                      autofocus: true,
+                      style: TextStyle(fontSize: 14.sp),
+                      inputFormatters: inputFormatters,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: colors.surfaceContainerHighest,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide.none,
+                        ),
+                        hintText: hintText,
+                        hintStyle: TextStyle(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 14.sp,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 14.h,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    SizedBox(
+                      height: 48.h,
+                      child: FilledButton(
+                        onPressed: () {
+                          onSave(controller.text);
+                          Navigator.pop(ctx);
+                        },
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                        child: Text(
+                          'Lagre',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Avbryt'),
-          ),
-          TextButton(
-            onPressed: () {
-              final year = int.tryParse(controller.text);
-              if (year != null) {
-                onYearChanged?.call(year);
-              }
-              Navigator.pop(ctx);
-            },
-            child: const Text('Lagre'),
-          ),
-        ],
       ),
     );
   }
 
-  void _showNotesDialog(BuildContext context, ColorScheme colors) {
-    final controller = TextEditingController(text: item.notes ?? '');
-    showDialog(
+  void _showYearSheet(BuildContext context, ColorScheme colors) {
+    _showEditSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Notater'),
-        content: TextField(
-          controller: controller,
-          maxLines: 4,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: 'Skriv et notat...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Avbryt'),
-          ),
-          TextButton(
-            onPressed: () {
-              onNotesChanged?.call(controller.text);
-              Navigator.pop(ctx);
-            },
-            child: const Text('Lagre'),
-          ),
-        ],
-      ),
+      colors: colors,
+      icon: Icons.calendar_today_outlined,
+      title: 'Årgang',
+      subtitle: 'Angi årgangen på produktet',
+      hintText: 'F.eks. 2024',
+      controller: TextEditingController(text: item.year?.toString() ?? ''),
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(4),
+      ],
+      onSave: (value) {
+        final year = int.tryParse(value);
+        if (year != null) onYearChanged?.call(year);
+      },
+    );
+  }
+
+  void _showNotesSheet(BuildContext context, ColorScheme colors) {
+    _showEditSheet(
+      context: context,
+      colors: colors,
+      icon: Icons.description_outlined,
+      title: 'Notater',
+      subtitle: 'Legg til et notat for dette produktet',
+      hintText: 'Skriv et notat...',
+      controller: TextEditingController(text: item.notes ?? ''),
+      maxLines: 4,
+      onSave: (value) => onNotesChanged?.call(value),
     );
   }
 
