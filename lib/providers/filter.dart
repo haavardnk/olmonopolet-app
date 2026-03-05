@@ -253,10 +253,25 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
+  List<String> get categoryFilteredStyles {
+    final hasCategory = mainCategorySelectedList.contains(true);
+    if (!hasCategory) return untappdStyleList;
+    final showBeer = mainCategorySelectedList[0];
+    final showMead = mainCategorySelectedList[1];
+    final showCider = mainCategorySelectedList[2];
+    return untappdStyleList.where((s) {
+      final lower = s.toLowerCase();
+      if (lower.startsWith('cider')) return showCider;
+      if (lower.startsWith('mead')) return showMead;
+      return showBeer;
+    }).toList();
+  }
+
   void setStyle() {
+    selectedStyles.removeWhere((s) => !categoryFilteredStyles.contains(s));
     if (selectedStyles.isEmpty ||
-        (untappdStyleList.isNotEmpty &&
-            selectedStyles.length == untappdStyleList.length)) {
+        (categoryFilteredStyles.isNotEmpty &&
+            selectedStyles.length == categoryFilteredStyles.length)) {
       style = '';
     } else {
       style = selectedStyles.join(',');
@@ -309,6 +324,7 @@ class Filter with ChangeNotifier {
 
   void setMainCategory(int index, bool boolean) {
     mainCategorySelectedList[index] = boolean;
+    setStyle();
     var temp = '';
     mainCategorySelectedList.asMap().forEach(
       (index, value) {

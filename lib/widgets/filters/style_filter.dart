@@ -107,8 +107,8 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
   }
 
   List<String> get _filteredStyles => _searchQuery.isEmpty
-      ? _filters.untappdStyleList
-      : _filters.untappdStyleList
+      ? _filters.categoryFilteredStyles
+      : _filters.categoryFilteredStyles
           .where((s) => s.toLowerCase().contains(_searchQuery))
           .toList();
 
