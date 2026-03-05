@@ -1,34 +1,3 @@
-const Map<String, String> beermonopolyStyleList = {
-  'Alkoholfritt': 'non-alcoholic',
-  'Annet': 'adambier,altbier,brett,burton,tan,chilli,cream ale,festbier,grape ale,'
-      'happoshu,historical,honey beer,kellerbier,koji,kvass,lichtenhainer,'
-      'malt beer,mild,pumpkin,rauchbier,roggenbier,root beer,rye beer,schwarzbier,'
-      'smoked beer,shandy,scotch ale,scottish,steinbier,spiced / herbed,strong ale,table beer,zoigl'
-      'kombucha,makgeolli,sorghum',
-  'Barleywine': 'barleywine',
-  'Belgisk': 'belgian',
-  'Blonde': 'blonde, golden',
-  'Bokk': 'bock',
-  'Brown Ale': 'brown',
-  'Dark Ale': 'dark ale',
-  'Farmhouse Ale': 'farmhouse ale',
-  'Glutenfri': 'gluten-free',
-  'Hvete': 'wheat beer',
-  'IPA': 'ipa',
-  'Juleøl': 'winter',
-  'Kölsch': 'kölsch',
-  'Lager': 'lager',
-  'Mjød': 'mead',
-  'Old Ale': 'old / stock, traditional ale',
-  'Pale Ale': 'pale ale',
-  'Pilsner': 'pilsner',
-  'Porter': 'porter',
-  'Red Ale': 'red ale -',
-  'Sider': 'cider',
-  'Stout': 'stout',
-  'Surøl': 'sour,wild ale,lambic,fruit beer',
-};
-
 const Map<String, String> sortList = {
   'Alkohol - Høy til lav': '-abv',
   'Alkohol - Lav til høy': 'abv',
@@ -86,11 +55,6 @@ const List<Map<String, String>> excludeAllergensList = [
   {'Laktose': 'laktose, melk'},
   {'Nøtter': 'nøtter, peanøtt, hasselnøtt, valnøtt, nøtt'},
   {'Sulfitt': 'sulfitt'},
-];
-
-const List<String> styleChoiceList = [
-  'Ølmonopolet',
-  'Untappd',
 ];
 
 const List<String> deliveryList = ['Levering til butikk', 'Levering på posten'];

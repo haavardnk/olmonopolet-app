@@ -28,7 +28,6 @@ class Filter with ChangeNotifier {
   String releaseSortBy = '-rating';
   String release = '';
   String releaseProductSelectionChoice = '';
-  int styleChoice = 0;
   bool christmasBeerOnly = false;
   String userTasted = '';
   String mainCategory = '';
@@ -87,7 +86,6 @@ class Filter with ChangeNotifier {
     {'name': 'alcohol', 'text': 'Alkohol', 'save': false},
     {'name': 'mainCategory', 'text': 'Kategori', 'save': false},
     {'name': 'style', 'text': 'Stil', 'save': false},
-    {'name': 'styleChoice', 'text': 'Stil utvalg', 'save': true},
     {'name': 'country', 'text': 'Land', 'save': false},
     {'name': 'productSelection', 'text': 'Produktutvalg', 'save': false},
     {'name': 'excludeAllergens', 'text': 'Allergener', 'save': false},
@@ -255,26 +253,13 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
-  void setStyle([List<String>? currentStyleList]) {
-    if (selectedStyles.isEmpty) {
-      style = '';
-    } else if (styleChoice == 1 &&
-        currentStyleList != null &&
-        selectedStyles.length == currentStyleList.length) {
+  void setStyle() {
+    if (selectedStyles.isEmpty ||
+        (untappdStyleList.isNotEmpty &&
+            selectedStyles.length == untappdStyleList.length)) {
       style = '';
     } else {
-      String temporaryStyles = '';
-      for (var styleName in selectedStyles) {
-        if (temporaryStyles.isNotEmpty) {
-          temporaryStyles += ',';
-        }
-        if (styleChoice == 0) {
-          temporaryStyles += beermonopolyStyleList[styleName]!;
-        } else if (styleChoice == 1) {
-          temporaryStyles += styleName;
-        }
-      }
-      style = temporaryStyles;
+      style = selectedStyles.join(',');
     }
     notifyListeners();
     saveFilters();
@@ -365,14 +350,6 @@ class Filter with ChangeNotifier {
 
   void setUserTasted(String value) {
     userTasted = value;
-    notifyListeners();
-    saveFilters();
-  }
-
-  void setStyleChoice(int index) {
-    styleChoice = index;
-    selectedStyles = [];
-    setStyle();
     notifyListeners();
     saveFilters();
   }
@@ -635,9 +612,6 @@ class Filter with ChangeNotifier {
         prefs.setString('style', style);
         prefs.setStringList('selectedStyles', selectedStyles);
       }
-      if (filter['name'] == 'styleChoice' && filter['save'] == true) {
-        prefs.setInt('styleChoice', styleChoice);
-      }
       if (filter['name'] == 'country' && filter['save'] == true) {
         prefs.setString('country', country);
         prefs.setStringList('selectedCountries', selectedCountries);
@@ -727,9 +701,6 @@ class Filter with ChangeNotifier {
       if (filter['name'] == 'style' && filter['save'] == true) {
         style = prefs.getString('style') ?? '';
         selectedStyles = prefs.getStringList('selectedStyles') ?? [];
-      }
-      if (filter['name'] == 'styleChoice' && filter['save'] == true) {
-        styleChoice = prefs.getInt('styleChoice') ?? 0;
       }
       if (filter['name'] == 'country' && filter['save'] == true) {
         country = prefs.getString('country') ?? '';

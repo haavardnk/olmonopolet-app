@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/filter.dart';
-import '../../assets/constants.dart';
 import '../../utils/crash_reporter.dart';
 import 'filter_section.dart';
 
@@ -92,17 +91,7 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
   @override
   void initState() {
     super.initState();
-    _loadStylesIfNeeded();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _loadStylesIfNeeded() {
-    if (_filters.styleChoice == 1 && _filters.untappdStyleList.isEmpty) {
+    if (_filters.untappdStyleList.isEmpty) {
       _filters.getStyles().then((_) {
         if (mounted) setState(() {});
       }).catchError((Object e, StackTrace st) {
@@ -111,26 +100,19 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
     }
   }
 
-  void _updateStyle() {
-    if (_filters.styleChoice == 0) {
-      _filters.setStyle();
-    } else {
-      _filters.setStyle(_filters.untappdStyleList);
-    }
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
-  List<String> get _allStyles => _filters.styleChoice == 0
-      ? beermonopolyStyleList.keys.toList()
-      : _filters.untappdStyleList;
-
   List<String> get _filteredStyles => _searchQuery.isEmpty
-      ? _allStyles
-      : _allStyles
+      ? _filters.untappdStyleList
+      : _filters.untappdStyleList
           .where((s) => s.toLowerCase().contains(_searchQuery))
           .toList();
 
-  bool get _isLoading =>
-      _filters.styleChoice == 1 && _filters.untappdStyleList.isEmpty;
+  bool get _isLoading => _filters.untappdStyleList.isEmpty && _filters.stylesLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -146,24 +128,18 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
           children: [
             Padding(
               padding: const EdgeInsets.all(12).copyWith(left: 16, right: 16),
-              child: Column(
-                children: [
-                  _buildStyleToggle(colors),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Søk etter stil...',
-                      prefixIcon: const Icon(Icons.search, size: 20),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                    ),
-                    onChanged: (v) =>
-                        setState(() => _searchQuery = v.toLowerCase()),
-                  ),
-                ],
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Søk etter stil...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                ),
+                onChanged: (v) =>
+                    setState(() => _searchQuery = v.toLowerCase()),
               ),
             ),
             Divider(height: 1, color: colors.outlineVariant),
@@ -209,7 +185,7 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
               isSelected
                   ? _filters.selectedStyles.remove(style)
                   : _filters.selectedStyles.add(style);
-              _updateStyle();
+              _filters.setStyle();
             });
             widget.parentSetState(() {});
           },
@@ -232,7 +208,7 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
                       _filters.selectedStyles.add(style);
                     }
                   }
-                  _updateStyle();
+                  _filters.setStyle();
                 });
                 widget.parentSetState(() {});
               },
@@ -243,7 +219,7 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
               onPressed: () {
                 setState(() {
                   _filters.selectedStyles = [];
-                  _updateStyle();
+                  _filters.setStyle();
                 });
                 widget.parentSetState(() {});
               },
@@ -254,69 +230,6 @@ class _StyleDialogContentState extends State<_StyleDialogContent> {
               onPressed: () => Navigator.pop(context),
               child: const Text('Ferdig')),
         ],
-      ),
-    );
-  }
-
-  Widget _buildStyleToggle(ColorScheme colors) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: colors.surfaceContainerHighest,
-      ),
-      padding: const EdgeInsets.all(3),
-      child: Row(
-        children: [
-          Expanded(
-              child: _buildToggleOption(
-                  'Standard', _filters.styleChoice == 0, colors, () {
-            if (_filters.styleChoice != 0) {
-              setState(() {
-                _filters.selectedStyles = [];
-                _filters.setStyleChoice(0);
-              });
-              widget.parentSetState(() {});
-            }
-          })),
-          Expanded(
-              child: _buildToggleOption(
-                  'Untappd', _filters.styleChoice == 1, colors, () {
-            if (_filters.styleChoice != 1) {
-              setState(() {
-                _filters.selectedStyles = [];
-                _filters.setStyleChoice(1);
-              });
-              widget.parentSetState(() {});
-              _loadStylesIfNeeded();
-            }
-          })),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleOption(
-      String label, bool isSelected, ColorScheme colors, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
-          color: isSelected ? colors.primaryContainer : Colors.transparent,
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            color: isSelected
-                ? colors.onPrimaryContainer
-                : colors.onSurfaceVariant,
-          ),
-        ),
       ),
     );
   }
