@@ -40,16 +40,19 @@ class _StockChangeItemState extends State<StockChangeItem> {
     final displayImageUrl = product.labelHdUrl ?? product.imageUrl;
     final colors = Theme.of(context).colorScheme;
 
+    final stockDate = widget.stockChange.stockUnstockAt ??
+        widget.stockChange.stockUpdated;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.lastDate == null ||
-            widget.lastDate!.day != widget.stockChange.stockUnstockAt!.day)
+            widget.lastDate!.day != stockDate.day)
           Padding(
             padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
             child: Text(
-              toBeginningOfSentenceCase(DateFormat.yMMMMEEEEd('nb_NO')
-                  .format(widget.stockChange.stockUnstockAt!)),
+              toBeginningOfSentenceCase(
+                  DateFormat.yMMMMEEEEd('nb_NO').format(stockDate)),
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
             ),
           ),
