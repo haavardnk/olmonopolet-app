@@ -159,6 +159,7 @@ doc/api/
 
 # dotenv environment variables file - only ignore .env, not .env.example
 .env
+.env.test
 !.env.example
 
 # Avoid committing generated Javascript files:
@@ -259,6 +260,8 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+fastlane/fonts/
+fastlane/backgrounds/
 
 # Code Injection
 #
@@ -420,7 +423,6 @@ freeline_project_description.json
 # fastlane
 #fastlane/report.xml
 #fastlane/Preview.html
-fastlane/screenshots
 #fastlane/test_output
 fastlane/readme.md
 
@@ -870,5 +872,5 @@ Temporary Items
 # JEnv             - https://github.com/github/gitignore/blob/main/Global/JEnv.gitignoregoogle_service_account.json
 **/fastlane/report.xml
 **/fastlane/Preview.html
-**/fastlane/screenshots
+**/fastlane/screenshots/**/*.png
 **/fastlane/test_output

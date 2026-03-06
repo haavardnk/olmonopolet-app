@@ -90,4 +90,25 @@ platform :android do
       debug: true
     )
   end
+
+  desc "Frame screenshots and optionally upload to Play Store"
+  lane :screenshots do |options|
+    frame_screenshots(
+      path: "#{root_path}/fastlane/screenshots",
+      use_platform: "ANDROID"
+    )
+
+    if options[:upload]
+      supply(
+        json_key: google_service_account_json_path,
+        skip_upload_apk: true,
+        skip_upload_aab: true,
+        skip_upload_metadata: true,
+        skip_upload_changelogs: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: false,
+        screenshots_path: "#{root_path}/fastlane/screenshots"
+      )
+    end
+  end
 end

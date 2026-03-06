@@ -129,4 +129,23 @@ platform :ios do
   #     )
   #   end
   # end
+
+  desc "Frame screenshots and optionally upload to App Store"
+  lane :screenshots do |options|
+    frame_screenshots(
+      path: "#{root_path}/fastlane/screenshots",
+      use_platform: "IOS"
+    )
+
+    if options[:upload]
+      authenticate_apple_store
+      deliver(
+        skip_metadata: true,
+        skip_binary_upload: true,
+        overwrite_screenshots: true,
+        force: true,
+        screenshots_path: "#{root_path}/fastlane/screenshots"
+      )
+    end
+  end
 end

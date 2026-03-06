@@ -54,8 +54,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
-  # integration_test:
-  # sdk: flutter
+  integration_test:
+    sdk: flutter
   mocktail: ^1.0.1
   flutter_lints: ^6.0.0
 

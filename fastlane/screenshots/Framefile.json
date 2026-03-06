@@ -1,0 +1,64 @@
+{
+  "device_frame_version": "latest",
+  "default": {
+    "background": "../backgrounds/gradient_gold.png",
+    "padding": "5%x8%",
+    "show_complete_frame": true,
+    "stack_title": true,
+    "title_below_image": false,
+    "frame": "JUST_BLACK",
+    "force_device_type": "Google Pixel 5",
+    "title": {
+      "color": "#FFFFFF",
+      "font_size": 92,
+      "font": "../fonts/Roboto-Bold.ttf"
+    },
+    "keyword": {
+      "color": "#FFE4B5",
+      "font_size": 52,
+      "font": "../fonts/Roboto-Bold.ttf"
+    }
+  },
+  "data": [
+    {
+      "filter": "01-Oversikt_android",
+      "keyword": { "text": "Ølmonopolet" },
+      "title": { "text": "Finn de beste ølene" }
+    },
+    {
+      "filter": "02-Filter_android",
+      "keyword": { "text": "Filtrer" },
+      "title": { "text": "Velg stil, land og butikk" }
+    },
+    {
+      "filter": "03-Detaljer_android",
+      "keyword": { "text": "Detaljer" },
+      "title": { "text": "Alt om ditt favorittøl" }
+    },
+    {
+      "filter": "04-Lanseringer_android",
+      "keyword": { "text": "Lanseringer" },
+      "title": { "text": "Aldri gå glipp av et slipp" }
+    },
+    {
+      "filter": "05-Lager_android",
+      "keyword": { "text": "Lagerendringer" },
+      "title": { "text": "Se hva som er nytt i butikken" }
+    },
+    {
+      "filter": "06-Lister_android",
+      "keyword": { "text": "Lister" },
+      "title": { "text": "Organiser favorittene dine" }
+    },
+    {
+      "filter": "07-Listedetaljer_android",
+      "keyword": { "text": "Listedetaljer" },
+      "title": { "text": "Hold oversikt og del med venner" }
+    },
+    {
+      "filter": "08-Logginn_android",
+      "keyword": { "text": "Konto" },
+      "title": { "text": "Logg inn for full tilgang" }
+    }
+  ]
+}
