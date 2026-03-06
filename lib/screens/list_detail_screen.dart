@@ -172,16 +172,18 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   }
 
   double _calculateTotal(UserList list) {
-    if (list.totalPrice != null) return list.totalPrice!;
     final items = list.items ?? [];
-    double total = 0;
-    for (final item in items) {
-      final product = _products[item.productId];
-      if (product != null) {
-        total += product.price * item.quantity;
+    if (_products.isNotEmpty && items.isNotEmpty) {
+      double total = 0;
+      for (final item in items) {
+        final product = _products[item.productId];
+        if (product != null) {
+          total += product.price * item.quantity;
+        }
       }
+      return total;
     }
-    return total;
+    return list.totalPrice ?? 0;
   }
 
   int _inStockCount(UserList list) {
