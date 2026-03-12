@@ -48,8 +48,9 @@ class _ProductItemState extends State<ProductItem> {
         ),
         child: InkWell(
           onTap: () async {
-            final basePath = widget.release != null
-                ? '/release/${widget.release!.name.replaceAll(' ', '-')}'
+            final release = widget.release;
+            final basePath = release != null
+                ? '/release/${release.name.replaceAll(' ', '-')}'
                 : '/products';
             final result = await context.push<Product>(
               '$basePath/${_product.id}',

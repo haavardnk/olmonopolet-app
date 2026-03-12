@@ -1,7 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 
 import '../models/store.dart';
-import '../utils/crash_reporter.dart';
 
 class LocationHelper {
   static Future<Position> determinePosition() async {
@@ -40,9 +39,7 @@ class LocationHelper {
               1000;
         }
       }
-    } catch (error, st) {
-      CrashReporter.recordError(error, st, reason: 'Location error');
-    }
+    } catch (_) {}
     return list;
   }
 }

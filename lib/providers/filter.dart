@@ -108,7 +108,7 @@ class Filter with ChangeNotifier {
       var stores = await ApiHelper.getStoreList(_client);
       storeList = stores;
       storeList = await LocationHelper.calculateStoreDistance(storeList);
-      storeList.sort((a, b) => a.distance!.compareTo(b.distance!));
+      storeList.sort((a, b) => (a.distance ?? double.infinity).compareTo(b.distance ?? double.infinity));
       storesLoading = false;
       notifyListeners();
       return storeList;

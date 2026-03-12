@@ -217,14 +217,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.3"
-  fancy_shimmer_image:
-    dependency: "direct main"
-    description:
-      name: fancy_shimmer_image
-      sha256: "566070403bc1d960f19fa0a38def8655166fad68a73a738a2b68c165f8a9ffc9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.3"
   fetch_api:
     dependency: transitive
     description:
@@ -1087,14 +1079,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.1"
-  shimmer:
-    dependency: transitive
-    description:
-      name: shimmer
-      sha256: "5f88c883a22e9f9f299e5ba0e4f7e6054857224976a5d9f839d4ebdc94a14ac9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   sign_in_with_apple:
     dependency: "direct main"
     description:

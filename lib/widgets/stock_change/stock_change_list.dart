@@ -83,9 +83,7 @@ class StockChangeListViewState extends State<StockChangeList> {
     _pageSize = 1.sw ~/ 371.r >= 2 ? 24 : 14;
 
     return RefreshIndicator(
-      onRefresh: () => Future.sync(
-        () => _pagingController.refresh(),
-      ),
+      onRefresh: () => Future.sync(() => _pagingController.refresh()),
       child: Consumer<Filter>(
         builder: (context, filterProvider, child) {
           return PagingListener(
@@ -100,7 +98,9 @@ class StockChangeListViewState extends State<StockChangeList> {
                       invisibleItemsThreshold: 5,
                       itemBuilder: (context, item, index) {
                         final items = state.items;
-                        if (index == 0 || items == null) {
+                        if (index == 0 ||
+                            items == null ||
+                            index >= items.length) {
                           return StockChangeItem(stockChange: item);
                         } else {
                           return StockChangeItem(
@@ -111,12 +111,12 @@ class StockChangeListViewState extends State<StockChangeList> {
                       },
                       firstPageErrorIndicatorBuilder: (_) =>
                           FirstPageErrorIndicator(
-                        onTryAgain: () => _pagingController.refresh(),
-                      ),
+                            onTryAgain: () => _pagingController.refresh(),
+                          ),
                       newPageErrorIndicatorBuilder: (_) =>
                           NewPageErrorIndicator(
-                        onTap: () => _pagingController.fetchNextPage(),
-                      ),
+                            onTap: () => _pagingController.fetchNextPage(),
+                          ),
                       noItemsFoundIndicatorBuilder: (_) =>
                           const NoItemsFoundIndicator(),
                     ),
@@ -139,12 +139,12 @@ class StockChangeListViewState extends State<StockChangeList> {
                           StockChangeItem(stockChange: item),
                       firstPageErrorIndicatorBuilder: (_) =>
                           FirstPageErrorIndicator(
-                        onTryAgain: () => _pagingController.refresh(),
-                      ),
+                            onTryAgain: () => _pagingController.refresh(),
+                          ),
                       newPageErrorIndicatorBuilder: (_) =>
                           NewPageErrorIndicator(
-                        onTap: () => _pagingController.fetchNextPage(),
-                      ),
+                            onTap: () => _pagingController.fetchNextPage(),
+                          ),
                       noItemsFoundIndicatorBuilder: (_) =>
                           const NoItemsFoundIndicator(),
                     ),
@@ -158,10 +158,11 @@ class StockChangeListViewState extends State<StockChangeList> {
   @override
   void dispose() {
     try {
-      Provider.of<Filter>(context, listen: false)
-          .removeListener(_onFilterChanged);
-      Provider.of<Auth>(context, listen: false)
-          .removeListener(_onAuthChanged);
+      Provider.of<Filter>(
+        context,
+        listen: false,
+      ).removeListener(_onFilterChanged);
+      Provider.of<Auth>(context, listen: false).removeListener(_onAuthChanged);
     } catch (_) {}
     _pagingController.dispose();
     super.dispose();
