@@ -11,10 +11,12 @@ const Map<String, String> sortList = {
   'Navn - Å til A': '-vmp_name',
   'Pris - Høy til lav': '-price',
   'Pris - Lav til høy': 'price',
-  'Pris per liter - Høy til lav': '-price_per_volume',
-  'Pris per liter - Lav til høy': 'price_per_volume',
   'Pris per alkoholenhet - Høy til lav': '-price_per_alcohol_unit',
   'Pris per alkoholenhet - Lav til høy': 'price_per_alcohol_unit',
+  'Pris per liter - Høy til lav': '-price_per_volume',
+  'Pris per liter - Lav til høy': 'price_per_volume',
+  'Verdi for pengene - Høy til lav': '-value_score',
+  'Verdi for pengene - Lav til høy': 'value_score',
 };
 
 const Map<String, String> productSelectionAbbreviationList = {

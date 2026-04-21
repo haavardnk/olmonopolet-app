@@ -389,7 +389,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,vmp_url,'
-        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer,user_tasted';
+        'untpd_url,untpd_id,country,country_code,product_selection,value_score,is_christmas_beer,user_tasted';
 
     final params = <String, String>{
       'fields': fields,
@@ -440,7 +440,7 @@ class ApiHelper {
     const fields =
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,vmp_url,'
-        'untpd_url,untpd_id,country,country_code,product_selection,is_christmas_beer,user_tasted';
+        'untpd_url,untpd_id,country,country_code,product_selection,value_score,is_christmas_beer,user_tasted';
 
     final params = <String, String>{
       'fields': fields,

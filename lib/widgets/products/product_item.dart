@@ -191,6 +191,40 @@ class _ProductItemState extends State<ProductItem> {
                                   ),
                                 ),
                               ],
+                              if (_product.valueScore != null) ...[
+                                SizedBox(width: 8.w),
+                                Tooltip(
+                                  message:
+                                      'Verdi for pengene — basert på vurdering og literpris',
+                                  child: SizedBox(
+                                    width: 48.w,
+                                    child: ClipRRect(
+                                      borderRadius:
+                                          BorderRadius.circular(2.r),
+                                      child: LinearProgressIndicator(
+                                        value: (_product.valueScore!
+                                                    .clamp(0, 20) as double) /
+                                                20,
+                                        minHeight: 5.h,
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .outlineVariant
+                                            .withValues(alpha: 0.2),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          _product.valueScore! >= 15
+                                              ? Colors.green
+                                              : _product.valueScore! >= 10
+                                                  ? Colors.blue
+                                                  : _product.valueScore! >= 5
+                                                      ? Colors.orange
+                                                      : Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                           SizedBox(height: 6.h),
