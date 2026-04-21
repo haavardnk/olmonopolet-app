@@ -23,6 +23,7 @@ class ListItemRow extends StatelessWidget {
   final void Function(int year)? onYearChanged;
   final void Function(String notes)? onNotesChanged;
   final String routePrefix;
+  final bool isReadOnly;
 
   const ListItemRow({
     super.key,
@@ -37,6 +38,7 @@ class ListItemRow extends StatelessWidget {
     this.onYearChanged,
     this.onNotesChanged,
     this.routePrefix = '/lists',
+    this.isReadOnly = false,
   });
 
   @override
@@ -44,60 +46,45 @@ class ListItemRow extends StatelessWidget {
     final double imageSize = 70.r;
     final colors = Theme.of(context).colorScheme;
 
-    return Dismissible(
-      key: Key('list-item-${item.id}'),
-      direction: DismissDirection.startToEnd,
-      confirmDismiss: (_) async {
-        HapticFeedback.mediumImpact();
-        onRemove();
-        return false;
-      },
-      background: Container(
-        color: Colors.pink,
-        padding: EdgeInsets.only(left: 50.w),
-        child: const Row(
-          children: [Icon(Icons.delete)],
-        ),
-      ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: product != null
-            ? () => context.push(
-                  '/products/${product!.id}',
-                  extra: product,
-                )
-            : null,
-        child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: colors.surfaceContainer,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(12.r),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (dragIndex != null)
-                        ReorderableDragStartListener(
-                          index: dragIndex!,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 8.w, top: 2.h),
-                            child: Icon(
-                              Icons.drag_indicator,
-                              size: 20.r,
-                              color: colors.onSurfaceVariant
-                                  .withValues(alpha: 0.5),
-                            ),
+    final content = GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: product != null
+          ? () => context.push(
+                '/products/${product!.id}',
+                extra: product,
+              )
+          : null,
+      child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            color: colors.surfaceContainer,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(12.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (dragIndex != null && !isReadOnly)
+                      ReorderableDragStartListener(
+                        index: dragIndex!,
+                        child: Padding(
+                          padding: EdgeInsets.only(right: 8.w, top: 2.h),
+                          child: Icon(
+                            Icons.drag_indicator,
+                            size: 20.r,
+                            color: colors.onSurfaceVariant
+                                .withValues(alpha: 0.5),
                           ),
                         ),
-                      _buildImage(imageSize),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
+                      ),
+                    _buildImage(imageSize),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -183,23 +170,44 @@ class ListItemRow extends StatelessWidget {
                       _buildRightColumn(colors),
                     ],
                   ),
-                  if (listType == ListType.cellar) ...[
-                    SizedBox(height: 8.h),
-                    _buildVintageChip(context, colors),
-                  ],
+                if (listType == ListType.cellar && !isReadOnly) ...[
+                  SizedBox(height: 8.h),
+                  _buildVintageChip(context, colors),
+                ],
+                if (!isReadOnly) ...[
                   SizedBox(height: 8.h),
                   _buildNotesChip(context, colors),
                 ],
-              ),
+              ],
             ),
+          ),
+      ),
+    );
+
+    if (isReadOnly) return content;
+
+    return Dismissible(
+      key: Key('list-item-${item.id}'),
+      direction: DismissDirection.startToEnd,
+      confirmDismiss: (_) async {
+        HapticFeedback.mediumImpact();
+        onRemove();
+        return false;
+      },
+      background: Container(
+        color: Colors.pink,
+        padding: EdgeInsets.only(left: 50.w),
+        child: const Row(
+          children: [Icon(Icons.delete)],
         ),
       ),
+      child: content,
     );
   }
 
   Widget _buildRightColumn(ColorScheme colors) {
     final isShopping = listType == ListType.shopping;
-    final showQuantity = isShopping || listType == ListType.cellar;
+    final showQuantity = (isShopping || listType == ListType.cellar) && !isReadOnly;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,

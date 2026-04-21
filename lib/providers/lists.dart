@@ -8,6 +8,7 @@ import '../models/user_list.dart';
 import '../services/list_api.dart';
 import '../providers/auth.dart';
 import '../utils/crash_reporter.dart';
+import '../utils/exceptions.dart';
 
 class ListsProvider with ChangeNotifier {
   late http.Client _client;
@@ -90,6 +91,12 @@ class ListsProvider with ChangeNotifier {
     try {
       _activeList = await ListApi.fetchList(_client, token, listId);
       _error = null;
+    } on NotFoundException {
+      _lists.removeWhere((l) => l.id == listId);
+      if (_activeList?.id == listId) {
+        _activeList = null;
+      }
+      _error = 'list_removed';
     } catch (e, st) {
       CrashReporter.recordError(e, st);
       _error = 'Kunne ikke laste listen';
@@ -482,5 +489,30 @@ class ListsProvider with ChangeNotifier {
     prefs.remove('useOverviewStoreSelection');
     prefs.remove('greyNoStock');
     prefs.remove('hideNoStock');
+  }
+
+  Future<bool> syncUntappdList(int untappdListId) async {
+    final token = await _token;
+    if (token == null) return false;
+
+    try {
+      await ListApi.syncUntappdList(_client, token, untappdListId);
+      return true;
+    } on NotFoundException {
+      _lists.removeWhere(
+        (l) => l.untappdListId == untappdListId,
+      );
+      if (_activeList?.untappdListId == untappdListId) {
+        _activeList = null;
+      }
+      _error = 'list_removed';
+      notifyListeners();
+      return false;
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
+      _error = 'Synkronisering feilet';
+      notifyListeners();
+      return false;
+    }
   }
 }

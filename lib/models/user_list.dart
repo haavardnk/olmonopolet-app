@@ -20,7 +20,8 @@ enum ListType {
   standard,
   shopping,
   cellar,
-  event;
+  event,
+  untappd;
 
   String get label {
     switch (this) {
@@ -32,6 +33,8 @@ enum ListType {
         return 'Kjeller';
       case ListType.event:
         return 'Arrangement';
+      case ListType.untappd:
+        return 'Untappd';
     }
   }
 
@@ -45,6 +48,8 @@ enum ListType {
         return Icons.inventory_2_outlined;
       case ListType.event:
         return Icons.event_outlined;
+      case ListType.untappd:
+        return Icons.cloud_download_outlined;
     }
   }
 
@@ -103,11 +108,11 @@ class ListItem extends Equatable {
 
   factory ListItem.fromJson(Map<String, dynamic> json) => ListItem(
         id: json['id'] as int,
-        productId: json['product_id'].toString(),
-        quantity: json['quantity'] as int,
+        productId: (json['product_id'] ?? json['product'])?.toString() ?? '',
+        quantity: (json['quantity'] as int?) ?? 1,
         year: json['year'] as int?,
         notes: json['notes'] as String?,
-        sortOrder: json['sort_order'] as int,
+        sortOrder: (json['sort_order'] as int?) ?? 0,
         createdAt: DateTime.parse(json['created_at'] as String),
       );
 
@@ -152,6 +157,10 @@ class UserList extends Equatable {
   final List<ListItem>? items;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int? untappdListId;
+  final String? untappdUsername;
+  final DateTime? lastSynced;
+  final String? syncStatus;
 
   const UserList({
     required this.id,
@@ -170,38 +179,67 @@ class UserList extends Equatable {
     this.items,
     required this.createdAt,
     required this.updatedAt,
+    this.untappdListId,
+    this.untappdUsername,
+    this.lastSynced,
+    this.syncStatus,
   });
 
-  factory UserList.fromJson(Map<String, dynamic> json) => UserList(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        description: json['description'] as String?,
-        listType: ListType.fromApi(json['list_type'] as String),
-        selectedStoreId: json['selected_store_id']?.toString(),
-        eventDate: json['event_date'] != null
-            ? DateTime.parse(json['event_date'] as String)
-            : null,
-        sortOrder: json['sort_order'] as int,
-        shareToken: json['share_token'] as String,
-        itemCount: json['item_count'] as int,
-        productIds: json['product_ids'] != null
-            ? (json['product_ids'] as List).map((e) => e.toString()).toList()
-            : [],
-        totalPrice: json['total_price'] != null
-            ? (json['total_price'] as num).toDouble()
-            : null,
-        stats: json['stats'] != null
-            ? ListStats.fromJson(json['stats'] as Map<String, dynamic>)
-            : null,
-        isPast: json['is_past'] as bool?,
-        items: json['items'] != null
-            ? (json['items'] as List)
-                .map((e) => ListItem.fromJson(e as Map<String, dynamic>))
-                .toList()
-            : null,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        updatedAt: DateTime.parse(json['updated_at'] as String),
-      );
+  factory UserList.fromJson(Map<String, dynamic> json) {
+    final listType = ListType.fromApi(json['list_type'] as String);
+    final productIds = json['product_ids'] != null
+        ? (json['product_ids'] as List).map((e) => e.toString()).toList()
+        : <String>[];
+
+    List<ListItem>? items;
+    if (listType == ListType.untappd) {
+      items = [
+        for (var i = 0; i < productIds.length; i++)
+          ListItem(
+            id: i,
+            productId: productIds[i],
+            quantity: 1,
+            sortOrder: i,
+            createdAt: DateTime.now(),
+          ),
+      ];
+    } else if (json['items'] != null) {
+      items = (json['items'] as List)
+          .map((e) => ListItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+
+    return UserList(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      listType: listType,
+      selectedStoreId: json['selected_store_id']?.toString(),
+      eventDate: json['event_date'] != null
+          ? DateTime.parse(json['event_date'] as String)
+          : null,
+      sortOrder: json['sort_order'] as int,
+      shareToken: json['share_token'] as String,
+      itemCount: json['item_count'] as int,
+      productIds: productIds,
+      totalPrice: json['total_price'] != null
+          ? (json['total_price'] as num).toDouble()
+          : null,
+      stats: json['stats'] != null
+          ? ListStats.fromJson(json['stats'] as Map<String, dynamic>)
+          : null,
+      isPast: json['is_past'] as bool?,
+      items: items,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      untappdListId: json['untappd_list_id'] as int?,
+      untappdUsername: json['untappd_username'] as String?,
+      lastSynced: json['last_synced'] != null
+          ? DateTime.parse(json['last_synced'] as String)
+          : null,
+      syncStatus: json['sync_status'] as String?,
+    );
+  }
 
   UserList copyWith({
     int? id,
@@ -220,6 +258,10 @@ class UserList extends Equatable {
     List<ListItem>? items,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? untappdListId,
+    String? untappdUsername,
+    DateTime? lastSynced,
+    String? syncStatus,
   }) =>
       UserList(
         id: id ?? this.id,
@@ -238,6 +280,10 @@ class UserList extends Equatable {
         items: items ?? this.items,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
+        untappdListId: untappdListId ?? this.untappdListId,
+        untappdUsername: untappdUsername ?? this.untappdUsername,
+        lastSynced: lastSynced ?? this.lastSynced,
+        syncStatus: syncStatus ?? this.syncStatus,
       );
 
   @override
@@ -258,6 +304,10 @@ class UserList extends Equatable {
         items,
         createdAt,
         updatedAt,
+        untappdListId,
+        untappdUsername,
+        lastSynced,
+        syncStatus,
       ];
 }
 

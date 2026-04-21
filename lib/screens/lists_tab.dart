@@ -6,9 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart' as p;
 
+import 'package:url_launcher/url_launcher.dart';
+
 import '../models/user_list.dart';
 import '../providers/auth.dart';
 import '../providers/lists.dart';
+import '../utils/environment.dart';
 import '../widgets/drawer/app_drawer.dart';
 import '../widgets/lists/list_card.dart';
 import '../widgets/lists/list_form_dialog.dart';
@@ -22,9 +25,31 @@ class ListsTab extends StatefulWidget {
   State<ListsTab> createState() => _ListsTabState();
 }
 
-class _ListsTabState extends State<ListsTab> {
+class _ListsTabState extends State<ListsTab> with WidgetsBindingObserver {
   int _localCartCount = 0;
   bool? _wasAuthenticated;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      final auth = Provider.of<Auth>(context, listen: false);
+      if (auth.isSignedIn) {
+        Provider.of<ListsProvider>(context, listen: false).fetchLists();
+      }
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -77,6 +102,109 @@ class _ListsTabState extends State<ListsTab> {
     }
   }
 
+  void _showAddMenu() {
+    final colors = Theme.of(context).colorScheme;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 32.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: colors.onSurfaceVariant.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              ListTile(
+                leading: Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    size: 20.r,
+                    color: colors.onPrimaryContainer,
+                  ),
+                ),
+                title: Text(
+                  'Ny liste',
+                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  'Opprett en handleliste, lagerliste eller annet',
+                  style: TextStyle(fontSize: 12.sp, color: colors.onSurfaceVariant),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _createList();
+                },
+              ),
+              SizedBox(height: 4.h),
+              ListTile(
+                leading: Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.cloud_download_outlined,
+                    size: 20.r,
+                    color: colors.onPrimaryContainer,
+                  ),
+                ),
+                title: Text(
+                  'Importer fra Untappd',
+                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  'Abonner på en Untappd-liste',
+                  style: TextStyle(fontSize: 12.sp, color: colors.onSurfaceVariant),
+                ),
+                trailing: Icon(
+                  Icons.open_in_new,
+                  size: 16.r,
+                  color: colors.onSurfaceVariant,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final auth = context.read<Auth>();
+                  String? token;
+                  try {
+                    token = await auth.getIdToken(forceRefresh: true);
+                  } catch (e, st) {
+                    CrashReporter.recordError(e, st);
+                  }
+                  final base = '${Environment.appBaseUrl}/lists/import';
+                  final url = token != null ? '$base?token=$token' : base;
+                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _createList() async {
     final result = await showListFormSheet(context);
     if (result == null || !mounted) return;
@@ -121,7 +249,7 @@ class _ListsTabState extends State<ListsTab> {
       drawer: const AppDrawer(),
       floatingActionButton: auth.isSignedIn
           ? FloatingActionButton(
-              onPressed: _createList,
+              onPressed: _showAddMenu,
               child: const Icon(Icons.add),
             )
           : null,

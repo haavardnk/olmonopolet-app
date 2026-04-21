@@ -30,11 +30,16 @@ class ListActions {
     UserList list,
     ListsProvider listsProvider,
   ) async {
+    final isUntappd = list.listType == ListType.untappd;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Slett liste'),
-        content: Text('Er du sikker på at du vil slette "${list.name}"?'),
+        title: Text(isUntappd ? 'Avslutt abonnement' : 'Slett liste'),
+        content: Text(
+          isUntappd
+              ? 'Er du sikker på at du vil avslutte abonnementet på "${list.name}"?'
+              : 'Er du sikker på at du vil slette "${list.name}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -42,7 +47,7 @@ class ListActions {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Slett'),
+            child: Text(isUntappd ? 'Avslutt abonnement' : 'Slett'),
           ),
         ],
       ),

@@ -154,6 +154,27 @@ class ListCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
+                        if (list.listType == ListType.untappd &&
+                            list.untappdUsername != null) ...[
+                          SizedBox(height: 2.h),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                size: 12.r,
+                                color: colors.onSurfaceVariant,
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                'Fra @${list.untappdUsername}',
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -189,16 +210,17 @@ class ListCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit_outlined, size: 18.r),
-                            SizedBox(width: 8.w),
-                            const Text('Rediger'),
-                          ],
+                      if (list.listType != ListType.untappd)
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit_outlined, size: 18.r),
+                              SizedBox(width: 8.w),
+                              const Text('Rediger'),
+                            ],
+                          ),
                         ),
-                      ),
                       PopupMenuItem(
                         value: 'delete',
                         child: Row(
@@ -206,8 +228,12 @@ class ListCard extends StatelessWidget {
                             Icon(Icons.delete_outline,
                                 size: 18.r, color: colors.error),
                             SizedBox(width: 8.w),
-                            Text('Slett',
-                                style: TextStyle(color: colors.error)),
+                            Text(
+                              list.listType == ListType.untappd
+                                  ? 'Avslutt abonnement'
+                                  : 'Slett',
+                              style: TextStyle(color: colors.error),
+                            ),
                           ],
                         ),
                       ),
@@ -238,6 +264,11 @@ class ListCard extends StatelessWidget {
         return count;
       case ListType.shopping:
       case ListType.standard:
+        return count;
+      case ListType.untappd:
+        if (list.untappdUsername != null) {
+          return '$count · @${list.untappdUsername}';
+        }
         return count;
     }
   }

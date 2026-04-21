@@ -236,8 +236,9 @@ class _ListFormSheetState extends State<_ListFormSheet> {
   }
 
   Widget _buildTypeRow(ColorScheme colors) {
+    final types = ListType.values.where((t) => t != ListType.untappd).toList();
     return Row(
-      children: ListType.values.map((type) {
+      children: types.map((type) {
         final isSelected = _selectedType == type;
         return Expanded(
           child: Padding(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/product.dart';
 import '../models/user_list.dart';
@@ -58,7 +59,15 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
     setState(() => _productsLoading = true);
 
-    final productIds = items.map((i) => i.productId).toSet().toList();
+    final productIds = items
+        .map((i) => i.productId)
+        .where((id) => id.isNotEmpty && id != 'null')
+        .toSet()
+        .toList();
+    if (productIds.isEmpty) {
+      setState(() => _productsLoading = false);
+      return;
+    }
     final idsStr = productIds.join(',');
 
     try {
@@ -248,14 +257,16 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   }
 
   AppBar _buildAppBar(UserList list) {
+    final isUntappd = list.listType == ListType.untappd;
     return AppBar(
       title: Text(list.name),
       actions: [
-        IconButton(
-          onPressed: () => ListActions.share(list),
-          icon: const Icon(Icons.share_outlined),
-          tooltip: 'Del',
-        ),
+        if (!isUntappd)
+          IconButton(
+            onPressed: () => ListActions.share(list),
+            icon: const Icon(Icons.share_outlined),
+            tooltip: 'Del',
+          ),
         PopupMenuButton<String>(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
@@ -265,23 +276,24 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             if (value == 'delete') _deleteList(list);
           },
           itemBuilder: (_) => [
-            const PopupMenuItem(
-              value: 'edit',
-              child: Row(
-                children: [
-                  Icon(Icons.edit_outlined),
-                  SizedBox(width: 12),
-                  Text('Rediger'),
-                ],
+            if (!isUntappd)
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_outlined),
+                    SizedBox(width: 12),
+                    Text('Rediger'),
+                  ],
+                ),
               ),
-            ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete_outline),
-                  SizedBox(width: 12),
-                  Text('Slett'),
+                  const Icon(Icons.delete_outline),
+                  const SizedBox(width: 12),
+                  Text(isUntappd ? 'Avslutt abonnement' : 'Slett'),
                 ],
               ),
             ),
@@ -293,6 +305,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
   Widget _buildBody(UserList list, ListsProvider listsProvider) {
     final items = list.items ?? [];
+    final isUntappd = list.listType == ListType.untappd;
 
     if (items.isEmpty && !_productsLoading) {
       return RefreshIndicator(
@@ -321,13 +334,15 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     ],
                     insertDuration: const Duration(milliseconds: 200),
                     removeDuration: const Duration(milliseconds: 200),
-                    onReorder: (oldIndex, newIndex) {
-                      if (newIndex > oldIndex) newIndex--;
-                      final ids = items.map((i) => i.id).toList();
-                      final movedId = ids.removeAt(oldIndex);
-                      ids.insert(newIndex, movedId);
-                      listsProvider.reorderItems(list.id, ids);
-                    },
+                    onReorder: isUntappd
+                        ? (_, _) {}
+                        : (oldIndex, newIndex) {
+                            if (newIndex > oldIndex) newIndex--;
+                            final ids = items.map((i) => i.id).toList();
+                            final movedId = ids.removeAt(oldIndex);
+                            ids.insert(newIndex, movedId);
+                            listsProvider.reorderItems(list.id, ids);
+                          },
                     isSameItem: (a, b) => a.id == b.id,
                     proxyDecorator: (child, index, animation) {
                       return Material(
@@ -352,23 +367,31 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                         item: item,
                         product: product,
                         listType: list.listType,
-                        dragIndex: index,
+                        dragIndex: isUntappd ? null : index,
                         inStock: inStock,
                         stockCount: stockCount,
+                        isReadOnly: isUntappd,
                         onRemove: () =>
                             listsProvider.removeItemFromList(list.id, item.id),
-                        onQuantityChanged: (qty) => listsProvider
-                            .updateListItem(list.id, item.id, quantity: qty),
-                        onYearChanged: (year) => listsProvider.updateListItem(
-                          list.id,
-                          item.id,
-                          year: year,
-                        ),
-                        onNotesChanged: (notes) => listsProvider.updateListItem(
-                          list.id,
-                          item.id,
-                          notes: notes,
-                        ),
+                        onQuantityChanged: isUntappd
+                            ? null
+                            : (qty) => listsProvider.updateListItem(
+                                list.id, item.id,
+                                quantity: qty),
+                        onYearChanged: isUntappd
+                            ? null
+                            : (year) => listsProvider.updateListItem(
+                                  list.id,
+                                  item.id,
+                                  year: year,
+                                ),
+                        onNotesChanged: isUntappd
+                            ? null
+                            : (notes) => listsProvider.updateListItem(
+                                  list.id,
+                                  item.id,
+                                  notes: notes,
+                                ),
                       );
                     },
                   ),
@@ -398,9 +421,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
           ],
           if (isShopping) ...[_buildStoreSelector(list, colors, hasStore)],
           if (list.eventDate != null) ...[_buildEventCard(list, colors)],
-          if (list.listType == ListType.cellar && list.items != null) ...[
-            CellarStatsWidget(stats: _computeCellarStats(list.items!)),
+          if (list.listType == ListType.cellar && list.items != null) ...[            CellarStatsWidget(stats: _computeCellarStats(list.items!)),
           ],
+          if (list.listType == ListType.untappd) ...[_buildUntappdHeader(list, colors)],
           SizedBox(height: 8.h),
         ],
       ),
@@ -592,6 +615,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   Widget _buildEmptyState(UserList list) {
     final colors = Theme.of(context).colorScheme;
     final isShopping = list.listType == ListType.shopping;
+    final isUntappd = list.listType == ListType.untappd;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -608,9 +632,11 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isShopping
-                      ? Icons.shopping_cart_outlined
-                      : Icons.playlist_add,
+                  isUntappd
+                      ? Icons.cloud_download_outlined
+                      : isShopping
+                          ? Icons.shopping_cart_outlined
+                          : Icons.playlist_add,
                   size: 48.r,
                   color: colors.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
@@ -622,7 +648,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
               ),
               SizedBox(height: 8.h),
               Text(
-                'Legg til produkter fra produktsiden.',
+                isUntappd
+                    ? 'Trykk synkroniser for å hente produkter fra Untappd.'
+                    : 'Legg til produkter fra produktsiden.',
                 style: TextStyle(
                   fontSize: 13.sp,
                   color: colors.onSurfaceVariant,
@@ -630,6 +658,91 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 textAlign: TextAlign.center,
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUntappdHeader(UserList list, ColorScheme colors) {
+    final lastSynced = list.lastSynced?.toLocal();
+    final syncedText = lastSynced != null
+        ? 'Sist synkronisert: ${lastSynced.day}. ${monthAbbreviations[lastSynced.month - 1]} ${lastSynced.year}, ${lastSynced.hour.toString().padLeft(2, '0')}:${lastSynced.minute.toString().padLeft(2, '0')}'
+        : 'Aldri synkronisert';
+
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: list.untappdUsername != null && list.untappdListId != null
+              ? () => launchUrl(
+                    Uri.parse(
+                      'https://untappd.com/user/${list.untappdUsername}/lists/${list.untappdListId}',
+                    ),
+                  )
+              : null,
+          child: Container(
+            padding: EdgeInsets.all(12.r),
+            decoration: BoxDecoration(
+              color: colors.primaryContainer.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: colors.primary.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color: colors.primary.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.cloud_download_outlined,
+                    size: 18.r,
+                    color: colors.primary,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (list.untappdUsername != null)
+                        Text(
+                          'Importert fra @${list.untappdUsername}',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      SizedBox(height: 1.h),
+                      Text(
+                        syncedText,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                      SizedBox(height: 1.h),
+                      Text(
+                        'Neste automatiske synkronisering ved midnatt',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (list.untappdUsername != null && list.untappdListId != null)
+                  Icon(
+                    Icons.open_in_new,
+                    size: 18.r,
+                    color: colors.primary,
+                  ),
+              ],
+            ),
           ),
         ),
       ],

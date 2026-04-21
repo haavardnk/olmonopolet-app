@@ -253,7 +253,9 @@ class ApiHelper {
         'vmp_id,vmp_name,price,rating,checkins,label_sm_url,main_category,'
         'sub_category,style,stock,abv,volume,price_per_volume,price_per_alcohol_unit,'
         'vmp_url,untpd_url,untpd_id,country,country_code,is_christmas_beer,user_tasted';
-    final endpoint = 'beers/?beers=$productIds&fields=$fields';
+    final idCount = productIds.split(',').length;
+    final pageSize = idCount.clamp(1, 1000);
+    final endpoint = 'beers/?beers=$productIds&fields=$fields&page_size=$pageSize';
 
     return _handleRequest(
       request: () => client.get(

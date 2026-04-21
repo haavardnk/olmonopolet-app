@@ -35,7 +35,9 @@ class AddToListSheet extends StatelessWidget {
 
     return Consumer<ListsProvider>(
       builder: (ctx, provider, _) {
-        final lists = provider.lists;
+        final lists = provider.lists
+            .where((l) => l.listType != ListType.untappd)
+            .toList();
 
         return Padding(
           padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),

@@ -349,4 +349,25 @@ class ListApi {
       throw const NetworkException();
     }
   }
+
+  static Future<void> syncUntappdList(
+    http.Client client,
+    String token,
+    int untappdListId,
+  ) async {
+    final endpoint = 'untappd-lists/$untappdListId/sync/';
+    try {
+      final response = await client.post(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _headers(token),
+      );
+      _handleResponse(
+        response: response,
+        parser: (_) => null,
+        endpoint: endpoint,
+      );
+    } on SocketException {
+      throw const NetworkException();
+    }
+  }
 }
