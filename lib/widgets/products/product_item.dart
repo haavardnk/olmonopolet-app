@@ -81,10 +81,7 @@ class _ProductItemState extends State<ProductItem> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ProductImage(
-                      imageUrl: displayImageUrl,
-                      size: imageSize,
-                    ),
+                    ProductImage(imageUrl: displayImageUrl, size: imageSize),
                     SizedBox(width: 12.w),
                     Expanded(
                       child: Column(
@@ -105,9 +102,9 @@ class _ProductItemState extends State<ProductItem> {
                                 '·',
                                 style: TextStyle(
                                   fontSize: 13.sp,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               SizedBox(width: 6.w),
@@ -115,9 +112,9 @@ class _ProductItemState extends State<ProductItem> {
                                 '${_product.pricePerVolume!.toStringAsFixed(0)} kr/l',
                                 style: TextStyle(
                                   fontSize: 11.sp,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               if (_product.pricePerAlcoholUnit != null) ...[
@@ -126,9 +123,9 @@ class _ProductItemState extends State<ProductItem> {
                                   '·',
                                   style: TextStyle(
                                     fontSize: 13.sp,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                                 SizedBox(width: 6.w),
@@ -136,9 +133,9 @@ class _ProductItemState extends State<ProductItem> {
                                   '${_product.pricePerAlcoholUnit!.toStringAsFixed(0)} kr/AE',
                                   style: TextStyle(
                                     fontSize: 11.sp,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -156,9 +153,9 @@ class _ProductItemState extends State<ProductItem> {
                                   _product.style,
                                   style: TextStyle(
                                     fontSize: 12.sp,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -170,12 +167,13 @@ class _ProductItemState extends State<ProductItem> {
                           Row(
                             children: [
                               createRatingBar(
-                                  rating: _product.rating ?? 0,
-                                  size: 16.r,
-                                  color: Colors.amber),
+                                rating: _product.rating ?? 0,
+                                size: 16.r,
+                                color: Colors.amber,
+                              ),
                               SizedBox(width: 4.w),
                               Text(
-                                _product.rating?.toStringAsFixed(1) ?? '-',
+                                _product.rating?.toStringAsFixed(2) ?? '-',
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
@@ -187,9 +185,9 @@ class _ProductItemState extends State<ProductItem> {
                                   '(${NumberFormat.compact().format(_product.checkins)})',
                                   style: TextStyle(
                                     fontSize: 11.sp,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -201,13 +199,17 @@ class _ProductItemState extends State<ProductItem> {
                             runSpacing: 4.h,
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              buildInfoChip('${_product.volume}L', context,
-                                  icon: Icons.water_drop_outlined),
+                              buildInfoChip(
+                                '${_product.volume}L',
+                                context,
+                                icon: Icons.water_drop_outlined,
+                              ),
                               if (_product.abv != null)
                                 buildInfoChip(
-                                    '${_product.abv!.toStringAsFixed(1)}%',
-                                    context,
-                                    icon: Icons.percent),
+                                  '${_product.abv!.toStringAsFixed(1)}%',
+                                  context,
+                                  icon: Icons.percent,
+                                ),
                               if (_product.country != null &&
                                   _product.country!.isNotEmpty)
                                 buildInfoChipWithFlag(
@@ -218,10 +220,11 @@ class _ProductItemState extends State<ProductItem> {
                               if (widget.release != null &&
                                   widget.release!.productSelections.length > 1)
                                 buildInfoChip(
-                                    productSelectionAbbreviationList[
-                                            _product.productSelection] ??
-                                        '',
-                                    context),
+                                  productSelectionAbbreviationList[_product
+                                          .productSelection] ??
+                                      '',
+                                  context,
+                                ),
                             ],
                           ),
                         ],
@@ -240,10 +243,7 @@ class _ProductItemState extends State<ProductItem> {
                         SizedBox(height: 4.h),
                         AddToListButton(productId: _product.id),
                         SizedBox(height: 4.h),
-                        ProductActionMenu(
-                          product: _product,
-                          compact: true,
-                        ),
+                        ProductActionMenu(product: _product, compact: true),
                       ],
                     ),
                   ],

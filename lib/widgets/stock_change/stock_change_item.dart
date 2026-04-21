@@ -171,7 +171,7 @@ class _StockChangeItemState extends State<StockChangeItem> {
                                       color: Colors.amber),
                                   SizedBox(width: 4.w),
                                   Text(
-                                    product.rating?.toStringAsFixed(1) ?? '-',
+                                    product.rating?.toStringAsFixed(2) ?? '-',
                                     style: TextStyle(
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.w500,
