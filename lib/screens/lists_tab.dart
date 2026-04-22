@@ -386,7 +386,6 @@ class _ListsTabState extends State<ListsTab> with WidgetsBindingObserver {
             insertDuration: const Duration(milliseconds: 200),
             removeDuration: const Duration(milliseconds: 200),
             onReorder: (oldIndex, newIndex) {
-              if (newIndex > oldIndex) newIndex--;
               final ids =
                   listsProvider.lists.map((l) => l.id).toList();
               final movedId = ids.removeAt(oldIndex);

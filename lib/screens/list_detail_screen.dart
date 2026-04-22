@@ -337,7 +337,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     onReorder: isUntappd
                         ? (_, _) {}
                         : (oldIndex, newIndex) {
-                            if (newIndex > oldIndex) newIndex--;
                             final ids = items.map((i) => i.id).toList();
                             final movedId = ids.removeAt(oldIndex);
                             ids.insert(newIndex, movedId);

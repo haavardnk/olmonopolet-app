@@ -196,14 +196,18 @@ class ListsProvider with ChangeNotifier {
   }
 
   Future<void> reorderLists(List<int> listIds) async {
-    final token = await _token;
-    if (token == null) return;
-
     final oldLists = [..._lists];
     _lists = listIds
         .map((id) => _lists.firstWhere((l) => l.id == id))
         .toList();
     notifyListeners();
+
+    final token = await _token;
+    if (token == null) {
+      _lists = oldLists;
+      notifyListeners();
+      return;
+    }
 
     try {
       await ListApi.reorderLists(_client, token, listIds);
@@ -352,24 +356,32 @@ class ListsProvider with ChangeNotifier {
   }
 
   Future<void> reorderItems(int listId, List<int> itemIds) async {
+    if (_activeList?.id != listId || _activeList?.items == null) return;
+
+    final oldItems = [..._activeList!.items!];
+    final reordered = itemIds
+        .map((id) => oldItems.firstWhere((i) => i.id == id))
+        .toList();
+    _activeList = _activeList!.copyWith(items: reordered);
+    notifyListeners();
+
     final token = await _token;
-    if (token == null) return;
-
-    if (_activeList?.id == listId && _activeList?.items != null) {
-      final oldItems = [..._activeList!.items!];
-      final reordered = itemIds
-          .map((id) => oldItems.firstWhere((i) => i.id == id))
-          .toList();
-      _activeList = _activeList!.copyWith(items: reordered);
+    if (token == null) {
+      debugPrint('[reorderItems] token is null, reverting');
+      _activeList = _activeList!.copyWith(items: oldItems);
       notifyListeners();
+      return;
+    }
 
-      try {
-        await ListApi.reorderItems(_client, token, listId, itemIds);
-      } catch (e, st) {
-        CrashReporter.recordError(e, st);
-        _activeList = _activeList!.copyWith(items: oldItems);
-        notifyListeners();
-      }
+    try {
+      debugPrint('[reorderItems] calling API with listId=$listId, itemIds=$itemIds');
+      await ListApi.reorderItems(_client, token, listId, itemIds);
+      debugPrint('[reorderItems] API success');
+    } catch (e, st) {
+      debugPrint('[reorderItems] API error: $e');
+      CrashReporter.recordError(e, st);
+      _activeList = _activeList!.copyWith(items: oldItems);
+      notifyListeners();
     }
   }
 
