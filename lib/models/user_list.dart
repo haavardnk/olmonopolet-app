@@ -218,9 +218,9 @@ class UserList extends Equatable {
       eventDate: json['event_date'] != null
           ? DateTime.parse(json['event_date'] as String)
           : null,
-      sortOrder: json['sort_order'] as int,
+      sortOrder: (json['sort_order'] as int?) ?? 0,
       shareToken: json['share_token'] as String,
-      itemCount: json['item_count'] as int,
+      itemCount: (json['item_count'] as int?) ?? 0,
       productIds: productIds,
       totalPrice: json['total_price'] != null
           ? (json['total_price'] as num).toDouble()

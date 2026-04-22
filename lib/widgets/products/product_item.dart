@@ -107,16 +107,18 @@ class _ProductItemState extends State<ProductItem> {
                                   ).colorScheme.onSurfaceVariant,
                                 ),
                               ),
-                              SizedBox(width: 6.w),
-                              Text(
-                                '${_product.pricePerVolume!.toStringAsFixed(0)} kr/l',
-                                style: TextStyle(
-                                  fontSize: 11.sp,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
+                              if (_product.pricePerVolume != null) ...[
+                                SizedBox(width: 6.w),
+                                Text(
+                                  '${_product.pricePerVolume!.toStringAsFixed(0)} kr/l',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
-                              ),
+                              ],
                               if (_product.pricePerAlcoholUnit != null) ...[
                                 SizedBox(width: 6.w),
                                 Text(
