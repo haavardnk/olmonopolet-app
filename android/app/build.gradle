@@ -51,7 +51,7 @@ android {
 
     defaultConfig {
         applicationId "com.beermonopoly.olmonopolet.android"
-        minSdkVersion 34
+        minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
