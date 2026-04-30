@@ -4,6 +4,26 @@ import '../models/changelog.dart';
 
 const List<ChangelogVersion> changelogVersions = [
   ChangelogVersion(
+    version: '3.1.0',
+    title: 'Hva er nytt?',
+    entries: [
+      ChangelogEntry(
+        icon: Icons.repeat_outlined,
+        title: 'Abonner på Untappd-lister',
+        description:
+            'Abonner på offentlige Untappd-lister for å få dem synkronisert automatisk. '
+            'Importer via Untappd-seksjonen under lister.',
+      ),
+      ChangelogEntry(
+        icon: Icons.trending_up,
+        title: 'Sorter etter verdi for pengene',
+        description:
+            'Ny sortering basert på vurdering og literpris. '
+            'Verdiscoren vises også på produktkortet.',
+      ),
+    ],
+  ),
+  ChangelogVersion(
     version: '3.0.1',
     title: 'Hva er nytt?',
     entries: [
