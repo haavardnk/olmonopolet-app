@@ -200,16 +200,17 @@ class ListCard extends StatelessWidget {
                       color: colors.onSurfaceVariant,
                     ),
                     itemBuilder: (_) => [
-                      PopupMenuItem(
-                        value: 'share',
-                        child: Row(
-                          children: [
-                            Icon(Icons.share_outlined, size: 18.r),
-                            SizedBox(width: 8.w),
-                            const Text('Del'),
-                          ],
+                      if (list.listType != ListType.untappd)
+                        PopupMenuItem(
+                          value: 'share',
+                          child: Row(
+                            children: [
+                              Icon(Icons.share_outlined, size: 18.r),
+                              SizedBox(width: 8.w),
+                              const Text('Del'),
+                            ],
+                          ),
                         ),
-                      ),
                       if (list.listType != ListType.untappd)
                         PopupMenuItem(
                           value: 'edit',
