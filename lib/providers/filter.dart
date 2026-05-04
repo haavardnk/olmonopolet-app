@@ -217,7 +217,7 @@ class Filter with ChangeNotifier {
 
   void setPricePerVolumeRange(RangeValues range) {
     pricePerVolumeRange = range;
-    if (pricePerVolumeRange.end == 500) {
+    if (pricePerVolumeRange.end == 1000) {
       ppvHigh = '';
       ppvLow = pricePerVolumeRange.start.toString();
     } else {
@@ -230,7 +230,7 @@ class Filter with ChangeNotifier {
 
   void setAlcoholRange(RangeValues range) {
     alcoholRange = range;
-    if (alcoholRange.end == 500) {
+    if (alcoholRange.end == 15) {
       abvHigh = '';
       abvLow = alcoholRange.start.toString();
     } else {
