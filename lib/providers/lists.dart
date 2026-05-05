@@ -367,18 +367,14 @@ class ListsProvider with ChangeNotifier {
 
     final token = await _token;
     if (token == null) {
-      debugPrint('[reorderItems] token is null, reverting');
       _activeList = _activeList!.copyWith(items: oldItems);
       notifyListeners();
       return;
     }
 
     try {
-      debugPrint('[reorderItems] calling API with listId=$listId, itemIds=$itemIds');
       await ListApi.reorderItems(_client, token, listId, itemIds);
-      debugPrint('[reorderItems] API success');
     } catch (e, st) {
-      debugPrint('[reorderItems] API error: $e');
       CrashReporter.recordError(e, st);
       _activeList = _activeList!.copyWith(items: oldItems);
       notifyListeners();
