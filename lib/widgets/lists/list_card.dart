@@ -89,7 +89,7 @@ class ListCard extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      list.listType.icon,
+                      list.icon,
                       size: 20.r,
                       color: isPast ? colors.error : colors.primary,
                     ),

@@ -16,53 +16,6 @@ const monthAbbreviations = [
   'des',
 ];
 
-enum ListType {
-  standard,
-  shopping,
-  cellar,
-  event,
-  untappd;
-
-  String get label {
-    switch (this) {
-      case ListType.standard:
-        return 'Standard';
-      case ListType.shopping:
-        return 'Handleliste';
-      case ListType.cellar:
-        return 'Kjeller';
-      case ListType.event:
-        return 'Arrangement';
-      case ListType.untappd:
-        return 'Untappd';
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case ListType.standard:
-        return Icons.list;
-      case ListType.shopping:
-        return Icons.shopping_cart_outlined;
-      case ListType.cellar:
-        return Icons.inventory_2_outlined;
-      case ListType.event:
-        return Icons.event_outlined;
-      case ListType.untappd:
-        return Icons.cloud_download_outlined;
-    }
-  }
-
-  String get apiValue => name;
-
-  static ListType fromApi(String value) {
-    return ListType.values.firstWhere(
-      (e) => e.name == value,
-      orElse: () => ListType.standard,
-    );
-  }
-}
-
 class ListStats extends Equatable {
   final int totalBottles;
   final double totalValue;
@@ -144,7 +97,6 @@ class UserList extends Equatable {
   final int id;
   final String name;
   final String? description;
-  final ListType listType;
   final bool showQuantity;
   final bool showStore;
   final bool showVintage;
@@ -172,11 +124,18 @@ class UserList extends Equatable {
   bool get isUntappd => untappdListId != null;
   bool get isReadOnly => isUntappd || isFollowed;
 
+  IconData get icon {
+    if (isUntappd) return Icons.cloud_download_outlined;
+    if (showStore) return Icons.shopping_cart_outlined;
+    if (showVintage) return Icons.inventory_2_outlined;
+    if (eventDate != null) return Icons.event_outlined;
+    return Icons.list;
+  }
+
   const UserList({
     required this.id,
     required this.name,
     this.description,
-    required this.listType,
     this.showQuantity = false,
     this.showStore = false,
     this.showVintage = false,
@@ -203,7 +162,6 @@ class UserList extends Equatable {
   });
 
   factory UserList.fromJson(Map<String, dynamic> json) {
-    final listType = ListType.fromApi(json['list_type'] as String);
     final productIds = json['product_ids'] != null
         ? (json['product_ids'] as List).map((e) => e.toString()).toList()
         : <String>[];
@@ -230,7 +188,6 @@ class UserList extends Equatable {
       id: json['id'] as int,
       name: json['name'] as String,
       description: json['description'] as String?,
-      listType: listType,
       showQuantity: json['show_quantity'] as bool? ?? false,
       showStore: json['show_store'] as bool? ?? false,
       showVintage: json['show_vintage'] as bool? ?? false,
@@ -269,7 +226,6 @@ class UserList extends Equatable {
     int? id,
     String? name,
     String? description,
-    ListType? listType,
     bool? showQuantity,
     bool? showStore,
     bool? showVintage,
@@ -298,7 +254,6 @@ class UserList extends Equatable {
         id: id ?? this.id,
         name: name ?? this.name,
         description: description ?? this.description,
-        listType: listType ?? this.listType,
         showQuantity: showQuantity ?? this.showQuantity,
         showStore: showStore ?? this.showStore,
         showVintage: showVintage ?? this.showVintage,
@@ -329,7 +284,6 @@ class UserList extends Equatable {
         id,
         name,
         description,
-        listType,
         showQuantity,
         showStore,
         showVintage,
@@ -360,7 +314,6 @@ class SharedUserList extends Equatable {
   final int id;
   final String name;
   final String? description;
-  final ListType listType;
   final bool showQuantity;
   final bool showStore;
   final bool showVintage;
@@ -376,14 +329,14 @@ class SharedUserList extends Equatable {
   final bool? isPast;
   final List<ListItem> items;
   final DateTime createdAt;
+  final int? untappdListId;
 
-  bool get isUntappd => listType == ListType.untappd;
+  bool get isUntappd => untappdListId != null;
 
   const SharedUserList({
     required this.id,
     required this.name,
     this.description,
-    required this.listType,
     this.showQuantity = false,
     this.showStore = false,
     this.showVintage = false,
@@ -399,6 +352,7 @@ class SharedUserList extends Equatable {
     this.isPast,
     required this.items,
     required this.createdAt,
+    this.untappdListId,
   });
 
   factory SharedUserList.fromJson(Map<String, dynamic> json) {
@@ -409,7 +363,6 @@ class SharedUserList extends Equatable {
       id: json['id'] as int,
       name: json['name'] as String,
       description: json['description'] as String?,
-      listType: ListType.fromApi(json['list_type'] as String),
       showQuantity: json['show_quantity'] as bool? ?? false,
       showStore: json['show_store'] as bool? ?? false,
       showVintage: json['show_vintage'] as bool? ?? false,
@@ -431,6 +384,7 @@ class SharedUserList extends Equatable {
       isPast: json['is_past'] as bool?,
       items: items,
       createdAt: DateTime.parse(json['created_at'] as String),
+      untappdListId: json['untappd_list_id'] as int?,
     );
   }
 
@@ -439,7 +393,6 @@ class SharedUserList extends Equatable {
         id,
         name,
         description,
-        listType,
         showQuantity,
         showStore,
         showVintage,
@@ -455,5 +408,6 @@ class SharedUserList extends Equatable {
         isPast,
         items,
         createdAt,
+        untappdListId,
       ];
 }
