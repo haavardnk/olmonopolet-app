@@ -25,7 +25,7 @@ class ListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isPast = list.isPast == true;
-    final storeName = list.listType == ListType.shopping
+    final storeName = list.showStore
         ? lookupStoreName(context, list.selectedStoreId)
         : null;
 
@@ -154,7 +154,7 @@ class ListCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                        if (list.listType == ListType.untappd &&
+                        if (list.isUntappd &&
                             list.untappdUsername != null) ...[
                           SizedBox(height: 2.h),
                           Row(
@@ -200,7 +200,7 @@ class ListCard extends StatelessWidget {
                       color: colors.onSurfaceVariant,
                     ),
                     itemBuilder: (_) => [
-                      if (list.listType != ListType.untappd)
+                      if (!list.isUntappd)
                         PopupMenuItem(
                           value: 'share',
                           child: Row(
@@ -211,7 +211,7 @@ class ListCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                      if (list.listType != ListType.untappd)
+                      if (!list.isUntappd)
                         PopupMenuItem(
                           value: 'edit',
                           child: Row(
@@ -230,7 +230,7 @@ class ListCard extends StatelessWidget {
                                 size: 18.r, color: colors.error),
                             SizedBox(width: 8.w),
                             Text(
-                              list.listType == ListType.untappd
+                              list.isUntappd
                                   ? 'Avslutt abonnement'
                                   : 'Slett',
                               style: TextStyle(color: colors.error),
@@ -251,31 +251,31 @@ class ListCard extends StatelessWidget {
 
   String _buildSubtitle() {
     final count = '${list.itemCount} produkter';
-    switch (list.listType) {
-      case ListType.cellar:
-        if (list.stats != null) {
-          return '${list.stats!.totalBottles} flasker · Kr ${list.stats!.totalValue.toStringAsFixed(0)}';
-        }
-        return count;
-      case ListType.event:
-        if (list.eventDate != null) {
-          final d = list.eventDate!;
-          return '$count · ${d.day}. ${monthAbbreviations[d.month - 1]} ${d.year}';
-        }
-        return count;
-      case ListType.shopping:
-      case ListType.standard:
-        return count;
-      case ListType.untappd:
-        if (list.untappdUsername != null) {
-          return '$count · @${list.untappdUsername}';
-        }
-        return count;
+
+    if (list.isUntappd && list.untappdUsername != null) {
+      return count;
     }
+
+    if (list.showVintage && list.stats != null) {
+      final bottles = list.stats!.totalBottles;
+      final label = '$bottles ${bottles == 1 ? 'flaske' : 'flasker'}';
+      // Only add value when showStore isn't already showing it via the badge
+      if (!list.showStore && list.stats!.totalValue > 0) {
+        return '$count · $label · Kr ${list.stats!.totalValue.toStringAsFixed(0)}';
+      }
+      return '$count · $label';
+    }
+
+    if (list.eventDate != null) {
+      final d = list.eventDate!;
+      return '$count · ${d.day}. ${monthAbbreviations[d.month - 1]} ${d.year}';
+    }
+
+    return count;
   }
 
   Widget _buildBadge(ColorScheme colors) {
-    if (list.listType == ListType.shopping && list.totalPrice != null) {
+    if (list.showStore && list.totalPrice != null && list.totalPrice! > 0) {
       return _pill(
         'Kr ${list.totalPrice!.toStringAsFixed(0)}',
         colors.primary.withValues(alpha: 0.12),
@@ -283,7 +283,7 @@ class ListCard extends StatelessWidget {
       );
     }
 
-    if (list.listType == ListType.event && list.isPast == true) {
+    if (list.eventDate != null && list.isPast == true) {
       return _pill(
         'Passert',
         colors.error.withValues(alpha: 0.12),

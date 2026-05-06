@@ -15,12 +15,18 @@ class ListActions {
     final result = await showListFormSheet(context, existingList: list);
     if (result == null) return false;
 
+    final clearDate = result['clearEventDate'] as bool? ?? false;
+
     await listsProvider.updateList(
       list.id,
       name: result['name'] as String,
       description: result['description'] as String,
-      listType: result['listType'] as ListType,
+      showQuantity: result['showQuantity'] as bool,
+      showStore: result['showStore'] as bool,
+      showVintage: result['showVintage'] as bool,
+      showPrices: result['showPrices'] as bool,
       eventDate: result['eventDate'] as DateTime?,
+      clearEventDate: clearDate,
     );
     return true;
   }
@@ -30,7 +36,7 @@ class ListActions {
     UserList list,
     ListsProvider listsProvider,
   ) async {
-    final isUntappd = list.listType == ListType.untappd;
+    final isUntappd = list.isUntappd;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

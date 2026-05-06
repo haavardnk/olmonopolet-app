@@ -145,6 +145,10 @@ class UserList extends Equatable {
   final String name;
   final String? description;
   final ListType listType;
+  final bool showQuantity;
+  final bool showStore;
+  final bool showVintage;
+  final bool showPrices;
   final String? selectedStoreId;
   final DateTime? eventDate;
   final int sortOrder;
@@ -162,11 +166,18 @@ class UserList extends Equatable {
   final DateTime? lastSynced;
   final String? syncStatus;
 
+  bool get isUntappd => untappdListId != null;
+  bool get isReadOnly => isUntappd;
+
   const UserList({
     required this.id,
     required this.name,
     this.description,
     required this.listType,
+    this.showQuantity = false,
+    this.showStore = false,
+    this.showVintage = false,
+    this.showPrices = true,
     this.selectedStoreId,
     this.eventDate,
     required this.sortOrder,
@@ -192,7 +203,7 @@ class UserList extends Equatable {
         : <String>[];
 
     List<ListItem>? items;
-    if (listType == ListType.untappd) {
+    if (json['untappd_list_id'] != null) {
       items = [
         for (var i = 0; i < productIds.length; i++)
           ListItem(
@@ -214,6 +225,10 @@ class UserList extends Equatable {
       name: json['name'] as String,
       description: json['description'] as String?,
       listType: listType,
+      showQuantity: json['show_quantity'] as bool? ?? false,
+      showStore: json['show_store'] as bool? ?? false,
+      showVintage: json['show_vintage'] as bool? ?? false,
+      showPrices: json['show_prices'] as bool? ?? true,
       selectedStoreId: json['selected_store_id']?.toString(),
       eventDate: json['event_date'] != null
           ? DateTime.parse(json['event_date'] as String)
@@ -246,6 +261,10 @@ class UserList extends Equatable {
     String? name,
     String? description,
     ListType? listType,
+    bool? showQuantity,
+    bool? showStore,
+    bool? showVintage,
+    bool? showPrices,
     String? selectedStoreId,
     DateTime? eventDate,
     int? sortOrder,
@@ -268,6 +287,10 @@ class UserList extends Equatable {
         name: name ?? this.name,
         description: description ?? this.description,
         listType: listType ?? this.listType,
+        showQuantity: showQuantity ?? this.showQuantity,
+        showStore: showStore ?? this.showStore,
+        showVintage: showVintage ?? this.showVintage,
+        showPrices: showPrices ?? this.showPrices,
         selectedStoreId: selectedStoreId ?? this.selectedStoreId,
         eventDate: eventDate ?? this.eventDate,
         sortOrder: sortOrder ?? this.sortOrder,
@@ -292,6 +315,10 @@ class UserList extends Equatable {
         name,
         description,
         listType,
+        showQuantity,
+        showStore,
+        showVintage,
+        showPrices,
         selectedStoreId,
         eventDate,
         sortOrder,
@@ -316,6 +343,10 @@ class SharedUserList extends Equatable {
   final String name;
   final String? description;
   final ListType listType;
+  final bool showQuantity;
+  final bool showStore;
+  final bool showVintage;
+  final bool showPrices;
   final String? userName;
   final String? storeName;
   final DateTime? eventDate;
@@ -326,11 +357,17 @@ class SharedUserList extends Equatable {
   final List<ListItem> items;
   final DateTime createdAt;
 
+  bool get isUntappd => listType == ListType.untappd;
+
   const SharedUserList({
     required this.id,
     required this.name,
     this.description,
     required this.listType,
+    this.showQuantity = false,
+    this.showStore = false,
+    this.showVintage = false,
+    this.showPrices = true,
     this.userName,
     this.storeName,
     this.eventDate,
@@ -351,6 +388,10 @@ class SharedUserList extends Equatable {
       name: json['name'] as String,
       description: json['description'] as String?,
       listType: ListType.fromApi(json['list_type'] as String),
+      showQuantity: json['show_quantity'] as bool? ?? false,
+      showStore: json['show_store'] as bool? ?? false,
+      showVintage: json['show_vintage'] as bool? ?? false,
+      showPrices: json['show_prices'] as bool? ?? true,
       userName: json['user_name'] as String?,
       storeName: json['store_name'] as String?,
       eventDate: json['event_date'] != null
@@ -375,6 +416,10 @@ class SharedUserList extends Equatable {
         name,
         description,
         listType,
+        showQuantity,
+        showStore,
+        showVintage,
+        showPrices,
         userName,
         storeName,
         eventDate,

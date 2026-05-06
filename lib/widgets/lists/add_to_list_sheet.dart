@@ -36,7 +36,7 @@ class AddToListSheet extends StatelessWidget {
     return Consumer<ListsProvider>(
       builder: (ctx, provider, _) {
         final lists = provider.lists
-            .where((l) => l.listType != ListType.untappd)
+            .where((l) => !l.isUntappd)
             .toList();
 
         return Padding(
@@ -135,7 +135,7 @@ class _ListPickerItem extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        '${list.itemCount} produkter · ${list.listType.label}',
+        '${list.itemCount} produkter',
         style: TextStyle(
           fontSize: 12.sp,
           color: colors.onSurfaceVariant,

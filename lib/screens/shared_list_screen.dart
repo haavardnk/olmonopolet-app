@@ -112,7 +112,7 @@ class _SharedListScreenState extends State<SharedListScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(list.name)),
       body: _buildBody(list),
-      bottomNavigationBar: list.listType == ListType.shopping
+      bottomNavigationBar: list.showStore
           ? ShoppingTotalBar(
               totalPrice: _calculateTotal(),
               itemCount: list.items.length,
@@ -145,7 +145,10 @@ class _SharedListScreenState extends State<SharedListScreen> {
                   key: ValueKey(item.id),
                   item: item,
                   product: _products[item.productId],
-                  listType: list.listType,
+                  showQuantity: list.showQuantity,
+                  showStore: list.showStore,
+                  showVintage: list.showVintage,
+                  showPrices: list.showPrices,
                   onRemove: () {},
                   routePrefix: '/lists/shared',
                 );
@@ -178,7 +181,7 @@ class _SharedListScreenState extends State<SharedListScreen> {
             ),
             SizedBox(height: 10.h),
           ],
-          if (list.listType == ListType.cellar && list.stats != null) ...[
+          if (list.showVintage && list.stats != null) ...[
             CellarStatsWidget(stats: list.stats!),
           ],
           SizedBox(height: 8.h),
@@ -241,7 +244,7 @@ class _SharedListScreenState extends State<SharedListScreen> {
               ),
             ],
           ),
-          if (list.storeName != null && list.listType == ListType.shopping) ...[
+          if (list.storeName != null && list.showStore) ...[
             Divider(
               height: 20.h,
               color: colors.secondary.withValues(alpha: 0.2),
@@ -363,7 +366,7 @@ class _SharedListScreenState extends State<SharedListScreen> {
 
   Widget _buildEmptyState(SharedUserList list) {
     final colors = Theme.of(context).colorScheme;
-    final isShopping = list.listType == ListType.shopping;
+    final isShopping = list.showStore;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),

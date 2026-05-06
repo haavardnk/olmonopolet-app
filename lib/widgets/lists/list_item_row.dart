@@ -14,7 +14,10 @@ import '../common/info_chips.dart';
 class ListItemRow extends StatelessWidget {
   final ListItem item;
   final Product? product;
-  final ListType listType;
+  final bool showQuantity;
+  final bool showStore;
+  final bool showVintage;
+  final bool showPrices;
   final int? dragIndex;
   final bool? inStock;
   final int? stockCount;
@@ -29,7 +32,10 @@ class ListItemRow extends StatelessWidget {
     super.key,
     required this.item,
     this.product,
-    required this.listType,
+    this.showQuantity = false,
+    this.showStore = false,
+    this.showVintage = false,
+    this.showPrices = true,
     this.dragIndex,
     this.inStock,
     this.stockCount,
@@ -170,7 +176,7 @@ class ListItemRow extends StatelessWidget {
                       _buildRightColumn(colors),
                     ],
                   ),
-                if (listType == ListType.cellar && !isReadOnly) ...[
+                if (showVintage && !isReadOnly) ...[
                   SizedBox(height: 8.h),
                   _buildVintageChip(context, colors),
                 ],
@@ -206,13 +212,12 @@ class ListItemRow extends StatelessWidget {
   }
 
   Widget _buildRightColumn(ColorScheme colors) {
-    final isShopping = listType == ListType.shopping;
-    final showQuantity = (isShopping || listType == ListType.cellar) && !isReadOnly;
+    final canShowQuantity = showQuantity && !isReadOnly;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if ((isShopping || listType == ListType.cellar) &&
+        if (showQuantity && showPrices &&
             product != null) ...[
           Text(
             '${(product!.price * item.quantity).toStringAsFixed(0)} kr',
@@ -231,8 +236,8 @@ class ListItemRow extends StatelessWidget {
             ),
           SizedBox(height: 6.h),
         ],
-        if (showQuantity) _buildQuantityControl(colors),
-        if (inStock != null && listType != ListType.cellar) ...[
+        if (canShowQuantity) _buildQuantityControl(colors),
+        if (inStock != null && showStore) ...[
           SizedBox(height: 4.h),
           _buildStockChip(colors),
         ],

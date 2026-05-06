@@ -109,7 +109,10 @@ class ListsProvider with ChangeNotifier {
   Future<UserList?> createList({
     required String name,
     String? description,
-    required ListType listType,
+    required bool showQuantity,
+    required bool showStore,
+    required bool showVintage,
+    required bool showPrices,
     DateTime? eventDate,
   }) async {
     final token = await _token;
@@ -121,7 +124,10 @@ class ListsProvider with ChangeNotifier {
         token,
         name: name,
         description: description,
-        listType: listType,
+        showQuantity: showQuantity,
+        showStore: showStore,
+        showVintage: showVintage,
+        showPrices: showPrices,
         eventDate: eventDate,
       );
       _lists.add(newList);
@@ -140,9 +146,13 @@ class ListsProvider with ChangeNotifier {
     int listId, {
     String? name,
     String? description,
-    ListType? listType,
+    bool? showQuantity,
+    bool? showStore,
+    bool? showVintage,
+    bool? showPrices,
     String? selectedStoreId,
     DateTime? eventDate,
+    bool clearEventDate = false,
   }) async {
     final token = await _token;
     if (token == null) return false;
@@ -154,9 +164,13 @@ class ListsProvider with ChangeNotifier {
         listId,
         name: name,
         description: description,
-        listType: listType,
+        showQuantity: showQuantity,
+        showStore: showStore,
+        showVintage: showVintage,
+        showPrices: showPrices,
         selectedStoreId: selectedStoreId,
         eventDate: eventDate,
+        clearEventDate: clearEventDate,
       );
       final index = _lists.indexWhere((l) => l.id == listId);
       if (index >= 0) {
@@ -457,7 +471,10 @@ class ListsProvider with ChangeNotifier {
         _client,
         token,
         name: 'Handleliste',
-        listType: ListType.shopping,
+        showQuantity: true,
+        showStore: true,
+        showVintage: false,
+        showPrices: true,
       );
     } catch (e, st) {
       CrashReporter.recordError(e, st);

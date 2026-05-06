@@ -15,7 +15,6 @@ import '../providers/lists.dart';
 import '../services/api.dart';
 import '../utils/crash_reporter.dart';
 import '../widgets/common/error_state.dart';
-import '../widgets/lists/cellar_stats.dart';
 import '../widgets/lists/list_actions.dart';
 import '../widgets/lists/list_item_row.dart';
 import '../widgets/lists/shopping_total_bar.dart';
@@ -176,6 +175,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _listsProvider.clearActiveList();
+      _listsProvider.fetchLists();
     });
     super.dispose();
   }
@@ -243,7 +243,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         return Scaffold(
           appBar: _buildAppBar(list),
           body: _buildBody(list, listsProvider),
-          bottomNavigationBar: list.listType == ListType.shopping
+          bottomNavigationBar: list.showStore
               ? ShoppingTotalBar(
                   totalPrice: _calculateTotal(list),
                   itemCount: list.items?.length ?? list.itemCount,
@@ -257,7 +257,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   }
 
   AppBar _buildAppBar(UserList list) {
-    final isUntappd = list.listType == ListType.untappd;
+    final isUntappd = list.isUntappd;
     return AppBar(
       title: Text(list.name),
       actions: [
@@ -305,7 +305,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
   Widget _buildBody(UserList list, ListsProvider listsProvider) {
     final items = list.items ?? [];
-    final isUntappd = list.listType == ListType.untappd;
+    final isUntappd = list.isUntappd;
 
     if (items.isEmpty && !_productsLoading) {
       return RefreshIndicator(
@@ -365,7 +365,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                         key: ValueKey(item.id),
                         item: item,
                         product: product,
-                        listType: list.listType,
+                        showQuantity: list.showQuantity,
+                        showStore: list.showStore,
+                        showVintage: list.showVintage,
+                        showPrices: list.showPrices,
                         dragIndex: isUntappd ? null : index,
                         inStock: inStock,
                         stockCount: stockCount,
@@ -402,9 +405,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
   Widget _buildListHeader(UserList list) {
     final colors = Theme.of(context).colorScheme;
-    final isShopping = list.listType == ListType.shopping;
     final hasStore =
         list.selectedStoreId != null && list.selectedStoreId!.isNotEmpty;
+    final hasMetadata = list.eventDate != null ||
+        (list.showVintage && (list.items?.isNotEmpty ?? false));
 
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
@@ -418,12 +422,106 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             ),
             SizedBox(height: 10.h),
           ],
-          if (isShopping) ...[_buildStoreSelector(list, colors, hasStore)],
-          if (list.eventDate != null) ...[_buildEventCard(list, colors)],
-          if (list.listType == ListType.cellar && list.items != null) ...[            CellarStatsWidget(stats: _computeCellarStats(list.items!)),
+          if (list.isUntappd) ...[
+            _buildUntappdHeader(list, colors),
+            SizedBox(height: 6.h),
           ],
-          if (list.listType == ListType.untappd) ...[_buildUntappdHeader(list, colors)],
-          SizedBox(height: 8.h),
+          if (list.showStore) ...[
+            _buildStoreSelector(list, colors, hasStore),
+            SizedBox(height: 6.h),
+          ],
+          if (hasMetadata) ...[
+            _buildMetadataChips(list, colors),
+            SizedBox(height: 4.h),
+          ],
+          SizedBox(height: 4.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetadataChips(UserList list, ColorScheme colors) {
+    final chips = <Widget>[];
+
+    if (list.eventDate != null) {
+      final isPast = list.isPast == true;
+      final date = list.eventDate!;
+      final label = isPast
+          ? 'Passert · ${date.day}. ${monthAbbreviations[date.month - 1]}'
+          : '${date.day}. ${monthAbbreviations[date.month - 1]} ${date.year}';
+      chips.add(_buildInfoChip(
+        Icons.event,
+        label,
+        isPast ? colors.errorContainer.withValues(alpha: 0.5) : colors.primaryContainer.withValues(alpha: 0.5),
+        isPast ? colors.error : colors.primary,
+        colors,
+      ));
+    }
+
+    if (list.showVintage && list.items != null && list.items!.isNotEmpty) {
+      final stats = _computeCellarStats(list.items!);
+      chips.add(_buildInfoChip(
+        Icons.inventory_2_outlined,
+        '${stats.totalBottles} flasker',
+        colors.surfaceContainerHighest,
+        colors.primary,
+        colors,
+      ));
+      // Don't duplicate value when showStore=true — the bottom bar already shows it
+      if (!list.showStore && stats.totalValue > 0) {
+        chips.add(_buildInfoChip(
+          Icons.payments_outlined,
+          'Kr ${stats.totalValue.toStringAsFixed(0)}',
+          colors.surfaceContainerHighest,
+          colors.primary,
+          colors,
+        ));
+      }
+      if (stats.oldestYear != null || stats.newestYear != null) {
+        final yearRange = (stats.oldestYear != null && stats.newestYear != null)
+            ? (stats.oldestYear == stats.newestYear
+                ? '${stats.oldestYear}'
+                : '${stats.oldestYear} – ${stats.newestYear}')
+            : '${stats.oldestYear ?? stats.newestYear}';
+        chips.add(_buildInfoChip(
+          Icons.calendar_today_outlined,
+          yearRange,
+          colors.surfaceContainerHighest,
+          colors.primary,
+          colors,
+        ));
+      }
+    }
+
+    return Wrap(spacing: 6.w, runSpacing: 6.h, children: chips);
+  }
+
+  Widget _buildInfoChip(
+    IconData icon,
+    String text,
+    Color bg,
+    Color iconColor,
+    ColorScheme colors,
+  ) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14.r, color: iconColor),
+          SizedBox(width: 6.w),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              color: colors.onSurface,
+            ),
+          ),
         ],
       ),
     );
@@ -504,85 +602,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     );
   }
 
-  Widget _buildEventCard(UserList list, ColorScheme colors) {
-    final isPast = list.isPast == true;
-    final date = list.eventDate!;
-
-    return Container(
-      padding: EdgeInsets.all(12.r),
-      decoration: BoxDecoration(
-        color: isPast
-            ? colors.errorContainer.withValues(alpha: 0.2)
-            : colors.primaryContainer.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: isPast
-              ? colors.error.withValues(alpha: 0.2)
-              : colors.primary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: isPast
-                  ? colors.error.withValues(alpha: 0.15)
-                  : colors.primary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.event,
-              size: 18.r,
-              color: isPast ? colors.error : colors.primary,
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${date.day}. ${monthAbbreviations[date.month - 1]} ${date.year}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 1.h),
-                Text(
-                  isPast ? 'Arrangementet er passert' : 'Kommende arrangement',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: isPast
-                        ? colors.error.withValues(alpha: 0.8)
-                        : colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (isPast)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: colors.error.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(
-                'Passert',
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w600,
-                  color: colors.error,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   ListStats _computeCellarStats(List<ListItem> items) {
     int totalBottles = 0;
     double totalValue = 0;
@@ -613,8 +632,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
   Widget _buildEmptyState(UserList list) {
     final colors = Theme.of(context).colorScheme;
-    final isShopping = list.listType == ListType.shopping;
-    final isUntappd = list.listType == ListType.untappd;
+    final isShopping = list.showStore;
+    final isUntappd = list.isUntappd;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -648,7 +667,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
               SizedBox(height: 8.h),
               Text(
                 isUntappd
-                    ? 'Trykk synkroniser for å hente produkter fra Untappd.'
+                    ? 'Ingen produkter fra denne Untappd-listen finnes på Vinmonopolet.'
                     : 'Legg til produkter fra produktsiden.',
                 style: TextStyle(
                   fontSize: 13.sp,

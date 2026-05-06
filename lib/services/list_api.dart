@@ -105,13 +105,19 @@ class ListApi {
     String token, {
     required String name,
     String? description,
-    required ListType listType,
+    required bool showQuantity,
+    required bool showStore,
+    required bool showVintage,
+    required bool showPrices,
     DateTime? eventDate,
   }) async {
     const endpoint = 'lists/';
     final body = <String, dynamic>{
       'name': name,
-      'list_type': listType.apiValue,
+      'show_quantity': showQuantity,
+      'show_store': showStore,
+      'show_vintage': showVintage,
+      'show_prices': showPrices,
     };
     if (description != null) body['description'] = description;
     if (eventDate != null) {
@@ -142,19 +148,28 @@ class ListApi {
     int listId, {
     String? name,
     String? description,
-    ListType? listType,
+    bool? showQuantity,
+    bool? showStore,
+    bool? showVintage,
+    bool? showPrices,
     String? selectedStoreId,
     DateTime? eventDate,
+    bool clearEventDate = false,
   }) async {
     final endpoint = 'lists/$listId/';
     final body = <String, dynamic>{};
     if (name != null) body['name'] = name;
     if (description != null) body['description'] = description;
-    if (listType != null) body['list_type'] = listType.apiValue;
+    if (showQuantity != null) body['show_quantity'] = showQuantity;
+    if (showStore != null) body['show_store'] = showStore;
+    if (showVintage != null) body['show_vintage'] = showVintage;
+    if (showPrices != null) body['show_prices'] = showPrices;
     if (selectedStoreId != null) {
       body['selected_store_id'] = int.tryParse(selectedStoreId);
     }
-    if (eventDate != null) {
+    if (clearEventDate) {
+      body['event_date'] = null;
+    } else if (eventDate != null) {
       body['event_date'] =
           '${eventDate.year}-${eventDate.month.toString().padLeft(2, '0')}-${eventDate.day.toString().padLeft(2, '0')}';
     }

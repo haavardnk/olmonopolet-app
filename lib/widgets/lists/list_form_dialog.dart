@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../models/user_list.dart';
+import '../../models/list_preset.dart';
 import '../common/drag_handle.dart';
 
 Future<Map<String, dynamic>?> showListFormSheet(
@@ -32,8 +33,12 @@ class _ListFormSheetState extends State<_ListFormSheet> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
-  late ListType _selectedType;
+  late bool _showQuantity;
+  late bool _showStore;
+  late bool _showVintage;
+  late bool _showPrices;
   DateTime? _eventDate;
+  bool _customExpanded = false;
 
   @override
   void initState() {
@@ -42,8 +47,21 @@ class _ListFormSheetState extends State<_ListFormSheet> {
         TextEditingController(text: widget.existingList?.name ?? '');
     _descriptionController =
         TextEditingController(text: widget.existingList?.description ?? '');
-    _selectedType = widget.existingList?.listType ?? ListType.standard;
+    _showQuantity = widget.existingList?.showQuantity ?? false;
+    _showStore = widget.existingList?.showStore ?? false;
+    _showVintage = widget.existingList?.showVintage ?? false;
+    _showPrices = widget.existingList?.showPrices ?? true;
     _eventDate = widget.existingList?.eventDate;
+
+    if (_isEditing) {
+      final matched = matchPreset(
+        showQuantity: _showQuantity,
+        showStore: _showStore,
+        showVintage: _showVintage,
+        showPrices: _showPrices,
+      );
+      if (matched == null) _customExpanded = true;
+    }
   }
 
   @override
@@ -55,6 +73,25 @@ class _ListFormSheetState extends State<_ListFormSheet> {
 
   bool get _isEditing => widget.existingList != null;
 
+  String? get _activePresetId {
+    final matched = matchPreset(
+      showQuantity: _showQuantity,
+      showStore: _showStore,
+      showVintage: _showVintage,
+      showPrices: _showPrices,
+    );
+    return matched?.id;
+  }
+
+  void _applyPreset(ListPreset preset) {
+    setState(() {
+      _showQuantity = preset.showQuantity;
+      _showStore = preset.showStore;
+      _showVintage = preset.showVintage;
+      _showPrices = preset.showPrices;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -64,13 +101,15 @@ class _ListFormSheetState extends State<_ListFormSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const DragHandle(topMargin: true),
-            _buildHeader(colors),
-            _buildForm(colors),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const DragHandle(topMargin: true),
+              _buildHeader(colors),
+              _buildForm(colors),
+            ],
+          ),
         ),
       ),
     );
@@ -108,7 +147,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
                 SizedBox(height: 2.h),
                 Text(
                   _isEditing
-                      ? 'Endre navn, type eller beskrivelse'
+                      ? 'Endre navn, innstillinger eller beskrivelse'
                       : 'Opprett en ny liste',
                   style: TextStyle(
                     fontSize: 13.sp,
@@ -203,11 +242,11 @@ class _ListFormSheetState extends State<_ListFormSheet> {
               ),
             ),
             SizedBox(height: 8.h),
-            _buildTypeRow(colors),
-            if (_selectedType == ListType.event) ...[
-              SizedBox(height: 12.h),
-              _buildDatePicker(colors),
-            ],
+            _buildPresetRow(colors),
+            SizedBox(height: 8.h),
+            _buildCustomSection(colors),
+            SizedBox(height: 12.h),
+            _buildDatePicker(colors),
             SizedBox(height: 20.h),
             SizedBox(
               width: double.infinity,
@@ -235,24 +274,23 @@ class _ListFormSheetState extends State<_ListFormSheet> {
     );
   }
 
-  Widget _buildTypeRow(ColorScheme colors) {
-    final types = ListType.values.where((t) => t != ListType.untappd).toList();
+  Widget _buildPresetRow(ColorScheme colors) {
     return Row(
-      children: types.map((type) {
-        final isSelected = _selectedType == type;
+      children: listPresets.map((preset) {
+        final isSelected = _activePresetId == preset.id;
         return Expanded(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 3.w),
-            child: _buildTypeChip(type, isSelected, colors),
+            child: _buildPresetChip(preset, isSelected, colors),
           ),
         );
       }).toList(),
     );
   }
 
-  Widget _buildTypeChip(ListType type, bool isSelected, ColorScheme colors) {
+  Widget _buildPresetChip(ListPreset preset, bool isSelected, ColorScheme colors) {
     return GestureDetector(
-      onTap: () => setState(() => _selectedType = type),
+      onTap: () => _applyPreset(preset),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10.h),
         decoration: BoxDecoration(
@@ -268,7 +306,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              type.icon,
+              preset.icon,
               size: 20.r,
               color: isSelected
                   ? colors.onPrimaryContainer
@@ -276,7 +314,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
             ),
             SizedBox(height: 4.h),
             Text(
-              type.label,
+              preset.label,
               style: TextStyle(
                 fontSize: 11.sp,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -284,6 +322,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
                     ? colors.onPrimaryContainer
                     : colors.onSurfaceVariant,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -291,42 +330,167 @@ class _ListFormSheetState extends State<_ListFormSheet> {
     );
   }
 
+  Widget _buildCustomSection(ColorScheme colors) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => setState(() => _customExpanded = !_customExpanded),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: colors.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.tune,
+                  size: 18.r,
+                  color: colors.onSurfaceVariant,
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    'Tilpass',
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                Icon(
+                  _customExpanded
+                      ? Icons.expand_less
+                      : Icons.expand_more,
+                  size: 20.r,
+                  color: colors.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_customExpanded) ...[
+          SizedBox(height: 8.h),
+          _buildToggle(
+            colors,
+            label: 'Vis antall',
+            icon: Icons.numbers,
+            value: _showQuantity,
+            onChanged: (v) => setState(() => _showQuantity = v),
+          ),
+          _buildToggle(
+            colors,
+            label: 'Vis butikkstatus',
+            icon: Icons.storefront_outlined,
+            value: _showStore,
+            onChanged: (v) => setState(() => _showStore = v),
+          ),
+          _buildToggle(
+            colors,
+            label: 'Vis årgang',
+            icon: Icons.calendar_today_outlined,
+            value: _showVintage,
+            onChanged: (v) => setState(() => _showVintage = v),
+          ),
+          _buildToggle(
+            colors,
+            label: 'Vis priser',
+            icon: Icons.payments_outlined,
+            value: _showPrices,
+            onChanged: (v) => setState(() => _showPrices = v),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildToggle(
+    ColorScheme colors, {
+    required String label,
+    required IconData icon,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2.h),
+      child: Row(
+        children: [
+          SizedBox(width: 4.w),
+          Icon(icon, size: 18.r, color: colors.onSurfaceVariant),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 13.sp),
+            ),
+          ),
+          SizedBox(
+            height: 32.h,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _eventDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (picked != null && mounted) {
+      setState(() => _eventDate = picked);
+    }
+  }
+
   Widget _buildDatePicker(ColorScheme colors) {
-    return InkWell(
-      onTap: () async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: _eventDate ?? DateTime.now(),
-          firstDate: DateTime(2020),
-          lastDate: DateTime(2030),
-        );
-        if (picked != null) {
-          setState(() => _eventDate = picked);
-        }
-      },
+    return ClipRRect(
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
-        decoration: BoxDecoration(
-          color: colors.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12.r),
-        ),
+        color: colors.surfaceContainerHighest,
         child: Row(
           children: [
-            Icon(Icons.calendar_today,
-                size: 18.r, color: colors.onSurfaceVariant),
-            SizedBox(width: 10.w),
-            Text(
-              _eventDate != null
-                  ? '${_eventDate!.day}.${_eventDate!.month}.${_eventDate!.year}'
-                  : 'Velg dato',
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: _eventDate != null
-                    ? colors.onSurface
-                    : colors.onSurfaceVariant,
+            Expanded(
+              child: InkWell(
+                onTap: _pickDate,
+                child: Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_today,
+                          size: 18.r, color: colors.onSurfaceVariant),
+                      SizedBox(width: 10.w),
+                      Text(
+                        _eventDate != null
+                            ? '${_eventDate!.day}.${_eventDate!.month}.${_eventDate!.year}'
+                            : 'Arrangementdato (valgfritt)',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: _eventDate != null
+                              ? colors.onSurface
+                              : colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
+            if (_eventDate != null)
+              IconButton(
+                icon: Icon(Icons.close, size: 18.r),
+                color: colors.onSurfaceVariant,
+                visualDensity: VisualDensity.compact,
+                tooltip: 'Fjern dato',
+                onPressed: () => setState(() => _eventDate = null),
+              ),
           ],
         ),
       ),
@@ -339,8 +503,12 @@ class _ListFormSheetState extends State<_ListFormSheet> {
     Navigator.of(context).pop({
       'name': _nameController.text.trim(),
       'description': _descriptionController.text.trim(),
-      'listType': _selectedType,
+      'showQuantity': _showQuantity,
+      'showStore': _showStore,
+      'showVintage': _showVintage,
+      'showPrices': _showPrices,
       'eventDate': _eventDate,
+      'clearEventDate': _isEditing && widget.existingList?.eventDate != null && _eventDate == null,
     });
   }
 }

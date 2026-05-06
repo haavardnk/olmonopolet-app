@@ -213,7 +213,10 @@ class _ListsTabState extends State<ListsTab> with WidgetsBindingObserver {
     await listsProvider.createList(
       name: result['name'] as String,
       description: result['description'] as String?,
-      listType: result['listType'] as ListType,
+      showQuantity: result['showQuantity'] as bool,
+      showStore: result['showStore'] as bool,
+      showVintage: result['showVintage'] as bool,
+      showPrices: result['showPrices'] as bool,
       eventDate: result['eventDate'] as DateTime?,
     );
   }
