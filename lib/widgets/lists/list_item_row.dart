@@ -10,6 +10,7 @@ import '../common/drag_handle.dart';
 import '../common/rating_widget.dart';
 import '../common/product_image.dart';
 import '../common/info_chips.dart';
+import '../common/tasted_badge.dart';
 
 class ListItemRow extends StatelessWidget {
   final ListItem item;
@@ -25,6 +26,7 @@ class ListItemRow extends StatelessWidget {
   final void Function(int quantity)? onQuantityChanged;
   final void Function(int year)? onYearChanged;
   final void Function(String notes)? onNotesChanged;
+  final void Function(Product updated)? onTastedToggled;
   final String routePrefix;
   final bool isReadOnly;
 
@@ -43,6 +45,7 @@ class ListItemRow extends StatelessWidget {
     this.onQuantityChanged,
     this.onYearChanged,
     this.onNotesChanged,
+    this.onTastedToggled,
     this.routePrefix = '/lists',
     this.isReadOnly = false,
   });
@@ -74,18 +77,32 @@ class ListItemRow extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (dragIndex != null && !isReadOnly)
-                      ReorderableDragStartListener(
-                        index: dragIndex!,
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 8.w, top: 2.h),
-                          child: Icon(
-                            Icons.drag_indicator,
-                            size: 20.r,
-                            color: colors.onSurfaceVariant
-                                .withValues(alpha: 0.5),
-                          ),
-                        ),
+                    if ((dragIndex != null && !isReadOnly) ||
+                        (product != null && onTastedToggled != null))
+                      Column(
+                        children: [
+                          if (dragIndex != null && !isReadOnly)
+                            ReorderableDragStartListener(
+                              index: dragIndex!,
+                              child: Padding(
+                                padding: EdgeInsets.only(right: 8.w, top: 2.h),
+                                child: Icon(
+                                  Icons.drag_indicator,
+                                  size: 20.r,
+                                  color: colors.onSurfaceVariant
+                                      .withValues(alpha: 0.5),
+                                ),
+                              ),
+                            ),
+                          if (product != null && onTastedToggled != null)
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.w, top: 6.h),
+                              child: TastedBadge(
+                                product: product!,
+                                onToggled: onTastedToggled!,
+                              ),
+                            ),
+                        ],
                       ),
                     _buildImage(imageSize),
                     SizedBox(width: 12.w),

@@ -394,6 +394,11 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                                   item.id,
                                   notes: notes,
                                 ),
+                        onTastedToggled: (updated) {
+                          setState(() {
+                            _products[updated.id.toString()] = updated;
+                          });
+                        },
                       );
                     },
                   ),
