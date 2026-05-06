@@ -4,6 +4,26 @@ import '../models/changelog.dart';
 
 const List<ChangelogVersion> changelogVersions = [
   ChangelogVersion(
+    version: '3.1.1',
+    title: 'Hva er nytt?',
+    entries: [
+      ChangelogEntry(
+        icon: Icons.group_outlined,
+        title: 'Følg andres lister',
+        description:
+            'Abonner på delte lister fra andre brukere. '
+            'Åpne en delt lenke og følg listen for å ha den tilgjengelig.',
+      ),
+      ChangelogEntry(
+        icon: Icons.tune_outlined,
+        title: 'Mer listefleksibilitet',
+        description:
+            'Tilpass hver liste akkurat slik du vil – velg hvilke felter som vises, '
+            'eller bruk en av forhåndsinnstillingene som utgangspunkt.',
+      ),
+    ],
+  ),
+  ChangelogVersion(
     version: '3.1.0',
     title: 'Hva er nytt?',
     entries: [
