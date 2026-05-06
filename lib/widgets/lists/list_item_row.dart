@@ -85,7 +85,7 @@ class ListItemRow extends StatelessWidget {
                             ReorderableDragStartListener(
                               index: dragIndex!,
                               child: Padding(
-                                padding: EdgeInsets.only(right: 8.w, top: 2.h),
+                                padding: EdgeInsets.only(right: 8.w),
                                 child: Icon(
                                   Icons.drag_indicator,
                                   size: 20.r,
@@ -96,7 +96,7 @@ class ListItemRow extends StatelessWidget {
                             ),
                           if (product != null && onTastedToggled != null)
                             Padding(
-                              padding: EdgeInsets.only(right: 8.w, top: 6.h),
+                              padding: EdgeInsets.only(right: 8.w, top: 4.h),
                               child: TastedBadge(
                                 product: product!,
                                 onToggled: onTastedToggled!,
@@ -167,24 +167,6 @@ class ListItemRow extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 4.h),
-                              Row(
-                                children: [
-                                  buildInfoChip(
-                                    '${product!.volume}L',
-                                    context,
-                                    icon: Icons.water_drop_outlined,
-                                  ),
-                                  if (product!.abv != null) ...[
-                                    SizedBox(width: 4.w),
-                                    buildInfoChip(
-                                      '${product!.abv!.toStringAsFixed(1)}%',
-                                      context,
-                                      icon: Icons.percent,
-                                    ),
-                                  ],
-                                ],
-                              ),
                             ],
                           ],
                         ),
@@ -193,6 +175,28 @@ class ListItemRow extends StatelessWidget {
                       _buildRightColumn(colors),
                     ],
                   ),
+                if (product != null) ...[
+                  SizedBox(height: 6.h),
+                  Wrap(
+                    spacing: 4.w,
+                    runSpacing: 4.h,
+                    children: [
+                      buildInfoChip(
+                        '${product!.volume}L',
+                        context,
+                        icon: Icons.water_drop_outlined,
+                      ),
+                      if (product!.abv != null)
+                        buildInfoChip(
+                          '${product!.abv!.toStringAsFixed(1)}%',
+                          context,
+                          icon: Icons.percent,
+                        ),
+                      if (inStock != null && showStore)
+                        _buildStockChip(colors),
+                    ],
+                  ),
+                ],
                 if (showVintage && !isReadOnly) ...[
                   SizedBox(height: 8.h),
                   _buildVintageChip(context, colors),
@@ -254,10 +258,6 @@ class ListItemRow extends StatelessWidget {
           SizedBox(height: 6.h),
         ],
         if (canShowQuantity) _buildQuantityControl(colors),
-        if (inStock != null && showStore) ...[
-          SizedBox(height: 4.h),
-          _buildStockChip(colors),
-        ],
       ],
     );
   }
