@@ -113,6 +113,7 @@ class ListsProvider with ChangeNotifier {
     required bool showStore,
     required bool showVintage,
     required bool showPrices,
+    bool showNotes = true,
     DateTime? eventDate,
   }) async {
     final token = await _token;
@@ -128,6 +129,7 @@ class ListsProvider with ChangeNotifier {
         showStore: showStore,
         showVintage: showVintage,
         showPrices: showPrices,
+        showNotes: showNotes,
         eventDate: eventDate,
       );
       _lists.add(newList);
@@ -150,6 +152,7 @@ class ListsProvider with ChangeNotifier {
     bool? showStore,
     bool? showVintage,
     bool? showPrices,
+    bool? showNotes,
     String? selectedStoreId,
     DateTime? eventDate,
     bool clearEventDate = false,
@@ -168,6 +171,7 @@ class ListsProvider with ChangeNotifier {
         showStore: showStore,
         showVintage: showVintage,
         showPrices: showPrices,
+        showNotes: showNotes,
         selectedStoreId: selectedStoreId,
         eventDate: eventDate,
         clearEventDate: clearEventDate,
@@ -475,6 +479,7 @@ class ListsProvider with ChangeNotifier {
         showStore: true,
         showVintage: false,
         showPrices: true,
+        showNotes: true,
       );
     } catch (e, st) {
       CrashReporter.recordError(e, st);

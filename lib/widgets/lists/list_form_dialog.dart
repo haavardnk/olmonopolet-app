@@ -37,6 +37,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
   late bool _showStore;
   late bool _showVintage;
   late bool _showPrices;
+  late bool _showNotes;
   DateTime? _eventDate;
   bool _customExpanded = false;
 
@@ -51,16 +52,17 @@ class _ListFormSheetState extends State<_ListFormSheet> {
     _showStore = widget.existingList?.showStore ?? false;
     _showVintage = widget.existingList?.showVintage ?? false;
     _showPrices = widget.existingList?.showPrices ?? true;
+    _showNotes = widget.existingList?.showNotes ?? false;
     _eventDate = widget.existingList?.eventDate;
 
     if (_isEditing) {
-      final matched = matchPreset(
+      matchPreset(
         showQuantity: _showQuantity,
         showStore: _showStore,
         showVintage: _showVintage,
         showPrices: _showPrices,
+        showNotes: _showNotes,
       );
-      if (matched == null) _customExpanded = true;
     }
   }
 
@@ -79,6 +81,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
       showStore: _showStore,
       showVintage: _showVintage,
       showPrices: _showPrices,
+      showNotes: _showNotes,
     );
     return matched?.id;
   }
@@ -89,6 +92,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
       _showStore = preset.showStore;
       _showVintage = preset.showVintage;
       _showPrices = preset.showPrices;
+      _showNotes = preset.showNotes;
     });
   }
 
@@ -400,6 +404,13 @@ class _ListFormSheetState extends State<_ListFormSheet> {
             value: _showPrices,
             onChanged: (v) => setState(() => _showPrices = v),
           ),
+          _buildToggle(
+            colors,
+            label: 'Notater',
+            icon: Icons.notes_outlined,
+            value: _showNotes,
+            onChanged: (v) => setState(() => _showNotes = v),
+          ),
         ],
       ],
     );
@@ -507,6 +518,7 @@ class _ListFormSheetState extends State<_ListFormSheet> {
       'showStore': _showStore,
       'showVintage': _showVintage,
       'showPrices': _showPrices,
+      'showNotes': _showNotes,
       'eventDate': _eventDate,
       'clearEventDate': _isEditing && widget.existingList?.eventDate != null && _eventDate == null,
     });

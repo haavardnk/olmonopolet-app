@@ -109,6 +109,7 @@ class ListApi {
     required bool showStore,
     required bool showVintage,
     required bool showPrices,
+    required bool showNotes,
     DateTime? eventDate,
   }) async {
     const endpoint = 'lists/';
@@ -118,6 +119,7 @@ class ListApi {
       'show_store': showStore,
       'show_vintage': showVintage,
       'show_prices': showPrices,
+      'show_notes': showNotes,
     };
     if (description != null) body['description'] = description;
     if (eventDate != null) {
@@ -152,6 +154,7 @@ class ListApi {
     bool? showStore,
     bool? showVintage,
     bool? showPrices,
+    bool? showNotes,
     String? selectedStoreId,
     DateTime? eventDate,
     bool clearEventDate = false,
@@ -164,6 +167,7 @@ class ListApi {
     if (showStore != null) body['show_store'] = showStore;
     if (showVintage != null) body['show_vintage'] = showVintage;
     if (showPrices != null) body['show_prices'] = showPrices;
+    if (showNotes != null) body['show_notes'] = showNotes;
     if (selectedStoreId != null) {
       body['selected_store_id'] = int.tryParse(selectedStoreId);
     }

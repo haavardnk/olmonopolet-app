@@ -9,6 +9,7 @@ class ListPreset {
   final bool showStore;
   final bool showVintage;
   final bool showPrices;
+  final bool showNotes;
 
   const ListPreset({
     required this.id,
@@ -19,6 +20,7 @@ class ListPreset {
     required this.showStore,
     required this.showVintage,
     required this.showPrices,
+    this.showNotes = true,
   });
 }
 
@@ -32,6 +34,7 @@ const listPresets = [
     showStore: false,
     showVintage: false,
     showPrices: true,
+    showNotes: false,
   ),
   ListPreset(
     id: 'shopping',
@@ -42,6 +45,7 @@ const listPresets = [
     showStore: true,
     showVintage: false,
     showPrices: true,
+    showNotes: true,
   ),
   ListPreset(
     id: 'cellar',
@@ -52,6 +56,7 @@ const listPresets = [
     showStore: false,
     showVintage: true,
     showPrices: true,
+    showNotes: true,
   ),
 ];
 
@@ -60,12 +65,14 @@ ListPreset? matchPreset({
   required bool showStore,
   required bool showVintage,
   required bool showPrices,
+  required bool showNotes,
 }) {
   for (final preset in listPresets) {
     if (preset.showQuantity == showQuantity &&
         preset.showStore == showStore &&
         preset.showVintage == showVintage &&
-        preset.showPrices == showPrices) {
+        preset.showPrices == showPrices &&
+        preset.showNotes == showNotes) {
       return preset;
     }
   }

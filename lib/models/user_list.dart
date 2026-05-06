@@ -149,6 +149,7 @@ class UserList extends Equatable {
   final bool showStore;
   final bool showVintage;
   final bool showPrices;
+  final bool showNotes;
   final String? selectedStoreId;
   final DateTime? eventDate;
   final int sortOrder;
@@ -178,6 +179,7 @@ class UserList extends Equatable {
     this.showStore = false,
     this.showVintage = false,
     this.showPrices = true,
+    this.showNotes = true,
     this.selectedStoreId,
     this.eventDate,
     required this.sortOrder,
@@ -229,6 +231,7 @@ class UserList extends Equatable {
       showStore: json['show_store'] as bool? ?? false,
       showVintage: json['show_vintage'] as bool? ?? false,
       showPrices: json['show_prices'] as bool? ?? true,
+      showNotes: json['show_notes'] as bool? ?? true,
       selectedStoreId: json['selected_store_id']?.toString(),
       eventDate: json['event_date'] != null
           ? DateTime.parse(json['event_date'] as String)
@@ -265,6 +268,7 @@ class UserList extends Equatable {
     bool? showStore,
     bool? showVintage,
     bool? showPrices,
+    bool? showNotes,
     String? selectedStoreId,
     DateTime? eventDate,
     int? sortOrder,
@@ -291,6 +295,7 @@ class UserList extends Equatable {
         showStore: showStore ?? this.showStore,
         showVintage: showVintage ?? this.showVintage,
         showPrices: showPrices ?? this.showPrices,
+        showNotes: showNotes ?? this.showNotes,
         selectedStoreId: selectedStoreId ?? this.selectedStoreId,
         eventDate: eventDate ?? this.eventDate,
         sortOrder: sortOrder ?? this.sortOrder,
@@ -319,6 +324,7 @@ class UserList extends Equatable {
         showStore,
         showVintage,
         showPrices,
+        showNotes,
         selectedStoreId,
         eventDate,
         sortOrder,
@@ -347,6 +353,7 @@ class SharedUserList extends Equatable {
   final bool showStore;
   final bool showVintage;
   final bool showPrices;
+  final bool showNotes;
   final String? userName;
   final String? storeName;
   final DateTime? eventDate;
@@ -368,6 +375,7 @@ class SharedUserList extends Equatable {
     this.showStore = false,
     this.showVintage = false,
     this.showPrices = true,
+    this.showNotes = true,
     this.userName,
     this.storeName,
     this.eventDate,
@@ -392,6 +400,7 @@ class SharedUserList extends Equatable {
       showStore: json['show_store'] as bool? ?? false,
       showVintage: json['show_vintage'] as bool? ?? false,
       showPrices: json['show_prices'] as bool? ?? true,
+      showNotes: json['show_notes'] as bool? ?? true,
       userName: json['user_name'] as String?,
       storeName: json['store_name'] as String?,
       eventDate: json['event_date'] != null
@@ -420,6 +429,7 @@ class SharedUserList extends Equatable {
         showStore,
         showVintage,
         showPrices,
+        showNotes,
         userName,
         storeName,
         eventDate,

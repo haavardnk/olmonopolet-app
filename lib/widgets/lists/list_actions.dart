@@ -25,6 +25,7 @@ class ListActions {
       showStore: result['showStore'] as bool,
       showVintage: result['showVintage'] as bool,
       showPrices: result['showPrices'] as bool,
+      showNotes: result['showNotes'] as bool,
       eventDate: result['eventDate'] as DateTime?,
       clearEventDate: clearDate,
     );

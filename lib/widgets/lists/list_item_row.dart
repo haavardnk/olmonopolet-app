@@ -19,6 +19,7 @@ class ListItemRow extends StatelessWidget {
   final bool showStore;
   final bool showVintage;
   final bool showPrices;
+  final bool showNotes;
   final int? dragIndex;
   final bool? inStock;
   final int? stockCount;
@@ -38,6 +39,7 @@ class ListItemRow extends StatelessWidget {
     this.showStore = false,
     this.showVintage = false,
     this.showPrices = true,
+    this.showNotes = true,
     this.dragIndex,
     this.inStock,
     this.stockCount,
@@ -201,7 +203,7 @@ class ListItemRow extends StatelessWidget {
                   SizedBox(height: 8.h),
                   _buildVintageChip(context, colors),
                 ],
-                if (!isReadOnly) ...[
+                if (!isReadOnly && showNotes) ...[
                   SizedBox(height: 8.h),
                   _buildNotesChip(context, colors),
                 ],

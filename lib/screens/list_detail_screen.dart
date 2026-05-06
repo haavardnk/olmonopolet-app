@@ -369,6 +369,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                         showStore: list.showStore,
                         showVintage: list.showVintage,
                         showPrices: list.showPrices,
+                        showNotes: list.showNotes,
                         dragIndex: isUntappd ? null : index,
                         inStock: inStock,
                         stockCount: stockCount,
