@@ -1,5 +1,5 @@
 PODS:
-  - app_badge_plus (1.2.9):
+  - app_badge_plus (1.2.10):
     - Flutter
   - AppAuth (1.7.6):
     - AppAuth/Core (= 1.7.6)
@@ -210,7 +210,7 @@ PODS:
   - PromisesObjC (2.4.0)
   - PromisesSwift (2.4.0):
     - PromisesObjC (= 2.4.0)
-  - rate_my_app (2.3.2):
+  - rate_my_app (2.4.0):
     - Flutter
     - FlutterMacOS
   - RecaptchaInterop (101.0.0)
@@ -321,7 +321,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  app_badge_plus: 6032bcb1e31689948ff63404c5d6f118001a9dee
+  app_badge_plus: 09939f19a075cc742cc155d8ed85e6d8601f0104
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   cupertino_http: 94ac07f5ff090b8effa6c5e2c47871d48ab7c86c
@@ -360,7 +360,7 @@ SPEC CHECKSUMS:
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
-  rate_my_app: cbb89973f870601f80f7bad63aba107260cabc5b
+  rate_my_app: 1bd2a80b234634df4af8634da60fe7d0f695d57f
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
