@@ -199,11 +199,11 @@ class ListItemRow extends StatelessWidget {
                     ],
                   ),
                 ],
-                if (showVintage && !isReadOnly) ...[
+                if (showVintage && (!isReadOnly || (item.year != null && item.year! > 0))) ...[
                   SizedBox(height: 8.h),
                   _buildVintageChip(context, colors),
                 ],
-                if (!isReadOnly && showNotes) ...[
+                if (showNotes && (!isReadOnly || (item.notes != null && item.notes!.isNotEmpty))) ...[
                   SizedBox(height: 8.h),
                   _buildNotesChip(context, colors),
                 ],

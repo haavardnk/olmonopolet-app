@@ -369,6 +369,46 @@ class ListApi {
     }
   }
 
+  static Future<void> followList(
+    http.Client client,
+    String token,
+    String shareToken,
+  ) async {
+    final endpoint = 'lists/shared/$shareToken/follow/';
+    try {
+      final response = await client.post(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _headers(token),
+      );
+      _handleResponse(
+        response: response,
+        parser: (_) => null,
+        endpoint: endpoint,
+      );
+    } on SocketException {
+      throw const NetworkException();
+    }
+  }
+
+  static Future<void> unfollowList(
+    http.Client client,
+    String token,
+    String shareToken,
+  ) async {
+    final endpoint = 'lists/shared/$shareToken/unfollow/';
+    try {
+      final response = await client.delete(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _headers(token),
+      );
+      if (response.statusCode != 204 && response.statusCode != 404) {
+        throw ApiException(message: 'Failed to unfollow list', endpoint: endpoint);
+      }
+    } on SocketException {
+      throw const NetworkException();
+    }
+  }
+
   static Future<void> syncUntappdList(
     http.Client client,
     String token,

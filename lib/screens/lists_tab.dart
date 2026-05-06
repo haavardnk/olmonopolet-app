@@ -230,6 +230,11 @@ class _ListsTabState extends State<ListsTab> with WidgetsBindingObserver {
 
   Future<void> _deleteList(UserList list) async {
     if (!mounted) return;
+    if (list.isFollowed) {
+      final listsProvider = Provider.of<ListsProvider>(context, listen: false);
+      await listsProvider.unfollowList(list.shareToken);
+      return;
+    }
     final listsProvider = Provider.of<ListsProvider>(context, listen: false);
     await ListActions.delete(context, list, listsProvider);
   }
@@ -382,6 +387,7 @@ class _ListsTabState extends State<ListsTab> with WidgetsBindingObserver {
         return RefreshIndicator(
           onRefresh: () => listsProvider.fetchLists(),
           child: AnimatedReorderableListView<UserList>(
+            key: ValueKey(listsProvider.listRebuildKey),
             items: listsProvider.lists,
             padding: EdgeInsets.only(top: 8.h, bottom: 80.h),
             buildDefaultDragHandles: false,

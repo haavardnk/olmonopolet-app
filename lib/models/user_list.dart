@@ -166,9 +166,11 @@ class UserList extends Equatable {
   final String? untappdUsername;
   final DateTime? lastSynced;
   final String? syncStatus;
+  final bool isFollowed;
+  final String? userName;
 
   bool get isUntappd => untappdListId != null;
-  bool get isReadOnly => isUntappd;
+  bool get isReadOnly => isUntappd || isFollowed;
 
   const UserList({
     required this.id,
@@ -196,6 +198,8 @@ class UserList extends Equatable {
     this.untappdUsername,
     this.lastSynced,
     this.syncStatus,
+    this.isFollowed = false,
+    this.userName,
   });
 
   factory UserList.fromJson(Map<String, dynamic> json) {
@@ -256,6 +260,8 @@ class UserList extends Equatable {
           ? DateTime.parse(json['last_synced'] as String)
           : null,
       syncStatus: json['sync_status'] as String?,
+      isFollowed: json['is_followed'] as bool? ?? false,
+      userName: json['user_name'] as String?,
     );
   }
 
@@ -285,6 +291,8 @@ class UserList extends Equatable {
     String? untappdUsername,
     DateTime? lastSynced,
     String? syncStatus,
+    bool? isFollowed,
+    String? userName,
   }) =>
       UserList(
         id: id ?? this.id,
@@ -312,6 +320,8 @@ class UserList extends Equatable {
         untappdUsername: untappdUsername ?? this.untappdUsername,
         lastSynced: lastSynced ?? this.lastSynced,
         syncStatus: syncStatus ?? this.syncStatus,
+        isFollowed: isFollowed ?? this.isFollowed,
+        userName: userName ?? this.userName,
       );
 
   @override
@@ -341,6 +351,8 @@ class UserList extends Equatable {
         untappdUsername,
         lastSynced,
         syncStatus,
+        isFollowed,
+        userName,
       ];
 }
 
@@ -356,6 +368,7 @@ class SharedUserList extends Equatable {
   final bool showNotes;
   final String? userName;
   final String? storeName;
+  final String? selectedStoreId;
   final DateTime? eventDate;
   final int itemCount;
   final double? totalPrice;
@@ -378,6 +391,7 @@ class SharedUserList extends Equatable {
     this.showNotes = true,
     this.userName,
     this.storeName,
+    this.selectedStoreId,
     this.eventDate,
     required this.itemCount,
     this.totalPrice,
@@ -403,6 +417,7 @@ class SharedUserList extends Equatable {
       showNotes: json['show_notes'] as bool? ?? true,
       userName: json['user_name'] as String?,
       storeName: json['store_name'] as String?,
+      selectedStoreId: json['selected_store_id']?.toString(),
       eventDate: json['event_date'] != null
           ? DateTime.parse(json['event_date'] as String)
           : null,
@@ -432,6 +447,7 @@ class SharedUserList extends Equatable {
         showNotes,
         userName,
         storeName,
+        selectedStoreId,
         eventDate,
         itemCount,
         totalPrice,

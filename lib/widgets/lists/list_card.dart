@@ -31,7 +31,7 @@ class ListCard extends StatelessWidget {
 
     return Dismissible(
       key: Key('list-card-${list.id}'),
-      direction: DismissDirection.startToEnd,
+      direction: list.isFollowed ? DismissDirection.none : DismissDirection.startToEnd,
       confirmDismiss: (_) async {
         HapticFeedback.mediumImpact();
         onDelete();
@@ -49,7 +49,9 @@ class ListCard extends StatelessWidget {
         ),
       ),
       child: GestureDetector(
-        onTap: () => context.go('/lists/${list.id}'),
+        onTap: () => list.isFollowed
+            ? context.go('/lists/shared/${list.shareToken}')
+            : context.go('/lists/${list.id}'),
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
           decoration: BoxDecoration(
@@ -175,6 +177,29 @@ class ListCard extends StatelessWidget {
                             ],
                           ),
                         ],
+                        if (list.isFollowed && list.userName != null) ...[
+                          SizedBox(height: 2.h),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                size: 12.r,
+                                color: colors.onSurfaceVariant,
+                              ),
+                              SizedBox(width: 4.w),
+                              Flexible(
+                                child: Text(
+                                  'Fra ${list.userName}',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -200,7 +225,7 @@ class ListCard extends StatelessWidget {
                       color: colors.onSurfaceVariant,
                     ),
                     itemBuilder: (_) => [
-                      if (!list.isUntappd)
+                      if (!list.isUntappd && !list.isFollowed)
                         PopupMenuItem(
                           value: 'share',
                           child: Row(
@@ -211,7 +236,7 @@ class ListCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                      if (!list.isUntappd)
+                      if (!list.isUntappd && !list.isFollowed)
                         PopupMenuItem(
                           value: 'edit',
                           child: Row(
@@ -232,7 +257,9 @@ class ListCard extends StatelessWidget {
                             Text(
                               list.isUntappd
                                   ? 'Avslutt abonnement'
-                                  : 'Slett',
+                                  : list.isFollowed
+                                      ? 'Slutt å følge'
+                                      : 'Slett',
                               style: TextStyle(color: colors.error),
                             ),
                           ],
@@ -275,6 +302,22 @@ class ListCard extends StatelessWidget {
   }
 
   Widget _buildBadge(ColorScheme colors) {
+    if (list.isFollowed) {
+      return _pill(
+        'Følger',
+        colors.secondary.withValues(alpha: 0.12),
+        colors.secondary,
+      );
+    }
+
+    if (list.isUntappd) {
+      return _pill(
+        'Untappd',
+        colors.secondary.withValues(alpha: 0.12),
+        colors.secondary,
+      );
+    }
+
     if (list.showStore && list.totalPrice != null && list.totalPrice! > 0) {
       return _pill(
         'Kr ${list.totalPrice!.toStringAsFixed(0)}',

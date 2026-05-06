@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../models/user_list.dart';
 import '../providers/http_client.dart';
+import '../providers/lists.dart';
 import '../services/list_api.dart';
 import '../utils/list_helpers.dart';
 import '../utils/crash_reporter.dart';
@@ -26,12 +27,19 @@ class _SharedListScreenState extends State<SharedListScreen> {
   SharedUserList? _list;
   Map<String, Product> _products = {};
   bool _loading = true;
+  bool _followLoading = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadSharedList());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSharedList();
+      final listsProvider = Provider.of<ListsProvider>(context, listen: false);
+      if (listsProvider.isAuthenticated && listsProvider.lists.isEmpty) {
+        listsProvider.fetchLists();
+      }
+    });
   }
 
   Future<void> _loadSharedList() async {
@@ -88,6 +96,25 @@ class _SharedListScreenState extends State<SharedListScreen> {
     return total;
   }
 
+  Future<void> _toggleFollow() async {
+    final listsProvider = Provider.of<ListsProvider>(context, listen: false);
+    if (!listsProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Logg inn for å følge lister')),
+      );
+      return;
+    }
+    setState(() => _followLoading = true);
+    final isFollowing = listsProvider.lists
+        .any((l) => l.isFollowed && l.shareToken == widget.shareToken);
+    if (isFollowing) {
+      await listsProvider.unfollowList(widget.shareToken);
+    } else {
+      await listsProvider.followList(widget.shareToken);
+    }
+    if (mounted) setState(() => _followLoading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -108,9 +135,40 @@ class _SharedListScreenState extends State<SharedListScreen> {
     }
 
     final list = _list!;
+    final listsProvider = context.watch<ListsProvider>();
+    final isOwnList = listsProvider.lists
+        .any((l) => !l.isFollowed && l.shareToken == widget.shareToken);
+    final isFollowing = listsProvider.lists
+        .any((l) => l.isFollowed && l.shareToken == widget.shareToken);
+    final showFollowButton =
+        listsProvider.isAuthenticated && !isOwnList;
 
     return Scaffold(
-      appBar: AppBar(title: Text(list.name)),
+      appBar: AppBar(
+        title: Text(list.name),
+        actions: [
+          if (showFollowButton)
+            _followLoading
+                ? Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: SizedBox(
+                      width: 20.r,
+                      height: 20.r,
+                      child: const CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : TextButton.icon(
+                    onPressed: _toggleFollow,
+                    icon: Icon(
+                      isFollowing
+                          ? Icons.bookmark
+                          : Icons.bookmark_border_outlined,
+                      size: 18.r,
+                    ),
+                    label: Text(isFollowing ? 'Følger' : 'Følg'),
+                  ),
+        ],
+      ),
       body: _buildBody(list),
       bottomNavigationBar: list.showStore
           ? ShoppingTotalBar(
@@ -149,8 +207,15 @@ class _SharedListScreenState extends State<SharedListScreen> {
                   showStore: list.showStore,
                   showVintage: list.showVintage,
                   showPrices: list.showPrices,
+                  showNotes: list.showNotes,
+                  isReadOnly: true,
                   onRemove: () {},
                   routePrefix: '/lists/shared',
+                  onTastedToggled: (updated) {
+                    setState(() {
+                      _products[updated.id.toString()] = updated;
+                    });
+                  },
                 );
               },
             ),
@@ -181,8 +246,22 @@ class _SharedListScreenState extends State<SharedListScreen> {
             ),
             SizedBox(height: 10.h),
           ],
-          if (list.showVintage && list.stats != null) ...[
-            CellarStatsWidget(stats: list.stats!),
+          if ((list.showVintage && list.stats != null) ||
+              (list.storeName != null && list.showStore)) ...[
+            Wrap(
+              spacing: 6.w,
+              runSpacing: 6.h,
+              children: [
+                if (list.showVintage && list.stats != null)
+                  ...CellarStatsWidget.buildChips(
+                    context,
+                    list.stats!,
+                    hidePrice: list.showStore,
+                  ),
+                if (list.storeName != null && list.showStore)
+                  _buildStoreChip(list.storeName!, colors),
+              ],
+            ),
           ],
           SizedBox(height: 8.h),
         ],
@@ -244,52 +323,6 @@ class _SharedListScreenState extends State<SharedListScreen> {
               ),
             ],
           ),
-          if (list.storeName != null && list.showStore) ...[
-            Divider(
-              height: 20.h,
-              color: colors.secondary.withValues(alpha: 0.2),
-            ),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(8.r),
-                  decoration: BoxDecoration(
-                    color: colors.secondary.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.store,
-                    size: 18.r,
-                    color: colors.secondary,
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        list.storeName!,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                          color: colors.onSurface,
-                        ),
-                      ),
-                      SizedBox(height: 1.h),
-                      Text(
-                        'Valgt butikk',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
           if (list.eventDate != null) ...[
             Divider(
               height: 20.h,
@@ -411,6 +444,31 @@ class _SharedListScreenState extends State<SharedListScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildStoreChip(String storeName, ColorScheme colors) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.store, size: 14.r, color: colors.primary),
+          SizedBox(width: 6.w),
+          Text(
+            storeName,
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              color: colors.onSurface,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

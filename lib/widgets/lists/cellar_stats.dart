@@ -5,46 +5,33 @@ import '../../models/user_list.dart';
 
 class CellarStatsWidget extends StatelessWidget {
   final ListStats stats;
+  final bool hidePrice;
 
-  const CellarStatsWidget({super.key, required this.stats});
+  const CellarStatsWidget({super.key, required this.stats, this.hidePrice = false});
 
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 6.w,
-      runSpacing: 6.h,
-      children: [
-        _buildChip(
-          context,
-          Icons.inventory_2_outlined,
-          '${stats.totalBottles} flasker',
-        ),
-        _buildChip(
-          context,
-          Icons.payments_outlined,
-          'Kr ${stats.totalValue.toStringAsFixed(0)}',
-        ),
-        if (stats.oldestYear != null || stats.newestYear != null)
-          _buildChip(
-            context,
-            Icons.calendar_today_outlined,
-            _yearRange,
-          ),
-      ],
-    );
+  static List<Widget> buildChips(
+    BuildContext context,
+    ListStats stats, {
+    bool hidePrice = false,
+  }) {
+    return [
+      _chip(context, Icons.inventory_2_outlined, '${stats.totalBottles} flasker'),
+      if (!hidePrice && stats.totalValue > 0)
+        _chip(context, Icons.payments_outlined, 'Kr ${stats.totalValue.toStringAsFixed(0)}'),
+      if (stats.oldestYear != null || stats.newestYear != null)
+        _chip(context, Icons.calendar_today_outlined, _yearRangeFor(stats)),
+    ];
   }
 
-  String get _yearRange {
+  static String _yearRangeFor(ListStats stats) {
     if (stats.oldestYear != null && stats.newestYear != null) {
       if (stats.oldestYear == stats.newestYear) return '${stats.oldestYear}';
       return '${stats.oldestYear} – ${stats.newestYear}';
     }
-    return stats.oldestYear?.toString() ??
-        stats.newestYear?.toString() ??
-        '-';
+    return stats.oldestYear?.toString() ?? stats.newestYear?.toString() ?? '-';
   }
 
-  Widget _buildChip(BuildContext context, IconData icon, String text) {
+  static Widget _chip(BuildContext context, IconData icon, String text) {
     final colors = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
@@ -67,6 +54,15 @@ class CellarStatsWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 6.w,
+      runSpacing: 6.h,
+      children: buildChips(context, stats, hidePrice: hidePrice),
     );
   }
 }

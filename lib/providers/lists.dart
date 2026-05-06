@@ -19,6 +19,7 @@ class ListsProvider with ChangeNotifier {
   bool _loading = false;
   bool _listsLoaded = false;
   String? _error;
+  int _listRebuildKey = 0;
 
   void update(http.Client client, Auth auth) {
     final wasSignedIn = _auth?.isSignedIn ?? false;
@@ -40,6 +41,7 @@ class ListsProvider with ChangeNotifier {
   bool get loading => _loading;
   bool get listsLoaded => _listsLoaded;
   String? get error => _error;
+  int get listRebuildKey => _listRebuildKey;
 
   bool get isAuthenticated => _auth?.isSignedIn ?? false;
 
@@ -542,6 +544,37 @@ class ListsProvider with ChangeNotifier {
       CrashReporter.recordError(e, st);
       _error = 'Synkronisering feilet';
       notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> followList(String shareToken) async {
+    final token = await _token;
+    if (token == null) return false;
+
+    try {
+      await ListApi.followList(_client, token, shareToken);
+      _listRebuildKey++;
+      await fetchLists();
+      return true;
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
+      return false;
+    }
+  }
+
+  Future<bool> unfollowList(String shareToken) async {
+    final token = await _token;
+    if (token == null) return false;
+
+    try {
+      await ListApi.unfollowList(_client, token, shareToken);
+      _listRebuildKey++;
+      await fetchLists();
+      return true;
+    } catch (e, st) {
+      CrashReporter.recordError(e, st);
+      await fetchLists();
       return false;
     }
   }
