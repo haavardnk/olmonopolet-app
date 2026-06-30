@@ -204,9 +204,9 @@ class _ProductItemState extends State<ProductItem> {
                                       borderRadius:
                                           BorderRadius.circular(2.r),
                                       child: LinearProgressIndicator(
-                                        value: (_product.valueScore!
-                                                    .clamp(0, 20) as double) /
-                                                20,
+                                        value: _product.valueScore!
+                                                .clamp(0.0, 20.0) /
+                                            20,
                                         minHeight: 5.h,
                                         backgroundColor: Theme.of(context)
                                             .colorScheme
