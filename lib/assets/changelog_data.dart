@@ -4,6 +4,18 @@ import '../models/changelog.dart';
 
 const List<ChangelogVersion> changelogVersions = [
   ChangelogVersion(
+    version: '3.2.0',
+    title: 'Hva er nytt?',
+    entries: [
+      ChangelogEntry(
+        icon: Icons.qr_code_scanner_outlined,
+        title: 'Strekkodeskanner',
+        description:
+            'Skann strekkoden på et produkt for å finne ølet raskere i appen.',
+      ),
+    ],
+  ),
+  ChangelogVersion(
     version: '3.1.1',
     title: 'Hva er nytt?',
     entries: [
