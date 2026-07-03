@@ -1,9 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:beermonopoly/services/api.dart';
 import 'package:beermonopoly/utils/exceptions.dart';
 import 'package:beermonopoly/providers/filter.dart';
@@ -17,6 +18,10 @@ class FakeUri extends Fake implements Uri {}
 void main() {
   late MockClient mockClient;
   late Filter filter;
+
+  setUpAll(() {
+    dotenv.loadFromString(envString: 'API_BASE_URL=https://api.example.com/');
+  });
 
   setUp(() {
     mockClient = MockClient();
@@ -62,7 +67,7 @@ void main() {
         "check stock of two beers in one store",
         () async {
           when(() => mockClient.get(
-                Uri.parse('https://api.example.com/'),
+                any(),
               )).thenAnswer(((_) async {
             return http.Response(
               '{"count":2,"next":null,"previous":null,"results":[{"vmp_id":1053802,"stock":8},{"vmp_id":1336902,"stock":7}]}',
@@ -90,6 +95,7 @@ void main() {
         () async {
           when(() => mockClient.get(
                 any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             return http.Response('', 400);
           }));
@@ -109,6 +115,7 @@ void main() {
         () async {
           when(() => mockClient.get(
                 any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             throw const SocketException('No connection');
           }));
@@ -127,9 +134,8 @@ void main() {
         "get stock change from store when not signed in",
         () async {
           when(() => mockClient.get(
-                Uri.parse(
-                  'https://api.example.com/',
-                ),
+                any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             return http.Response(
               """
@@ -196,6 +202,7 @@ void main() {
         () async {
           when(() => mockClient.get(
                 any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             return http.Response('', 400);
           }));
@@ -215,6 +222,7 @@ void main() {
         () async {
           when(() => mockClient.get(
                 any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             throw const SocketException('No connection');
           }));
@@ -235,9 +243,8 @@ void main() {
           filter.style = 'mead';
           filter.ppvLow = '2.3';
           when(() => mockClient.get(
-                Uri.parse(
-                  'https://api.example.com/',
-                ),
+                any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             return http.Response(
               """
@@ -315,6 +322,7 @@ void main() {
         () async {
           when(() => mockClient.get(
                 any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             return http.Response('', 400);
           }));
@@ -333,6 +341,7 @@ void main() {
         () async {
           when(() => mockClient.get(
                 any(),
+                headers: any(named: 'headers'),
               )).thenAnswer(((_) async {
             throw const SocketException('No connection');
           }));
@@ -341,6 +350,100 @@ void main() {
             () => ApiHelper.getProductsByIds(mockClient, '1,2,3'),
             throwsA(
               isA<NetworkException>(),
+            ),
+          );
+        },
+      );
+    },
+  );
+
+  group(
+    'getProductByBarcode',
+    () {
+      test(
+        "parses Product from a single object response",
+        () async {
+          when(() => mockClient.get(
+                any(),
+                headers: any(named: 'headers'),
+              )).thenAnswer(((_) async {
+            return http.Response.bytes(
+              utf8.encode(
+                '{"vmp_id":1053802,"vmp_name":"Nøgne Ø Imperial Stout",'
+                '"style":"Imperial Stout","price":74.9,"volume":0.5}',
+              ),
+              200,
+            );
+          }));
+
+          final product =
+              await ApiHelper.getProductByBarcode(mockClient, '7090008090472');
+
+          expect(
+            product,
+            const Product(
+              id: 1053802,
+              name: "Nøgne Ø Imperial Stout",
+              style: "Imperial Stout",
+              price: 74.9,
+              volume: 0.5,
+            ),
+          );
+        },
+      );
+
+      test(
+        "raises NotFoundException on status code 404",
+        () async {
+          when(() => mockClient.get(
+                any(),
+                headers: any(named: 'headers'),
+              )).thenAnswer(((_) async {
+            return http.Response('', 404);
+          }));
+
+          expect(
+            () => ApiHelper.getProductByBarcode(mockClient, '000'),
+            throwsA(
+              isA<NotFoundException>(),
+            ),
+          );
+        },
+      );
+
+      test(
+        "raises NetworkException on SocketException",
+        () async {
+          when(() => mockClient.get(
+                any(),
+                headers: any(named: 'headers'),
+              )).thenAnswer(((_) async {
+            throw const SocketException('No connection');
+          }));
+
+          expect(
+            () => ApiHelper.getProductByBarcode(mockClient, '7090008090472'),
+            throwsA(
+              isA<NetworkException>(),
+            ),
+          );
+        },
+      );
+
+      test(
+        "raises ServerException on status code 503",
+        () async {
+          when(() => mockClient.get(
+                any(),
+                headers: any(named: 'headers'),
+              )).thenAnswer(((_) async {
+            return http.Response('', 503);
+          }));
+
+          expect(
+            () => ApiHelper.getProductByBarcode(mockClient, '7090008090472'),
+            throwsA(
+              isA<ServerException>(),
             ),
           );
         },

@@ -125,6 +125,23 @@ class ApiHelper {
     );
   }
 
+  static Future<Product> getProductByBarcode(
+    http.Client client,
+    String barcode, {
+    String? token,
+  }) async {
+    final endpoint = 'beers/barcode/?code=$barcode';
+    return _handleRequest(
+      request: () => client.get(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: _authHeaders(token),
+      ),
+      parser: (json) => Product.fromJson(json as Map<String, dynamic>),
+      endpoint: endpoint,
+      expectResultsKey: false,
+    );
+  }
+
   static Future<List<StockInfo>> getProductStock(
     http.Client client,
     int productId,
