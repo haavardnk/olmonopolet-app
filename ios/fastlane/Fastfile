@@ -103,11 +103,16 @@ platform :ios do
       archive_path: "../build/ios/archive/Runner.xcarchive",
     )
 
-    # If GoogleService-Info.plist exists and Pods/FirebaseCrashlytics exists
-    # Upload symbols to Firebase Crashlytics
-    if File.file?("../ios/Runner/GoogleService-Info.plist") && File.directory?("../ios/Pods/FirebaseCrashlytics")
+    gsp_path = "../ios/Runner/GoogleService-Info.plist"
+    crashlytics_binary_path = Dir[File.expand_path("~/Library/Developer/Xcode/DerivedData/*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols")]
+      .max_by { |file| File.mtime(file) }
+    dsym_paths = Dir["../build/ios/archive/Runner.xcarchive/dSYMs/*.dSYM"]
+
+    if File.file?(gsp_path) && !crashlytics_binary_path.nil? && dsym_paths.any?
       upload_symbols_to_crashlytics(
-        gsp_path: "../ios/Runner/GoogleService-Info.plist"
+        gsp_path: gsp_path,
+        binary_path: crashlytics_binary_path,
+        dsym_paths: dsym_paths
       )
     end
 

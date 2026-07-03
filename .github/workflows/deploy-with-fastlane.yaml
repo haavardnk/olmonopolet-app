@@ -42,7 +42,7 @@ jobs:
       - name: Run Flutter tasks
         uses: subosito/flutter-action@v2.16.0
         with:
-          flutter-version: "3.41.7"
+          flutter-version: "3.44.4"
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -60,7 +60,10 @@ jobs:
       - name: Run flutterfire configure
         run: flutterfire configure --platforms ${{ env.FLUTTERFIRE_PLATFORM }} --project ${{ secrets.FIREBASE_PROJECT_ID }} --yes --token ${{ secrets.FIREBASE_TOKEN }}
 
-      - uses: maierj/fastlane-action@v3.1.0
+      - name: Remove broken Crashlytics build phase
+        run: ruby scripts/remove_flutterfire_crashlytics_build_phase.rb ios/Runner.xcodeproj
+
+      - uses: maierj/fastlane-action@v3.2.0
         with:
           lane: "release_app_store"
           subdirectory: ios
@@ -106,7 +109,7 @@ jobs:
       - name: Run Flutter tasks
         uses: subosito/flutter-action@v2.16.0
         with:
-          flutter-version: "3.41.7"
+          flutter-version: "3.44.4"
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -140,7 +143,7 @@ jobs:
       - name: Run flutterfire configure
         run: flutterfire configure --platforms android --project ${{ secrets.FIREBASE_PROJECT_ID }} --yes --token ${{ secrets.FIREBASE_TOKEN }}
 
-      - uses: maierj/fastlane-action@v3.1.0
+      - uses: maierj/fastlane-action@v3.2.0
         with:
           lane: "release_play_store"
           subdirectory: android
