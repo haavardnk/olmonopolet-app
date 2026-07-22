@@ -13,6 +13,7 @@ class ListApi {
   static Map<String, String> _headers(String token) => {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
+        'X-Api-Key': Environment.apiKey,
       };
 
   static T _handleResponse<T>({
@@ -91,8 +92,7 @@ class ListApi {
       );
       return _handleResponse(
         response: response,
-        parser: (json) =>
-            UserList.fromJson(json as Map<String, dynamic>),
+        parser: (json) => UserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
       );
     } on SocketException {
@@ -135,8 +135,7 @@ class ListApi {
       );
       return _handleResponse(
         response: response,
-        parser: (json) =>
-            UserList.fromJson(json as Map<String, dynamic>),
+        parser: (json) => UserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
       );
     } on SocketException {
@@ -186,8 +185,7 @@ class ListApi {
       );
       return _handleResponse(
         response: response,
-        parser: (json) =>
-            UserList.fromJson(json as Map<String, dynamic>),
+        parser: (json) => UserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
       );
     } on SocketException {
@@ -263,8 +261,7 @@ class ListApi {
       );
       return _handleResponse(
         response: response,
-        parser: (json) =>
-            ListItem.fromJson(json as Map<String, dynamic>),
+        parser: (json) => ListItem.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
       );
     } on SocketException {
@@ -295,8 +292,7 @@ class ListApi {
       );
       return _handleResponse(
         response: response,
-        parser: (json) =>
-            ListItem.fromJson(json as Map<String, dynamic>),
+        parser: (json) => ListItem.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
       );
     } on SocketException {
@@ -360,8 +356,7 @@ class ListApi {
       );
       return _handleResponse(
         response: response,
-        parser: (json) =>
-            SharedUserList.fromJson(json as Map<String, dynamic>),
+        parser: (json) => SharedUserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
       );
     } on SocketException {
@@ -402,7 +397,8 @@ class ListApi {
         headers: _headers(token),
       );
       if (response.statusCode != 204 && response.statusCode != 404) {
-        throw ApiException(message: 'Failed to unfollow list', endpoint: endpoint);
+        throw ApiException(
+            message: 'Failed to unfollow list', endpoint: endpoint);
       }
     } on SocketException {
       throw const NetworkException();

@@ -78,8 +78,9 @@ class ApiHelper {
   }
 
   static Map<String, String> _authHeaders(String? token) {
-    if (token == null) return {};
-    return {'Authorization': 'Bearer $token'};
+    final headers = {'X-Api-Key': Environment.apiKey};
+    if (token != null) headers['Authorization'] = 'Bearer $token';
+    return headers;
   }
 
   static Future<Product> getProductDetails(
@@ -272,7 +273,8 @@ class ApiHelper {
         'vmp_url,untpd_url,untpd_id,country,country_code,is_christmas_beer,user_tasted';
     final idCount = productIds.split(',').length;
     final pageSize = idCount.clamp(1, 1000);
-    final endpoint = 'beers/?beers=$productIds&fields=$fields&page_size=$pageSize';
+    final endpoint =
+        'beers/?beers=$productIds&fields=$fields&page_size=$pageSize';
 
     return _handleRequest(
       request: () => client.get(
