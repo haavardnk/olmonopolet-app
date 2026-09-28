@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -176,6 +176,8 @@ class _MyAppState extends State<MyApp> {
                 theme: theme,
                 darkTheme: darkTheme,
                 routerConfig: goRouter,
+                builder: (context, child) =>
+                    MaterialUiCompatibilityBridge(child: child!),
               ),
               onInitialized: (context, rateMyApp) {
                 if (rateMyApp.shouldOpenDialog) {

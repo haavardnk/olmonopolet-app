@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Widget createRatingBar(
     {double rating = 5, double size = 24, required Color color}) {

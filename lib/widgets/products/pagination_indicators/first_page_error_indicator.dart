@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import './first_page_exception_indicator.dart';
 
 class FirstPageErrorIndicator extends StatelessWidget {

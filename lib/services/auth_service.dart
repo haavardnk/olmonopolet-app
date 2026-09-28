@@ -7,14 +7,27 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthService {
+  static final Future<void> _googleSignInReady =
+      GoogleSignIn.instance.initialize();
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
+  Future<GoogleSignInAccount?> _authenticateWithGoogle() async {
+    await _googleSignInReady;
+    try {
+      return await GoogleSignIn.instance.authenticate();
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return null;
+      rethrow;
+    }
+  }
+
   Future<UserCredential> signInWithGoogle() async {
-    final googleUser = await GoogleSignIn().signIn();
+    final googleUser = await _authenticateWithGoogle();
     if (googleUser == null) {
       throw FirebaseAuthException(
         code: 'sign-in-cancelled',
@@ -22,10 +35,8 @@ class AuthService {
       );
     }
 
-    final googleAuth = await googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+      idToken: googleUser.authentication.idToken,
     );
 
     return _auth.signInWithCredential(credential);
@@ -88,7 +99,8 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
+    await _googleSignInReady;
+    await GoogleSignIn.instance.signOut();
     await _auth.signOut();
   }
 
@@ -99,12 +111,10 @@ class AuthService {
   }
 
   Future<void> reauthenticateWithGoogle() async {
-    final googleUser = await GoogleSignIn().signIn();
+    final googleUser = await _authenticateWithGoogle();
     if (googleUser == null) return;
-    final googleAuth = await googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+      idToken: googleUser.authentication.idToken,
     );
     await _auth.currentUser?.reauthenticateWithCredential(credential);
   }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide SearchBar;
+import 'package:material_ui/material_ui.dart' hide SearchBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
