@@ -97,6 +97,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
               ReleaseFilter(parentSetState: setState),
               const Divider(height: 16),
               ProductSelectionFilter(parentSetState: setState),
+              PackageTypeFilter(parentSetState: setState),
               AllergensFilter(parentSetState: setState),
               DeliveryFilter(parentSetState: setState),
               SizedBox(height: 8.h),

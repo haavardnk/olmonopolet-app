@@ -12,6 +12,7 @@ import '../../assets/constants.dart';
 import '../../services/api.dart';
 import '../../utils/crash_reporter.dart';
 import '../../utils/date_utils.dart';
+import 'chip_filters.dart';
 import 'filter_section.dart';
 import 'multi_select_dropdown.dart';
 import 'range_filters.dart';
@@ -125,6 +126,7 @@ class _ReleaseFilterSheetContentState
                 client: widget.client,
               ),
               const Divider(height: 16),
+              _ReleasePackageTypeFilter(parentSetState: setState),
               _ReleaseAllergensFilter(parentSetState: setState),
               SizedBox(height: 8.h),
             ],
@@ -847,6 +849,34 @@ class _ReleaseMainCategoryFilter extends StatelessWidget {
             );
           }),
         ),
+      ),
+    );
+  }
+}
+
+class _ReleasePackageTypeFilter extends StatelessWidget {
+  final StateSetter parentSetState;
+
+  const _ReleasePackageTypeFilter({required this.parentSetState});
+
+  @override
+  Widget build(BuildContext context) {
+    final filters = Provider.of<Filter>(context, listen: false);
+
+    return Consumer<Filter>(
+      builder: (context, flt, _) => ChipFilter(
+        title: 'Emballasje',
+        icon: Icons.inventory_2_outlined,
+        options: packageTypeList.map((e) => e.keys.first).toList(),
+        selectedList: filters.releasePackageTypeSelectedList,
+        onChanged: filters.setReleasePackageType,
+        parentSetState: parentSetState,
+        onToggleAll: () => parentSetState(() {
+          filters.releasePackageTypeSelectedList =
+              List<bool>.filled(packageTypeList.length, false);
+          filters.releasePackageType = '';
+          filters.setFilters();
+        }),
       ),
     );
   }

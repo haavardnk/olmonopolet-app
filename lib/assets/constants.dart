@@ -66,3 +66,9 @@ const List<Map<String, String>> mainCategoryList = [
   {'Mjød': 'mjød'},
   {'Sider': 'sider'},
 ];
+
+const List<Map<String, String>> packageTypeList = [
+  {'Flaske': 'bottle'},
+  {'Boks': 'can'},
+  {'Annet': 'other'},
+];

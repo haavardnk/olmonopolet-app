@@ -133,6 +133,29 @@ class ProductSelectionFilter extends StatelessWidget {
   }
 }
 
+class PackageTypeFilter extends StatelessWidget {
+  final StateSetter parentSetState;
+
+  const PackageTypeFilter({super.key, required this.parentSetState});
+
+  @override
+  Widget build(BuildContext context) {
+    final filters = Provider.of<Filter>(context, listen: false);
+
+    return Consumer<Filter>(
+      builder: (context, flt, _) => ChipFilter(
+        title: 'Emballasje',
+        icon: Icons.inventory_2_outlined,
+        options: packageTypeList.map((e) => e.keys.first).toList(),
+        selectedList: filters.packageTypeSelectedList,
+        onChanged: filters.setPackageType,
+        parentSetState: parentSetState,
+        onToggleAll: () => parentSetState(filters.resetPackageType),
+      ),
+    );
+  }
+}
+
 class ChristmasBeerFilter extends StatelessWidget {
   final StateSetter parentSetState;
 

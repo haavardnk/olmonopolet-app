@@ -10,6 +10,7 @@ import 'package:beermonopoly/utils/exceptions.dart';
 import 'package:beermonopoly/providers/filter.dart';
 import 'package:beermonopoly/models/stock_change.dart';
 import 'package:beermonopoly/models/product.dart';
+import 'package:beermonopoly/models/release.dart';
 
 class MockClient extends Mock implements http.Client {}
 
@@ -233,6 +234,39 @@ void main() {
             throwsA(
               isA<NetworkException>(),
             ),
+          );
+        },
+      );
+
+      test(
+        "sends package_type only when selected",
+        () async {
+          when(() => mockClient.get(
+                any(),
+                headers: any(named: 'headers'),
+              )).thenAnswer(((_) async {
+            return http.Response('{"results": []}', 200);
+          }));
+          final release = Release(name: 'Lansering', productSelections: []);
+
+          await ApiHelper.getProductList(mockClient,
+              filter: filter, page: 1, pageSize: 1);
+          await ApiHelper.getProductList(mockClient,
+              filter: filter, page: 1, pageSize: 1, release: release);
+          filter.packageType = 'bottle,can';
+          filter.releasePackageType = 'can';
+          await ApiHelper.getProductList(mockClient,
+              filter: filter, page: 1, pageSize: 1);
+          await ApiHelper.getProductList(mockClient,
+              filter: filter, page: 1, pageSize: 1, release: release);
+
+          final urls = verify(() => mockClient.get(
+                captureAny(),
+                headers: any(named: 'headers'),
+              )).captured.cast<Uri>();
+          expect(
+            urls.map((u) => u.queryParameters['package_type']),
+            [null, null, 'bottle,can', 'can'],
           );
         },
       );

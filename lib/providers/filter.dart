@@ -31,6 +31,7 @@ class Filter with ChangeNotifier {
   bool christmasBeerOnly = false;
   String userTasted = '';
   String mainCategory = '';
+  String packageType = '';
 
   RangeValues priceRange = const RangeValues(0, 500);
   RangeValues pricePerVolumeRange = const RangeValues(0, 1000);
@@ -52,6 +53,9 @@ class Filter with ChangeNotifier {
   RangeValues releaseAlcoholRange = const RangeValues(0, 15);
   String releaseMainCategory = '';
   List<bool> releaseMainCategorySelectedList = List<bool>.filled(3, false);
+  String releasePackageType = '';
+  List<bool> releasePackageTypeSelectedList =
+      List<bool>.filled(packageTypeList.length, false);
   List<String> releaseSelectedStyles = [];
   List<String> releaseSelectedCountries = [];
   List<bool> releaseExcludeAllergensSelectedList = List<bool>.filled(4, false);
@@ -70,6 +74,8 @@ class Filter with ChangeNotifier {
   List<bool> excludeAllergensSelectedList = List<bool>.filled(4, false);
   List<bool> deliverySelectedList = List<bool>.filled(2, false);
   List<bool> mainCategorySelectedList = List<bool>.filled(3, false);
+  List<bool> packageTypeSelectedList =
+      List<bool>.filled(packageTypeList.length, false);
   List<bool> releaseSelectedList = [];
 
   late http.Client _client;
@@ -88,6 +94,7 @@ class Filter with ChangeNotifier {
     {'name': 'style', 'text': 'Stil', 'save': false},
     {'name': 'country', 'text': 'Land', 'save': false},
     {'name': 'productSelection', 'text': 'Produktutvalg', 'save': false},
+    {'name': 'packageType', 'text': 'Emballasje', 'save': false},
     {'name': 'excludeAllergens', 'text': 'Allergener', 'save': false},
     {'name': 'delivery', 'text': 'Bestilling', 'save': false},
     {'name': 'stockChangeStoreId', 'text': 'Lager inn/ut butikk', 'save': true},
@@ -344,6 +351,23 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
+  void setPackageType(int index, bool boolean) {
+    packageTypeSelectedList[index] = boolean;
+    packageType = [
+      for (final (i, selected) in packageTypeSelectedList.indexed)
+        if (selected) packageTypeList[i].values.first,
+    ].join(',');
+    notifyListeners();
+    saveFilters();
+  }
+
+  void resetPackageType() {
+    packageTypeSelectedList = List<bool>.filled(packageTypeList.length, false);
+    packageType = '';
+    notifyListeners();
+    saveFilters();
+  }
+
   void setRelease(int index, bool boolean) {
     releaseSelectedList[index] = boolean;
     var temporaryRelease = '';
@@ -498,6 +522,15 @@ class Filter with ChangeNotifier {
     notifyListeners();
   }
 
+  void setReleasePackageType(int index, bool boolean) {
+    releasePackageTypeSelectedList[index] = boolean;
+    releasePackageType = [
+      for (final (i, selected) in releasePackageTypeSelectedList.indexed)
+        if (selected) packageTypeList[i].values.first,
+    ].join(',');
+    notifyListeners();
+  }
+
   void setReleaseExcludeAllergensSelection(int index, bool boolean) {
     releaseExcludeAllergensSelectedList[index] = boolean;
     var temporarySelection = '';
@@ -542,6 +575,9 @@ class Filter with ChangeNotifier {
     releaseExcludeAllergensSelectedList = List<bool>.filled(4, false);
     releaseMainCategory = '';
     releaseMainCategorySelectedList = List<bool>.filled(3, false);
+    releasePackageType = '';
+    releasePackageTypeSelectedList =
+        List<bool>.filled(packageTypeList.length, false);
     releaseProductSelectionChoice = '';
     releaseSortIndex = 'Global rating - Høy til lav';
     releaseSortBy = '-rating';
@@ -554,6 +590,7 @@ class Filter with ChangeNotifier {
     excludeAllergensSelectedList = List<bool>.filled(4, false);
     deliverySelectedList = List<bool>.filled(2, false);
     mainCategorySelectedList = List<bool>.filled(3, false);
+    packageTypeSelectedList = List<bool>.filled(packageTypeList.length, false);
     releaseSelectedList = List<bool>.filled(releaseList.length, false);
     priceRange = const RangeValues(0, 500);
     pricePerVolumeRange = const RangeValues(0, 1000);
@@ -577,6 +614,7 @@ class Filter with ChangeNotifier {
     christmasBeerOnly = false;
     userTasted = '';
     mainCategory = '';
+    packageType = '';
     notifyListeners();
     saveFilters();
   }
@@ -673,6 +711,14 @@ class Filter with ChangeNotifier {
       if (filter['name'] == 'userTasted' && filter['save'] == true) {
         prefs.setString('userTasted', userTasted);
       }
+      if (filter['name'] == 'packageType' && filter['save'] == true) {
+        prefs.setString('packageType', packageType);
+        prefs.setStringList(
+            'packageTypeSelectedList',
+            packageTypeSelectedList
+                .map((e) => e == true ? 'true' : 'false')
+                .toList());
+      }
     }
   }
 
@@ -761,6 +807,13 @@ class Filter with ChangeNotifier {
       }
       if (filter['name'] == 'userTasted' && filter['save'] == true) {
         userTasted = prefs.getString('userTasted') ?? '';
+      }
+      if (filter['name'] == 'packageType' && filter['save'] == true) {
+        packageType = prefs.getString('packageType') ?? '';
+        var tempList = prefs.getStringList('packageTypeSelectedList');
+        packageTypeSelectedList = tempList != null
+            ? tempList.map((e) => e == "true").toList()
+            : List<bool>.filled(packageTypeList.length, false);
       }
     }
     notifyListeners();

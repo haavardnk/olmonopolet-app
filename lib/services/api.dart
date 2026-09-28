@@ -446,6 +446,9 @@ class ApiHelper {
     if (filter.userTasted.isNotEmpty) {
       params['user_tasted'] = filter.userTasted;
     }
+    if (filter.packageType.isNotEmpty) {
+      params['package_type'] = filter.packageType;
+    }
 
     return Uri.parse('${_baseUrl}beers/').replace(queryParameters: params);
   }
@@ -493,6 +496,9 @@ class ApiHelper {
     }
     if (filter.releaseMainCategory.isNotEmpty) {
       params['main_category'] = filter.releaseMainCategory;
+    }
+    if (filter.releasePackageType.isNotEmpty) {
+      params['package_type'] = filter.releasePackageType;
     }
     if (filter.releaseExcludeAllergens.isNotEmpty) {
       params['exclude_allergen'] = filter.releaseExcludeAllergens;
