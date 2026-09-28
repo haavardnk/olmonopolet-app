@@ -30,7 +30,7 @@ class ReleaseItem extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12.r),
         onTap: () {
-          if (filters.filterSaveSettings[12]['save'] == false) {
+          if (filters.releaseSortBySaveSetting['save'] == false) {
             filters.releaseSortBy = '-rating';
             filters.releaseSortIndex = 'Global rating - Høy til lav';
           }

@@ -80,9 +80,9 @@ class _ReleaseSortState extends State<ProductOverviewReleaseSort> {
                         Transform.scale(
                           scale: 0.8,
                           child: Switch(
-                            value: filters.filterSaveSettings[12]['save'],
+                            value: filters.releaseSortBySaveSetting['save'],
                             onChanged: (bool newValue) {
-                              filters.filterSaveSettings[12]['save'] = newValue;
+                              filters.releaseSortBySaveSetting['save'] = newValue;
                               filters.saveFilterSettings();
                             },
                           ),

@@ -94,6 +94,9 @@ class Filter with ChangeNotifier {
     {'name': 'releaseSortBy', 'text': 'Lanseringer Sortering', 'save': true},
   ];
 
+  Map<String, dynamic> get releaseSortBySaveSetting =>
+      filterSaveSettings.firstWhere((e) => e['name'] == 'releaseSortBy');
+
   Filter get filters {
     return this;
   }
