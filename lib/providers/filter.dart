@@ -308,6 +308,14 @@ class Filter with ChangeNotifier {
     saveFilters();
   }
 
+  void resetProductSelection() {
+    productSelectionSelectedList =
+        List<bool>.filled(productSelectionList.length, false);
+    productSelection = '';
+    notifyListeners();
+    saveFilters();
+  }
+
   void setExcludeAllergensSelection(int index, bool boolean) {
     excludeAllergensSelectedList[index] = boolean;
     var temporaryProductSelection = '';
@@ -322,6 +330,14 @@ class Filter with ChangeNotifier {
       },
     );
     excludeAllergens = temporaryProductSelection;
+    notifyListeners();
+    saveFilters();
+  }
+
+  void resetExcludeAllergens() {
+    excludeAllergensSelectedList =
+        List<bool>.filled(excludeAllergensList.length, false);
+    excludeAllergens = '';
     notifyListeners();
     saveFilters();
   }
@@ -349,6 +365,12 @@ class Filter with ChangeNotifier {
     mainCategory = temp;
     notifyListeners();
     saveFilters();
+  }
+
+  void resetMainCategory() {
+    mainCategorySelectedList = List<bool>.filled(mainCategoryList.length, false);
+    mainCategory = '';
+    setStyle();
   }
 
   void setPackageType(int index, bool boolean) {

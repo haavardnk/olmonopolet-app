@@ -27,4 +27,33 @@ void main() {
       expect(filter.packageTypeSelectedList, [false, false, false]);
     });
   }
+
+  for (final (name, select, reset, value) in [
+    (
+      'mainCategory',
+      (Filter f) => f.setMainCategory(0, true),
+      (Filter f) => f.resetMainCategory(),
+      (Filter f) => f.mainCategory,
+    ),
+    (
+      'productSelection',
+      (Filter f) => f.setProductSelection(0, true),
+      (Filter f) => f.resetProductSelection(),
+      (Filter f) => f.productSelection,
+    ),
+    (
+      'excludeAllergens',
+      (Filter f) => f.setExcludeAllergensSelection(0, true),
+      (Filter f) => f.resetExcludeAllergens(),
+      (Filter f) => f.excludeAllergens,
+    ),
+  ]) {
+    test('reset clears $name query value', () {
+      final filter = Filter();
+      select(filter);
+      expect(value(filter), isNotEmpty);
+      reset(filter);
+      expect(value(filter), '');
+    });
+  }
 }

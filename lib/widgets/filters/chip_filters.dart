@@ -96,11 +96,7 @@ class AllergensFilter extends StatelessWidget {
         selectedList: filters.excludeAllergensSelectedList,
         onChanged: filters.setExcludeAllergensSelection,
         parentSetState: parentSetState,
-        onToggleAll: () => parentSetState(() {
-          filters.excludeAllergensSelectedList =
-              List<bool>.filled(excludeAllergensList.length, false);
-          filters.setFilters();
-        }),
+        onToggleAll: () => parentSetState(filters.resetExcludeAllergens),
       ),
     );
   }
@@ -123,11 +119,7 @@ class ProductSelectionFilter extends StatelessWidget {
         selectedList: filters.productSelectionSelectedList,
         onChanged: filters.setProductSelection,
         parentSetState: parentSetState,
-        onToggleAll: () => parentSetState(() {
-          filters.productSelectionSelectedList =
-              List<bool>.filled(productSelectionList.length, false);
-          filters.setFilters();
-        }),
+        onToggleAll: () => parentSetState(filters.resetProductSelection),
       ),
     );
   }
@@ -225,11 +217,7 @@ class MainCategoryFilter extends StatelessWidget {
         selectedList: filters.mainCategorySelectedList,
         onChanged: filters.setMainCategory,
         parentSetState: parentSetState,
-        onToggleAll: () => parentSetState(() {
-          filters.mainCategorySelectedList =
-              List<bool>.filled(mainCategoryList.length, false);
-          filters.setFilters();
-        }),
+        onToggleAll: () => parentSetState(filters.resetMainCategory),
       ),
     );
   }
