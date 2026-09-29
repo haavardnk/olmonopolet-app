@@ -64,7 +64,7 @@ class ListApi {
         Uri.parse('$_baseUrl$endpoint'),
         headers: _headers(token),
       );
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: (json) {
           final list = json is List ? json : (json['results'] as List);
@@ -90,7 +90,7 @@ class ListApi {
         Uri.parse('$_baseUrl$endpoint'),
         headers: _headers(token),
       );
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: (json) => UserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
@@ -133,7 +133,7 @@ class ListApi {
         headers: _headers(token),
         body: json.encode(body),
       );
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: (json) => UserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
@@ -183,7 +183,7 @@ class ListApi {
         headers: _headers(token),
         body: json.encode(body),
       );
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: (json) => UserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
@@ -259,7 +259,7 @@ class ListApi {
         headers: _headers(token),
         body: json.encode(body),
       );
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: (json) => ListItem.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
@@ -290,7 +290,7 @@ class ListApi {
         headers: _headers(token),
         body: json.encode(body),
       );
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: (json) => ListItem.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,
@@ -354,7 +354,7 @@ class ListApi {
       final response = await client.get(
         Uri.parse('$_baseUrl$endpoint'),
       );
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: (json) => SharedUserList.fromJson(json as Map<String, dynamic>),
         endpoint: endpoint,

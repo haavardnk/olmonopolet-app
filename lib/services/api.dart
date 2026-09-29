@@ -24,7 +24,7 @@ class ApiHelper {
   }) async {
     try {
       final response = await request();
-      return _handleResponse(
+      return await _handleResponse(
         response: response,
         parser: parser,
         endpoint: endpoint,

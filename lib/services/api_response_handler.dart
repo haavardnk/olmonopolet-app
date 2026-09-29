@@ -59,7 +59,7 @@ Future<T> handleApiRequest<T>({
 }) async {
   try {
     final response = await request();
-    return handleApiResponse(
+    return await handleApiResponse(
       response: response,
       parser: parser,
       endpoint: endpoint,
