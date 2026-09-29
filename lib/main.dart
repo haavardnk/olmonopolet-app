@@ -177,6 +177,7 @@ class _MyAppState extends State<MyApp> {
                 darkTheme: darkTheme,
                 routerConfig: goRouter,
                 builder: (context, child) =>
+                    // ignore: deprecated_member_use
                     MaterialUiCompatibilityBridge(child: child!),
               ),
               onInitialized: (context, rateMyApp) {
@@ -194,6 +195,7 @@ class _MyAppState extends State<MyApp> {
                             await rateMyApp.callEvent(
                               RateMyAppEventType.rateButtonPressed,
                             );
+                            if (!context.mounted) return;
                             Navigator.pop<RateMyAppDialogButton>(
                               context,
                               RateMyAppDialogButton.rate,

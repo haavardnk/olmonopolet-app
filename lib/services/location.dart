@@ -31,7 +31,9 @@ class LocationHelper {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     var location = await Geolocator.getLastKnownPosition();
-    location ??= await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 15));
+    location ??= await Geolocator.getCurrentPosition(
+        locationSettings:
+            const LocationSettings(timeLimit: Duration(seconds: 15)));
 
     return location;
   }

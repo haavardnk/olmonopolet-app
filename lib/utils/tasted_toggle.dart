@@ -12,10 +12,10 @@ import '../utils/exceptions.dart';
 Future<Product?> toggleTasted(BuildContext context, Product product) async {
   final auth = Provider.of<Auth>(context, listen: false);
   if (!auth.isSignedIn) return null;
-  final token = await auth.getIdToken();
-  if (token == null) return null;
   final http.Client client =
       Provider.of<HttpClient>(context, listen: false).apiClient;
+  final token = await auth.getIdToken();
+  if (token == null) return null;
   try {
     if (product.userTasted) {
       await ApiHelper.unmarkTasted(client, product.id, token);

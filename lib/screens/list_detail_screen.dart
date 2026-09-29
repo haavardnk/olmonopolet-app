@@ -151,7 +151,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     final filters = Provider.of<Filter>(context, listen: false);
     if (filters.storeList.isEmpty) {
       await filters.getStores();
-      if (filters.storeList.isEmpty) return;
+      if (filters.storeList.isEmpty || !mounted) return;
     }
 
     final selected = await showStorePicker(
